@@ -1,0 +1,30 @@
+:root {
+  --paper: #F7F2E8;
+  --paper-2: #EFE8D8;
+  --ink: #1B1712;
+  --ink-2: #5B5448;
+  --line: #D9D0BC;
+
+  /* thread colours: one per interest, used for card accents and graph lines */
+  --clay: #B8452E;   /* primary action */
+  --saffron: #D9942A;
+  --moss: #4F7A57;
+  --indigo: #3347A8;
+  --rose: #C0527E;
+  --teal: #2A8C8C;
+  --plum: #7A4A7A;
+
+  --onchain: #836EF9;   /* reserved ONLY for verified/onchain UI */
+
+  --radius: 6px;
+  --shadow-hard: 3px 3px 0 var(--ink);
+}
+
+:root[data-theme="dark"] {
+  --paper: #14110D;
+  --paper-2: #1E1A14;
+  --ink: #F2EBDD;
+  --ink-2: #A89F8E;
+  --line: #3A3326;
+  --shadow-hard: 3px 3px 0 #000000;
+}
