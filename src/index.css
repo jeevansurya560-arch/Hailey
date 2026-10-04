@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import "./styles/tokens.css";
+@import "tailwindcss";
 
 @theme {
   --font-serif: 'Fraunces', Georgia, serif;
@@ -25,24 +25,26 @@
   --shadow-hard: var(--shadow-hard);
 }
 
-* {
-  border-color: var(--line);
-}
+@layer base {
+  * {
+    border-color: var(--line);
+  }
 
-body {
-  background-color: var(--paper);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-}
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
 
-h1, h2, h3, h4, .font-display {
-  font-family: var(--font-serif);
-}
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-serif);
+  }
 
-code, pre, .font-mono {
-  font-family: var(--font-mono);
+  code, pre, .font-mono {
+    font-family: var(--font-mono);
+  }
 }
