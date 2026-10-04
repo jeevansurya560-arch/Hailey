@@ -1,0 +1,39 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from '@/features/auth/AuthContext'
+import { AppShell } from '@/app/AppShell'
+import { HomePage } from '@/app/routes/HomePage'
+import { ExplorePage } from '@/app/routes/ExplorePage'
+import { ProfilePage } from '@/app/routes/ProfilePage'
+import { AuthPage } from '@/features/auth/AuthPage'
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+})
+
+export function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<AppShell />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/u/:handle" element={<ProfilePage />} />
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
+  )
+}
+
+export default App
