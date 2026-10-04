@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { User, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
+import { LazyWalletSection } from '@/features/wallet/LazyWalletSection'
 
 export function ProfilePage() {
   const { handle } = useParams<{ handle: string }>()
@@ -12,7 +13,7 @@ export function ProfilePage() {
     <div className="space-y-6">
       {/* Profile Header */}
       <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)]">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 border border-[var(--ink)] bg-[var(--paper)] flex items-center justify-center">
               <User className="h-8 w-8 text-[var(--ink-2)]" />
@@ -34,11 +35,14 @@ export function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 border border-[var(--onchain)]/30 bg-[var(--paper)] px-3 py-1.5 text-xs">
-            <ShieldCheck className="h-4 w-4 text-[var(--onchain)]" />
-            <span className="font-mono text-[11px] text-[var(--ink)]">
-              Attestations: <strong>0</strong>
-            </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <LazyWalletSection />
+            <div className="flex items-center gap-2 border border-[var(--onchain)]/30 bg-[var(--paper)] px-3 py-1.5 text-xs">
+              <ShieldCheck className="h-4 w-4 text-[var(--onchain)]" />
+              <span className="font-mono text-[11px] text-[var(--ink)]">
+                Attestations: <strong>0</strong>
+              </span>
+            </div>
           </div>
         </div>
       </div>

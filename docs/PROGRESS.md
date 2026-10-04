@@ -25,22 +25,51 @@
   - `0001_schema`: Applied to Supabase project `Hailey` (`ycftnowviqyapxycirwz`). 17 tables created with check constraints, foreign keys, indexes, and `handle_new_user()` security definer trigger.
   - `0002_rls`: Applied to Supabase project `Hailey`. RLS enabled on all 17 tables with policies matching System Design §10.1.
 
+---
+
+## Day 2 — Mon Oct 5 — Contract, relayer, wallet connect
+
+### Done
+- **Foundry Project & Smart Contract (`/contracts`)**:
+  - `contracts/foundry.toml`: Configured for Solidity 0.8.24 with Cancun EVM and Monad testnet RPC profile.
+  - `contracts/src/HaileyContributions.sol`: Implemented attestation registry per System Design §7.1 (`attest`, `count`, `attested`, `setAttestor`, `Attested` event, custom error types).
+  - `contracts/test/HaileyContributions.t.sol`: Comprehensive unit test suite covering SRS SC-06 (success, non-attestor revert, duplicate hash revert, `setAttestor` rotation & zero address checks).
+  - `contracts/script/Deploy.s.sol`: Foundry deployment broadcast script reading `ATTESTOR_ADDRESS`.
+  - `scripts/redeploy-contract.sh` & `scripts/redeploy-contract.ps1`: Deployment helpers for Monad testnet.
+- **Identifier & Hashing Engine (`server/hash.ts`)**:
+  - `computeCommunityId(slug)`: keccak256 hash of community slug.
+  - `computeItemContent(item)`: canonical formatting `kind:target:note`.
+  - `computeContentHash(params)`: deterministic `hailey:v1|...` string hashed with sha256 and keccak256.
+  - Unit tests in `server/__tests__/hash.test.ts` passing 3/3 in Vitest (`npm test`).
+- **Attestation Relayer Service (`server/relayer.ts`)**:
+  - Built using `viem` with Monad testnet chain configuration (Chain ID 10143).
+  - Pre-checks relayer wallet balance against `RELAYER_MIN_BALANCE` (0.01 MON).
+  - Submits onchain `attest` transaction and waits for receipt with 8s timeout, returning `{ txHash, status: 'attested' | 'failed' | 'submitted' }`.
+- **Local Test Script (`scripts/send-test-attest.ts`)**:
+  - Self-contained CLI script to test the relayer flow against `CONTRACT_ADDRESS` on Monad testnet.
+- **Frontend Wallet Layer (`src/features/wallet`)**:
+  - `src/features/wallet/chain.ts`: Monad testnet chain definition.
+  - `src/features/wallet/config.ts`: Wagmi + RainbowKit config.
+  - `src/features/wallet/WalletProvider.tsx` & `WalletConnectButton.tsx`: Custom styled connect button with chain detection and switch prompt.
+  - `src/features/wallet/LazyWalletSection.tsx`: Dynamic `React.lazy` loading ensuring Home route bundle remains lightweight. Mounted on `/u/:handle` (`ProfilePage.tsx`).
+
 ### Not done / Deferred
-- None from Day 1 scope.
+- None from Day 2 scope.
 
 ### Known issues / Not verified
 - **NOT VERIFIED**:
-  - Live Vercel deployment and `/api/health` live endpoint check (requires git push + Vercel deploy).
-  - Browser auth interaction with live Supabase email provider.
+  - Live onchain contract deployment to Monad Testnet (must be broadcast using funded relayer key).
+  - Live attestation transaction on Monad testnet explorer.
+  - Real wallet popup connection on mobile devices.
 
 ### Decisions made
-- Applied both schema and RLS migrations directly via Supabase tool connection.
-- Used Tailwind CSS v4 `@theme` integration with CSS variables for dynamic design tokens.
-- Separated `AuthContext` definitions and `useAuth` hook into clean modules for fast refresh compliance.
-- Ensured strict TypeScript compliance (`tsc -b`) and zero linter warnings (`oxlint`).
+- Used Wagmi v2 + RainbowKit v2 with custom theme colors (`--clay` `#B8452E` and `--onchain` `#836EF9`).
+- Implemented lazy loading for the wallet bundle so unauthenticated home visitors don't download wallet SDKs.
+- Created both Bash and PowerShell redeploy scripts for cross-platform support.
 
-### Next day (Day 2 — Mon Oct 5)
-- Foundry project setup in `/contracts` for `HaileyContributions.sol`.
-- Contract unit tests (`forge test` for SC-06).
-- Attestor relayer helper (`server/relayer.ts`), identifier hashing (`server/hash.ts`), and test script (`scripts/send-test-attest.ts`).
-- Lazy-loaded frontend wallet layer with wagmi + RainbowKit on Monad testnet (Chain ID 10143).
+### Next day (Day 3 — Tue Oct 6)
+- Culture taxonomy data (`supabase/seed/tags.json` and `supabase/seed/edges.json` with 60+ tags and 100+ topic edges).
+- Idempotent database seeding script (`scripts/seed.ts` via `npm run seed`).
+- Onboarding flow (`/onboarding`) with interest picker, min 3 / max 10 selections, and user interest seeding.
+- `TagSticker` component with thread color animation and reduced motion support.
+- Explore page tag directory grouped by kind with search filter.
