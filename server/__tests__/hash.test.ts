@@ -53,6 +53,9 @@ describe('server/hash', () => {
 
     const hash = computeContentHash(params)
     expect(hash).toMatch(/^0x[0-9a-f]{64}$/)
+    expect(hash).toBe(
+      '0xdee04155ade44cffae243d2a79734108ad72f3aa67ebb0128692333ebab813d9'
+    )
 
     // Same inputs produce identical hash
     const hashRepeat = computeContentHash(params)
