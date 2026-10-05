@@ -6,6 +6,11 @@ import { HomePage } from '@/app/routes/HomePage'
 import { ExplorePage } from '@/app/routes/ExplorePage'
 import { ProfilePage } from '@/app/routes/ProfilePage'
 import { AuthPage } from '@/features/auth/AuthPage'
+import { OnboardingPage } from '@/features/onboarding/OnboardingPage'
+import { CommunitiesPage } from '@/features/communities/CommunitiesPage'
+import { CommunityPage } from '@/features/communities/CommunityPage'
+import { PostDetailPage } from '@/app/routes/PostDetailPage'
+import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +30,17 @@ export function App() {
             <Route element={<AppShell />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/communities" element={<CommunitiesPage />} />
+              <Route path="/communities/:slug" element={<CommunityPage />} />
+              <Route path="/post/:id" element={<PostDetailPage />} />
+              <Route
+                path="/onboarding"
+                element={
+                  <ProtectedRoute>
+                    <OnboardingPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/u/:handle" element={<ProfilePage />} />
               <Route path="/login" element={<AuthPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />

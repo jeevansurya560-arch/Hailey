@@ -1,13 +1,48 @@
-import { Outlet, NavLink, Link } from 'react-router-dom'
-import { Home, Compass, User, LogIn, LogOut } from 'lucide-react'
+import { useEffect } from 'react'
+import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
+import { Home, Compass, Users, User, LogIn, LogOut } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/useAuth'
+import { supabase } from '@/lib/supabase'
 
 export function AppShell() {
   const { user, signOut } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  // ONB-01: Check user interests count for signed-in users
+  const { data: interestsCount, isLoading: checkingInterests } = useQuery({
+    queryKey: ['user_interests_count', user?.id],
+    queryFn: async () => {
+      if (!user) return null
+      const { count, error } = await supabase
+        .from('user_interests')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+
+      if (error) return null
+      return count ?? 0
+    },
+    enabled: !!user,
+  })
+
+  // Redirect signed-in users with 0 interests to /onboarding
+  useEffect(() => {
+    if (
+      user &&
+      !checkingInterests &&
+      interestsCount === 0 &&
+      location.pathname !== '/onboarding' &&
+      location.pathname !== '/login'
+    ) {
+      navigate('/onboarding', { replace: true })
+    }
+  }, [user, checkingInterests, interestsCount, location.pathname, navigate])
 
   const navItems = [
     { to: '/', label: 'Home', icon: Home },
     { to: '/explore', label: 'Explore', icon: Compass },
+    { to: '/communities', label: 'Communities', icon: Users },
     {
       to: user ? `/u/${user.user_metadata?.handle || user.email?.split('@')[0] || 'me'}` : '/login',
       label: 'Profile',
@@ -37,7 +72,9 @@ export function AppShell() {
                 to={item.to}
                 className={({ isActive }) =>
                   `font-mono text-xs uppercase tracking-wider transition-colors hover:text-[var(--clay)] ${
-                    isActive ? 'text-[var(--clay)] font-bold border-b border-[var(--clay)] pb-0.5' : 'text-[var(--ink-2)]'
+                    isActive
+                      ? 'text-[var(--clay)] font-bold border-b border-[var(--clay)] pb-0.5'
+                      : 'text-[var(--ink-2)]'
                   }`
                 }
               >
@@ -87,12 +124,16 @@ export function AppShell() {
               to={item.to}
               className={({ isActive }) =>
                 `flex flex-col items-center gap-1 py-1 px-3 transition-colors ${
-                  isActive ? 'text-[var(--clay)] font-bold' : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+                  isActive
+                    ? 'text-[var(--clay)] font-bold'
+                    : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
                 }`
               }
             >
               <Icon className="h-5 w-5" />
-              <span className="font-mono text-[10px] uppercase tracking-wider">{item.label}</span>
+              <span className="font-mono text-[10px] uppercase tracking-wider">
+                {item.label}
+              </span>
             </NavLink>
           )
         })}
