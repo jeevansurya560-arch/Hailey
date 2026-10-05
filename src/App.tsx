@@ -10,6 +10,7 @@ import { OnboardingPage } from '@/features/onboarding/OnboardingPage'
 import { CommunitiesPage } from '@/features/communities/CommunitiesPage'
 import { CommunityPage } from '@/features/communities/CommunityPage'
 import { PostDetailPage } from '@/app/routes/PostDetailPage'
+import { CulturePage } from '@/app/routes/CulturePage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
 
 const queryClient = new QueryClient({
@@ -30,6 +31,7 @@ export function App() {
             <Route element={<AppShell />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/c/:slug" element={<CulturePage />} />
               <Route path="/communities" element={<CommunitiesPage />} />
               <Route path="/communities/:slug" element={<CommunityPage />} />
               <Route path="/post/:id" element={<PostDetailPage />} />
