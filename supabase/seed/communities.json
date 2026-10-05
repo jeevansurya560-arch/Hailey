@@ -1,0 +1,50 @@
+[
+  {
+    "slug": "streetwear-archive",
+    "name": "Tokyo & Global Streetwear Archive",
+    "description": "Documenting 1990s Urahara design, graphic print methods, and vintage subcultural apparel.",
+    "tag_slugs": ["streetwear", "japanese", "harajuku-fashion", "archival-fashion"]
+  },
+  {
+    "slug": "dub-sound-system",
+    "name": "Dub & Sound System Heritage",
+    "description": "Custom speaker stacks, tape delay dubbing, and the sonic legacy of Jamaican & UK sound systems.",
+    "tag_slugs": ["dub-reggae", "sound-system", "caribbean", "london-sound"]
+  },
+  {
+    "slug": "bronx-hiphop-origins",
+    "name": "Bronx & 70s Hip-Hop Roots",
+    "description": "Preserving the oral history, breakbeats, park jams, and subway aerosol art of early hip-hop.",
+    "tag_slugs": ["hip-hop", "african-american", "bronx-origin", "graffiti-muralism"]
+  },
+  {
+    "slug": "nordic-ferment-craft",
+    "name": "Nordic Fermentation & Studio Crafts",
+    "description": "Exploring slow fermentation traditions, specialty light-roast coffee, and functional stoneware.",
+    "tag_slugs": ["nordic", "fermentation", "coffee-culture", "ceramics-pottery"]
+  },
+  {
+    "slug": "latin-sonic-innovations",
+    "name": "Latin Sonic Innovations & Agave",
+    "description": "From baile funk and reggaeton rhythms to artisanal Oaxaca mezcal distillation rituals.",
+    "tag_slugs": ["reggaeton", "baile-funk", "latino", "mezcal-agave"]
+  },
+  {
+    "slug": "berlin-modular-minimal",
+    "name": "Berlin Modular & Club Geometries",
+    "description": "Synthesizer patch architecture, industrial space reclamation, and raw architectural concrete.",
+    "tag_slugs": ["berlin-club-culture", "modular-synth", "ambient-drone", "brutalism-modernism"]
+  },
+  {
+    "slug": "south-asian-handloom",
+    "name": "South Asian Handlooms & Spices",
+    "description": "Centuries of ikat weaving, natural indigo dyeing, and regional culinary spice chemistry.",
+    "tag_slugs": ["handloom-textiles", "south-asian", "spice-routes", "bhangra"]
+  },
+  {
+    "slug": "cinematheque-verite",
+    "name": "Cinematheque & 35mm New Wave",
+    "description": "Handheld 35mm cinematography, observational documentary movements, and street photo archives.",
+    "tag_slugs": ["french-new-wave", "cinema-verite", "street-photography", "analog-film-photo"]
+  }
+]
