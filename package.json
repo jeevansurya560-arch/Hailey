@@ -10,6 +10,7 @@
     "lint": "oxlint",
     "seed": "tsx scripts/seed.ts",
     "check-weights": "tsx scripts/check-weights.ts",
+    "check-feed": "tsx scripts/check-feed.ts",
     "test": "vitest run",
     "preview": "vite preview"
   },
