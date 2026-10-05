@@ -1,0 +1,457 @@
+[
+  {
+    "slug": "african-american",
+    "name": "African American",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "African American cultural traditions, expressive arts, and historical contributions shaped across the United States."
+  },
+  {
+    "slug": "japanese",
+    "name": "Japanese",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Japanese cultural traditions, modern aesthetic movements, design philosophies, and contemporary media."
+  },
+  {
+    "slug": "latino",
+    "name": "Latino & Hispanic",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Diverse traditions, music, visual arts, and literary heritage across Latin America and the diaspora."
+  },
+  {
+    "slug": "south-asian",
+    "name": "South Asian",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Cultures, regional heritage, and artistic movements spanning the Indian subcontinent and diaspora."
+  },
+  {
+    "slug": "korean",
+    "name": "Korean",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Historical traditions, visual arts, culinary customs, and the contemporary Korean Wave (Hallyu)."
+  },
+  {
+    "slug": "nordic",
+    "name": "Nordic",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Cultural traditions, minimalist design philosophy, folklore, and craft from Northern Europe."
+  },
+  {
+    "slug": "caribbean",
+    "name": "Caribbean",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Polyphonic music traditions, carnival cultures, and syncretic heritage across the Caribbean basin."
+  },
+  {
+    "slug": "middle-eastern",
+    "name": "Middle Eastern & SWANA",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Heritage traditions, architectural heritage, calligraphic arts, and music from Southwest Asia and North Africa."
+  },
+  {
+    "slug": "west-african",
+    "name": "West African",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Textile arts, storytelling traditions, rhythmic music innovations, and historical heritage across West Africa."
+  },
+  {
+    "slug": "celtic",
+    "name": "Celtic",
+    "kind": "culture",
+    "parent_slug": null,
+    "description": "Oral literature, traditional folk instruments, knotwork design, and regional heritage across Celtic lands."
+  },
+  {
+    "slug": "hip-hop",
+    "name": "Hip-Hop",
+    "kind": "music",
+    "parent_slug": "african-american",
+    "description": "Cultural movement and music genre originating in the Bronx in the 1970s, defined by MCing, DJing, breaking, and graffiti."
+  },
+  {
+    "slug": "jazz",
+    "name": "Jazz",
+    "kind": "music",
+    "parent_slug": "african-american",
+    "description": "Genre rooted in African American traditions of New Orleans featuring syncopation, polyrhythms, and improvisation."
+  },
+  {
+    "slug": "city-pop",
+    "name": "City Pop",
+    "kind": "music",
+    "parent_slug": "japanese",
+    "description": "Late-1970s and 1980s Japanese pop music incorporating funk, disco, soft rock, and tropical lounge aesthetics."
+  },
+  {
+    "slug": "afrobeats",
+    "name": "Afrobeats",
+    "kind": "music",
+    "parent_slug": "west-african",
+    "description": "Contemporary West African genre blending Fuji, highlife, hip-hop, and dancehall rhythms into global pop structures."
+  },
+  {
+    "slug": "reggaeton",
+    "name": "Reggaeton",
+    "kind": "music",
+    "parent_slug": "latino",
+    "description": "Music genre originating in Puerto Rico and Panama blending Jamaican dancehall riddims with Latin hip-hop."
+  },
+  {
+    "slug": "k-pop",
+    "name": "K-Pop",
+    "kind": "music",
+    "parent_slug": "korean",
+    "description": "Mainstream popular music from South Korea characterized by audiovisual production, synchronized dance, and genre fusion."
+  },
+  {
+    "slug": "baile-funk",
+    "name": "Baile Funk",
+    "kind": "music",
+    "parent_slug": "latino",
+    "description": "Rio de Janeiro electronic dance music derived from Miami bass, characterized by syncopated drum loops and call-and-response."
+  },
+  {
+    "slug": "shoegaze",
+    "name": "Shoegaze",
+    "kind": "music",
+    "parent_slug": null,
+    "description": "Alternative rock subgenre characterized by heavy guitar distortion, audio feedback, and obscured, dreamy vocals."
+  },
+  {
+    "slug": "bhangra",
+    "name": "Bhangra",
+    "kind": "music",
+    "parent_slug": "south-asian",
+    "description": "Lively folk music and dance form from the Punjab region driven by the dhol drum, now integrated into global dance beats."
+  },
+  {
+    "slug": "dub-reggae",
+    "name": "Dub & Reggae",
+    "kind": "music",
+    "parent_slug": "caribbean",
+    "description": "Jamaican music traditions characterized by off-beat rhythms, deep basslines, and studio tape echo experimentation."
+  },
+  {
+    "slug": "ambient-drone",
+    "name": "Ambient & Drone",
+    "kind": "music",
+    "parent_slug": null,
+    "description": "Music emphasizing tone, texture, and atmospheric space over traditional melodic structures and rhythm."
+  },
+  {
+    "slug": "flamenco",
+    "name": "Flamenco",
+    "kind": "music",
+    "parent_slug": "latino",
+    "description": "Andalusian art form combining cante (singing), toque (guitar playing), baile (dance), and rhythmic clapping."
+  },
+  {
+    "slug": "streetwear",
+    "name": "Streetwear",
+    "kind": "fashion",
+    "parent_slug": null,
+    "description": "Casual apparel movement rooted in California surf and skate culture, New York hip-hop, and Japanese Urahara design."
+  },
+  {
+    "slug": "harajuku-fashion",
+    "name": "Harajuku Street Style",
+    "kind": "fashion",
+    "parent_slug": "japanese",
+    "description": "Eclectic Tokyo subcultural fashion styles including Decora, Lolita, Visual Kei, and DIY layering movements."
+  },
+  {
+    "slug": "workwear",
+    "name": "Heritage Workwear",
+    "kind": "fashion",
+    "parent_slug": null,
+    "description": "Durable garment designs derived from industrial, military, and agricultural utility, emphasizing denim, canvas, and leather."
+  },
+  {
+    "slug": "techwear",
+    "name": "Techwear",
+    "kind": "fashion",
+    "parent_slug": null,
+    "description": "Aesthetic style focusing on utility, high-tech textiles (Gore-Tex), modular attachments, and ergonomic tailoring."
+  },
+  {
+    "slug": "handloom-textiles",
+    "name": "Handloom & Ikat",
+    "kind": "fashion",
+    "parent_slug": "south-asian",
+    "description": "Artisanal weaving techniques, natural vegetable dyeing, and resist-dyed patterns with centuries of regional heritage."
+  },
+  {
+    "slug": "sartorial-tailoring",
+    "name": "Sartorial Tailoring",
+    "kind": "fashion",
+    "parent_slug": null,
+    "description": "Bespoke suiting traditions, pattern drafting, and formal draping techniques refined across European ateliers."
+  },
+  {
+    "slug": "indigenous-beadwork",
+    "name": "Indigenous Beadwork & Quill",
+    "kind": "fashion",
+    "parent_slug": null,
+    "description": "Intricate geometric and floral bead crafting traditions preserving ancestral narratives and ceremonial attire."
+  },
+  {
+    "slug": "street-food",
+    "name": "Street Food Culture",
+    "kind": "food",
+    "parent_slug": null,
+    "description": "Informal culinary traditions prepared in night markets, hawker stalls, and curbside carts worldwide."
+  },
+  {
+    "slug": "fermentation",
+    "name": "Fermentation & Curing",
+    "kind": "food",
+    "parent_slug": null,
+    "description": "Microbial preservation methods including kimchi, miso, sourdough, cheese, garum, and wild-fermented beverages."
+  },
+  {
+    "slug": "coffee-culture",
+    "name": "Specialty Coffee",
+    "kind": "food",
+    "parent_slug": null,
+    "description": "Origin-traceable bean cultivation, roasting crafts, pour-over methods, and communal cafe rituals."
+  },
+  {
+    "slug": "tea-ceremony",
+    "name": "Tea Traditions & Gongfu",
+    "kind": "food",
+    "parent_slug": "japanese",
+    "description": "Ritualized preparation and mindful appreciation of tea leaves practiced across East and South Asia."
+  },
+  {
+    "slug": "mezcal-agave",
+    "name": "Mezcal & Agave Spirits",
+    "kind": "food",
+    "parent_slug": "latino",
+    "description": "Artisanal pit-roasting and copper/clay pot distillation of wild agave species in regional Mexican palenques."
+  },
+  {
+    "slug": "spice-routes",
+    "name": "Spice Chemistry & Masalas",
+    "kind": "food",
+    "parent_slug": "south-asian",
+    "description": "Layered spice tempering (tadka/chaunk) and regional aromatic blending across historical trade routes."
+  },
+  {
+    "slug": "ceramics-pottery",
+    "name": "Studio Ceramics & Pottery",
+    "kind": "art",
+    "parent_slug": null,
+    "description": "Tactile clay arts including stoneware, porcelain, wood-firing kilns, wabi-sabi aesthetics, and raku."
+  },
+  {
+    "slug": "graffiti-muralism",
+    "name": "Graffiti & Public Murals",
+    "kind": "art",
+    "parent_slug": "hip-hop",
+    "description": "Public visual expressions from aerosol subway lettering to large-scale community narrative murals."
+  },
+  {
+    "slug": "calligraphy",
+    "name": "Calligraphy & Lettering",
+    "kind": "art",
+    "parent_slug": null,
+    "description": "The expressive craft of handwritten letterforms in Arabic, East Asian brushwork, and Latin blackletter."
+  },
+  {
+    "slug": "printmaking-woodblock",
+    "name": "Printmaking & Woodblock",
+    "kind": "art",
+    "parent_slug": "japanese",
+    "description": "Relief printing, etching, screenprinting, and Japanese ukiyo-e methods creating reproducible graphics."
+  },
+  {
+    "slug": "riso-zines",
+    "name": "Risograph & Indie Zines",
+    "kind": "art",
+    "parent_slug": "internet",
+    "description": "Self-published mini-magazines and spot-color stencil duplicator printing fostering underground subcultures."
+  },
+  {
+    "slug": "street-photography",
+    "name": "Street Photography",
+    "kind": "art",
+    "parent_slug": null,
+    "description": "Unposed documentary photography capturing candid human encounters and architectural juxtaposition in public."
+  },
+  {
+    "slug": "analog-film-photo",
+    "name": "35mm & Medium Format",
+    "kind": "art",
+    "parent_slug": null,
+    "description": "Chemical darkroom processes, silver halide film stocks, and mechanical camera craft."
+  },
+  {
+    "slug": "anime-manga",
+    "name": "Anime & Manga",
+    "kind": "film",
+    "parent_slug": "japanese",
+    "description": "Japanese animation and serialized comic arts renowned for cinematic staging, expressive line work, and genre depth."
+  },
+  {
+    "slug": "french-new-wave",
+    "name": "French New Wave",
+    "kind": "film",
+    "parent_slug": null,
+    "description": "1950s/60s cinematic revolution emphasizing jump cuts, natural lighting, handheld cameras, and auteur theory."
+  },
+  {
+    "slug": "hong-kong-cinema",
+    "name": "Hong Kong New Wave & Martial Arts",
+    "kind": "film",
+    "parent_slug": null,
+    "description": "High-velocity stunt choreography, neon-lit urban noir, and lyrical melodrama from 1980s/90s Hong Kong."
+  },
+  {
+    "slug": "nollywood",
+    "name": "Nollywood Cinema",
+    "kind": "film",
+    "parent_slug": "west-african",
+    "description": "Nigeria's prolific cinematic industry delivering vernacular storytelling, dramatic cinema, and cultural commentary."
+  },
+  {
+    "slug": "cinema-verite",
+    "name": "Cinema Verite & Non-Fiction",
+    "kind": "film",
+    "parent_slug": null,
+    "description": "Observational documentary filmmaking utilizing lightweight gear to record unscripted human reality."
+  },
+  {
+    "slug": "afrofuturism",
+    "name": "Afrofuturism",
+    "kind": "heritage",
+    "parent_slug": "african-american",
+    "description": "Cultural aesthetic and philosophy exploring the intersection of the African diaspora with science, tech, and myth."
+  },
+  {
+    "slug": "oral-history",
+    "name": "Oral History & Griots",
+    "kind": "language",
+    "parent_slug": null,
+    "description": "Verbal storytelling, genealogies, and memory preservation passed across generations through spoken word."
+  },
+  {
+    "slug": "slang-vernacular",
+    "name": "Urban Vernacular & Dialects",
+    "kind": "language",
+    "parent_slug": null,
+    "description": "Linguistic innovation, slang formation, and regional idioms emerging from urban neighborhoods and youth culture."
+  },
+  {
+    "slug": "folk-architecture",
+    "name": "Vernacular Architecture",
+    "kind": "heritage",
+    "parent_slug": null,
+    "description": "Regional building traditions utilizing local materials (timber, adobe, stone) adapted to climate and landscape."
+  },
+  {
+    "slug": "brutalism-modernism",
+    "name": "Brutalism & Modernist Design",
+    "kind": "heritage",
+    "parent_slug": null,
+    "description": "Mid-20th-century architectural movement celebrating raw concrete (béton brut), geometric massing, and social ethos."
+  },
+  {
+    "slug": "skate-culture",
+    "name": "Skateboard Culture",
+    "kind": "internet",
+    "parent_slug": null,
+    "description": "Reinterpretation of urban concrete landscapes through skateboarding, DIY spot building, and video aesthetics."
+  },
+  {
+    "slug": "net-art",
+    "name": "Net Art & Early Web",
+    "kind": "internet",
+    "parent_slug": null,
+    "description": "Digital art made for and by the internet, exploring hypertext, GeoCities nostalgia, pixel graphics, and cyberculture."
+  },
+  {
+    "slug": "vaporwave",
+    "name": "Vaporwave & Mallsoft",
+    "kind": "internet",
+    "parent_slug": "city-pop",
+    "description": "Microgenre satirizing consumerism through slowed elevator jazz, 80s/90s infomercial aesthetics, and glitch art."
+  },
+  {
+    "slug": "lofi-beats",
+    "name": "Lo-Fi Hip Hop",
+    "kind": "internet",
+    "parent_slug": "hip-hop",
+    "description": "Downtempo electronic instrumental subgenre built on vintage vinyl crackle, nostalgic chords, and relaxed boom-bap."
+  },
+  {
+    "slug": "archival-fashion",
+    "name": "Archival & Vintage Collecting",
+    "kind": "fashion",
+    "parent_slug": "streetwear",
+    "description": "Curating, documenting, and collecting rare historical garments from pioneering runway and subcultural seasons."
+  },
+  {
+    "slug": "sound-system",
+    "name": "Sound System Culture",
+    "kind": "music",
+    "parent_slug": "caribbean",
+    "description": "Custom high-power speaker stacks, selectors, and toasters that originated in Kingston and shaped UK dance music."
+  },
+  {
+    "slug": "modular-synth",
+    "name": "Modular Synthesis & Hardware",
+    "kind": "music",
+    "parent_slug": null,
+    "description": "Patch-cord voltage-controlled electronic sound design exploring Eurorack, Buchla, and Moog synthesis."
+  },
+  {
+    "slug": "tokyo-underground",
+    "name": "Tokyo Underground",
+    "kind": "place",
+    "parent_slug": "japanese",
+    "description": "The interconnected web of jazz kissa, underground vinyl bars, back-alley thrift shops, and live houses in Tokyo."
+  },
+  {
+    "slug": "bronx-origin",
+    "name": "The South Bronx",
+    "kind": "place",
+    "parent_slug": "african-american",
+    "description": "The historic birthplace of hip-hop culture, community block parties, and youth-led artistic resilience."
+  },
+  {
+    "slug": "berlin-club-culture",
+    "name": "Berlin Club Culture",
+    "kind": "place",
+    "parent_slug": null,
+    "description": "Post-wall electronic music sanctuaries, industrial space reclamation, and minimalist techno subcultures."
+  },
+  {
+    "slug": "london-sound",
+    "name": "London Underground Bass",
+    "kind": "place",
+    "parent_slug": null,
+    "description": "Grime, jungle, UK garage, and pirate radio culture echoing from East and South London tower blocks."
+  },
+  {
+    "slug": "seoul-subculture",
+    "name": "Hongdae & Euljiro Culture",
+    "kind": "place",
+    "parent_slug": "korean",
+    "description": "Seoul's indie music hotbeds and industrial metal-shop alleys transformed into creative cafes and DIY galleries."
+  },
+  {
+    "slug": "mexico-city-art",
+    "name": "CDMX Contemporary Art & Murals",
+    "kind": "place",
+    "parent_slug": "latino",
+    "description": "Mexico City's vibrant contemporary art scene, architectural modernism, and independent publishing presses."
+  }
+]
