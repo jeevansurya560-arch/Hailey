@@ -1,0 +1,134 @@
+[
+  {
+    "slug_id": "post-1",
+    "community_slug": "streetwear-archive",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "In 1993, the backstreets of Harajuku (Urahara) became a crucible for small-batch garment experimentation. Early label drops were produced in runs of under 50 pieces, shared strictly by word-of-mouth among local skaters and DJs.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Tokyo_Harajuku_Takeshita_Street.jpg/1280px-Tokyo_Harajuku_Takeshita_Street.jpg",
+    "media_credit": "Wikimedia Commons / Harajuku Street Scene (CC BY-SA 3.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Harajuku",
+    "tag_slugs": ["streetwear", "japanese", "harajuku-fashion"]
+  },
+  {
+    "slug_id": "post-2",
+    "community_slug": "dub-sound-system",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "King Tubby’s custom four-track console in Waterhouse, Kingston transformed the mixing desk into an instrument. By muting vocal tracks, sweeping high-pass filters, and sending snare hits into spring reverb tanks, dub was born.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Dub_Sound_System_Speakers.jpg/1280px-Dub_Sound_System_Speakers.jpg",
+    "media_credit": "Wikimedia Commons / Sound System Tower (CC BY-SA 2.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Dub_music",
+    "tag_slugs": ["dub-reggae", "sound-system", "caribbean"]
+  },
+  {
+    "slug_id": "post-3",
+    "community_slug": "bronx-hiphop-origins",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "On August 11, 1973, at 1520 Sedgwick Avenue in the West Bronx, DJ Kool Herc introduced the 'Merry-Go-Round' technique — extending the drum break of two identical funk records using twin turntables.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/1520_Sedgwick_Avenue_Bronx.jpg/1280px-1520_Sedgwick_Avenue_Bronx.jpg",
+    "media_credit": "Wikimedia Commons / 1520 Sedgwick Ave (CC BY-SA 4.0)",
+    "source_url": "https://en.wikipedia.org/wiki/1520_Sedgwick_Avenue",
+    "tag_slugs": ["hip-hop", "african-american", "bronx-origin"]
+  },
+  {
+    "slug_id": "post-4",
+    "community_slug": "nordic-ferment-craft",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "Traditional koji fermentation applied to indigenous barley and Nordic elderberries creates deep umami garums without animal proteins, bridging East Asian mold culture with Scandinavian forest foraging.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Fermentation_crock_pottery.jpg/1280px-Fermentation_crock_pottery.jpg",
+    "media_credit": "Wikimedia Commons / Ceramic Fermentation Vessels (CC BY-SA 4.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Fermentation",
+    "tag_slugs": ["fermentation", "nordic", "ceramics-pottery"]
+  },
+  {
+    "slug_id": "post-5",
+    "community_slug": "latin-sonic-innovations",
+    "author_handle": "demo_contributor",
+    "is_editorial": false,
+    "body": "Baile Funk's Tamborzão rhythm pattern emerged in early-2000s Rio favelas, replacing 808 Miami bass with live vocal Beatbox samples and MPC percussion chops that defined a generation of baile parties.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Favela_Rocinha_Rio_de_Janeiro.jpg/1280px-Favela_Rocinha_Rio_de_Janeiro.jpg",
+    "media_credit": "Wikimedia Commons / Rio Urban Landscape (CC BY-SA 3.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Funk_carioca",
+    "tag_slugs": ["baile-funk", "latino"]
+  },
+  {
+    "slug_id": "post-6",
+    "community_slug": "berlin-modular-minimal",
+    "author_handle": "demo_curator",
+    "is_editorial": false,
+    "body": "Eurorack standardisation created an open ecosystem for boutique analog circuitry. Voltage control allows unpredictable polyrhythmic modulation that mirrors minimalist industrial architecture.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Eurorack_Modular_Synthesizer.jpg/1280px-Eurorack_Modular_Synthesizer.jpg",
+    "media_credit": "Wikimedia Commons / Patch Modular Synthesizer (CC BY-SA 4.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Eurorack",
+    "tag_slugs": ["modular-synth", "berlin-club-culture", "ambient-drone"]
+  },
+  {
+    "slug_id": "post-7",
+    "community_slug": "south-asian-handloom",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "Patan Patola double-ikat weaving requires warp and weft threads to be individually resist-dyed before mounting on the loom. A single sari can require six months to a year of mathematical alignment.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Patan_Patola_Sari_Silk.jpg/1280px-Patan_Patola_Sari_Silk.jpg",
+    "media_credit": "Wikimedia Commons / Patola Silk Weave (CC BY-SA 3.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Patola_sari",
+    "tag_slugs": ["handloom-textiles", "south-asian"]
+  },
+  {
+    "slug_id": "post-8",
+    "community_slug": "cinematheque-verite",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "Jean-Luc Godard’s Breathless (1960) rejected Hollywood master-shot coverage in favor of jump cuts and lightweight handheld Cameflex 35mm cameras pushed in a wheelchair through Paris streets.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Paris_Boulevard_Saint-Michel_Cinema.jpg/1280px-Paris_Boulevard_Saint-Michel_Cinema.jpg",
+    "media_credit": "Wikimedia Commons / Paris Latin Quarter (CC BY-SA 4.0)",
+    "source_url": "https://en.wikipedia.org/wiki/French_New_Wave",
+    "tag_slugs": ["french-new-wave", "cinema-verite", "street-photography"]
+  },
+  {
+    "slug_id": "post-9",
+    "community_slug": "streetwear-archive",
+    "author_handle": "demo_contributor",
+    "is_editorial": false,
+    "body": "Vintage loopwheel knitting machines in Wakayama, Japan produce tube knit t-shirts with zero side seams, operating at only 24 rotations per minute to preserve cotton fiber loft.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Wakayama_vintage_textile_mill.jpg/1280px-Wakayama_vintage_textile_mill.jpg",
+    "media_credit": "Wikimedia Commons / Japanese Textile Mill (CC BY-SA 3.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Circular_knitting",
+    "tag_slugs": ["archival-fashion", "japanese", "workwear"]
+  },
+  {
+    "slug_id": "post-10",
+    "community_slug": "dub-sound-system",
+    "author_handle": "demo_curator",
+    "is_editorial": false,
+    "body": "Jah Shaka's legendary all-night sessions at London's Rocket club fused spiritual roots reggae with heavy pre-amp equalization, establishing the foundation for UK Jungle and Dubstep.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Jah_Shaka_Sound_System_London.jpg/1280px-Jah_Shaka_Sound_System_London.jpg",
+    "media_credit": "Wikimedia Commons / Sound System Heritage (CC BY-SA 2.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Jah_Shaka",
+    "tag_slugs": ["sound-system", "london-sound", "dub-reggae"]
+  },
+  {
+    "slug_id": "post-11",
+    "community_slug": "latin-sonic-innovations",
+    "author_handle": "hailey_editorial",
+    "is_editorial": true,
+    "body": "Ancestral mezcal production uses wild Agave Karwinskii and Espadín roasted for 5 days in conical stone earth pits over oak charcoal, followed by horse-drawn tahona stone crushing.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Mezcal_distillery_Oaxaca_palenque.jpg/1280px-Mezcal_distillery_Oaxaca_palenque.jpg",
+    "media_credit": "Wikimedia Commons / Oaxaca Palenque Distillery (CC BY-SA 4.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Mezcal",
+    "tag_slugs": ["mezcal-agave", "latino"]
+  },
+  {
+    "slug_id": "post-12",
+    "community_slug": "bronx-hiphop-origins",
+    "author_handle": "demo_contributor",
+    "is_editorial": false,
+    "body": "Phase 2's soft bubble lettering styles pioneered in the early 1970s transformed subway writing from simple signatures into complex typography with arrows, cloud borders, and color fades.",
+    "media_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Early_NYC_Subway_Graffiti_Art.jpg/1280px-Early_NYC_Subway_Graffiti_Art.jpg",
+    "media_credit": "Wikimedia Commons / NYC Aerosol Art (CC BY-SA 3.0)",
+    "source_url": "https://en.wikipedia.org/wiki/Phase_2_(artist)",
+    "tag_slugs": ["graffiti-muralism", "hip-hop", "bronx-origin"]
+  }
+]
