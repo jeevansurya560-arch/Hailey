@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b",
     "lint": "oxlint",
+    "seed": "tsx scripts/seed.ts",
+    "check-weights": "tsx scripts/check-weights.ts",
     "test": "vitest run",
     "preview": "vite preview"
   },
