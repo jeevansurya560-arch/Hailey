@@ -160,6 +160,53 @@
 - Relevance prompt cards for deterministic feedback (`hash(user_id || post_id) % 10 = 0`).
 - Culture page `/c/:slug` with relations, top posts, and exploring toggle.
 
+---
+
+## Day 5 — Thu Oct 8 — Feed v1, WhyStamp, impressions, /c/:slug
+
+### Done
+- **Feed & Exploration SQL Engine (`supabase/migrations/0004_feed.sql`)**:
+  - `get_feed(p_limit integer, p_offset integer)`: Implemented scoring formula `score = tag_score * (0.6 + 0.4 * fresh) + 2.0 * [membership]`, aggregated tags, and top-2 `why` reasoning tags array.
+  - `get_explore(p_limit integer)`: Discovers adjacent posts via `topic_edges` from the user's top 5 interests, filtering out direct interests.
+  - `on_post_delete`: Trigger cascade to clean up `user_interests` when dispatches are deleted.
+- **Explainability & Attribution Chips (`src/components/WhyStamp.tsx`)**:
+  - Rendered mono tag chip formatted as `BECAUSE · [TAG1 + TAG2]` for personalised posts or `DISCOVERY · [TAG]` for exploration slots.
+  - Consistent hover state, truncation, and thread color highlights.
+- **Deterministic Relevance Feedback (`src/components/RelevancePrompt.tsx` & `src/lib/relevance.ts`)**:
+  - Hash function `Math.abs(hash(userId + postId)) % 10 === 0` rendering a lightweight feedback question on ~10% of dispatches.
+  - Instant submission to `feedback` table with optimistic feedback confirmation.
+- **Impression Tracking Hook (`src/features/feed/useImpression.ts`)**:
+  - `IntersectionObserver` observing feed cards with `>= 50%` viewport intersection for `>= 1000ms`.
+  - Batching queue debounced at 3 seconds, writing impressions to `impressions` table.
+- **Feed Card Presentation (`src/features/feed/FeedCard.tsx`)**:
+  - Top accent stripe colored by first tag's thread color (`--clay`, `--moss`, `--indigo`, etc.).
+  - Integrated `WhyStamp`, `useImpression`, `RelevancePrompt`, and optimistic reactions (like, save, hide).
+- **Topic Culture Page (`/c/:slug` & `src/app/routes/CulturePage.tsx`)**:
+  - Header with tag kind, description, parent/child tag badges, and thematic edge connections with similarity scores.
+  - "Add to exploring" toggle updating `user_interests` (`weight: 5.0`).
+  - Top dispatches under this culture tag and linked cultural collectives.
+- **Home Feed Interleaving & Pagination (`src/app/routes/HomePage.tsx`)**:
+  - Connected to `get_feed` RPC preserving rank score order.
+  - Interleaves one `get_explore` item at every 5th slot (index 4, 9, 14...).
+  - Infinite "Load More" pagination (`p_offset`).
+  - Cold-start fallback showing recent curated dispatches when user has no interest history (FEED-08).
+- **Feed Ranking Verification Script (`scripts/check-feed.ts`)**:
+  - Self-contained CLI verification script testing `get_feed` RPC, explainable `why` stamps, exploration interleaving, and cold-start fallback. Configured as `npm run check-feed`.
+
+### Not done / Deferred
+- None from Day 5 scope.
+
+### Known issues / Not verified
+- **NOT VERIFIED**:
+  - Live execution of `0004_feed.sql` migration inside Supabase SQL editor by developer.
+
+### Decisions made
+- Extracted deterministic hash calculation to `src/lib/relevance.ts` for clean separation of concerns and fast refresh support.
+- Configured feed query in `HomePage.tsx` to handle both authenticated RPC responses and unauthenticated cold-start fallback cleanly.
+
+### Next day (Day 6 — Fri Oct 9)
+- Moderation pipeline, curator triage dashboard (`/communities/:slug/mod`), report queue, and hiding posts with >= 3 reports.
+
 
 
 
