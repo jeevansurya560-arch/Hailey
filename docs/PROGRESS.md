@@ -68,8 +68,99 @@
 - Created both Bash and PowerShell redeploy scripts for cross-platform support.
 
 ### Next day (Day 3 — Tue Oct 6)
-- Culture taxonomy data (`supabase/seed/tags.json` and `supabase/seed/edges.json` with 60+ tags and 100+ topic edges).
-- Idempotent database seeding script (`scripts/seed.ts` via `npm run seed`).
-- Onboarding flow (`/onboarding`) with interest picker, min 3 / max 10 selections, and user interest seeding.
-- `TagSticker` component with thread color animation and reduced motion support.
-- Explore page tag directory grouped by kind with search filter.
+- Taxonomy, seed script, onboarding flow, TagSticker, and Explore directory.
+
+---
+
+## Day 3 — Tue Oct 6 — Taxonomy, seed script, onboarding
+
+### Done
+- **Culture Taxonomy Graph (`supabase/seed`)**:
+  - `supabase/seed/tags.json`: 65 rich cultural tags spanning 10 kinds (`culture`, `music`, `fashion`, `food`, `art`, `film`, `language`, `heritage`, `internet`, `place`) with parent hierarchy and factual, neutral descriptions (<= 200 chars).
+  - `supabase/seed/edges.json`: 148 thematic adjacency edges with weights 0.6–0.95 and symmetric links expressing topic relationships without stereotypes.
+  - Live Supabase Database verified: 65 tags and 148 edges present.
+- **Idempotent Seeding Engine (`scripts/seed.ts`)**:
+  - Standalone script using `@supabase/supabase-js`.
+  - Upserts tags, resolves `parent_slug` to parent ID references, and upserts topic edges idempotently.
+  - Script configured in `package.json` as `npm run seed`.
+- **Design System & TagSticker (`src/components/TagSticker.tsx`)**:
+  - Implemented interactive chip with thread color mapping based on tag kind (`--clay`, `--saffron`, `--moss`, `--indigo`, `--rose`, `--teal`, `--plum`, `--onchain`).
+  - 150ms press micro-animation respecting `prefers-reduced-motion`.
+  - Accessible keyboard navigation and selection state.
+- **Onboarding Flow (`/onboarding` & `src/features/onboarding/OnboardingPage.tsx`)**:
+  - Interactive grid grouped by 6 theme domains with topic explanations.
+  - Enforces minimum 3 and maximum 10 selections with live counter.
+  - Saves initial interests to `user_interests` (`weight: 5`, `source: 'onboarding'`).
+  - Strict copy compliance: uses "What are you curious about?" and "Exploring" (never "My culture").
+- **Automatic Onboarding Redirection (`AppShell.tsx`)**:
+  - Checks user's `user_interests` count; automatically routes newly signed-in users with 0 interests to `/onboarding`.
+- **Explore Directory (`/explore` & `src/app/routes/ExplorePage.tsx`)**:
+  - Live taxonomy fetch from Supabase database with real-time text filter across names, slugs, and descriptions.
+  - Category pill filter allowing filtering by specific kinds (`culture`, `music`, `fashion`, `food`, etc.).
+  - Shows total topic counts per group.
+
+### Not done / Deferred
+- None from Day 3 scope.
+
+### Known issues / Not verified
+- **NOT VERIFIED**:
+  - Manual browser testing of the full email signup -> forced onboarding redirect -> 3-selection interest save on mobile Safari/Chrome.
+
+### Decisions made
+- Extracted thread color mapping to `src/lib/threadColors.ts` to keep `TagSticker.tsx` purely focused on component rendering and prevent Fast Refresh lint warnings.
+- Added live database queries on `/explore` with graceful fallback handling.
+
+### Next day (Day 4 — Wed Oct 7)
+- Communities, posts, reactions, and database triggers that update interest weights.
+
+---
+
+## Day 4 — Wed Oct 7 — Communities, posts, reactions, weight triggers
+
+### Done
+- **Database Triggers Migration (`supabase/migrations/0003_triggers.sql`)**:
+  - `bump_interests(p_user uuid, p_post uuid, p_delta real)`: Security definer procedure updating `user_interests` with delta multipliers and flooring at 0.
+  - `on_reaction`: Trigger on `post_reactions` updating weights on like (+1), save (+3), and hide (-3).
+  - `on_membership_join`: Trigger on `memberships` incrementing weights on community tags by +4.
+  - `on_feedback`: Trigger on `feedback` updating weights on yes (+1) and no (-2).
+- **Seed Data Expansion (`supabase/seed`)**:
+  - `supabase/seed/communities.json`: 8 cultural communities with descriptions and community tags.
+  - `supabase/seed/posts.json`: 12 test posts with validated source URLs, media credits, and post tags.
+  - `scripts/seed.ts`: Extended to idempotently seed tags, edges, demo accounts (Hailey Editorial, demo contributor, demo curator), 8 communities, curator roles, and test posts. Configured in `package.json` as `npm run seed`.
+- **Communities Interface (`src/features/communities`)**:
+  - `/communities` (`CommunitiesPage.tsx`): Directory listing 8 communities with member counts, topic tags, and optimistic Join/Leave actions.
+  - `/communities/:slug` (`CommunityPage.tsx`): Detailed collective view with header, member counts, curators list, community tags, post composer, and dispatches.
+- **Posts & Dispatches Architecture (`src/features/posts`)**:
+  - `PostComposer.tsx`: Full composer supporting body (1–2000 chars), image URLs (https://), media credits, source citations, and 1–5 topic tags.
+  - `PostCard.tsx`: Plain-text rendering (POST-05), lazy-loaded images with `referrerpolicy="no-referrer"`, source links (CULT-03), and author deletion (POST-04).
+  - `/post/:id` (`PostDetailPage.tsx`): Dedicated post detail view (POST-03).
+- **Optimistic Reactions (POST-02)**:
+  - Like, save, and hide interactions on `PostCard` with instant UI state update and database rollback on failure.
+  - Hidden posts immediately filtered out and prevented from reappearing.
+- **Weight Verification Script (`scripts/check-weights.ts`)**:
+  - Verified script checking initial weights, inserting reactions, and verifying weight progression. Configured as `npm run check-weights`.
+
+### Not done / Deferred
+- None from Day 4 scope (comments, search, image uploads deferred to P1/later as specified).
+
+### Known issues / Not verified
+- **NOT VERIFIED**:
+  - Live execution of `0003_triggers.sql` inside the Supabase SQL editor by the human developer.
+
+### Decisions made
+- Community memberships and reaction states use optimistic React state with rollback guards for instantaneous response times.
+- Structured seed data into dedicated `communities.json` and `posts.json` files for maintainability and idempotency.
+
+### Next day (Day 5 — Thu Oct 8)
+- Personalised feed SQL function (`get_feed(p_limit, p_offset)`) and exploration slots (`get_explore(p_limit)`).
+- Home feed calling `get_feed` preserving score ranking order with "load more" pagination.
+- Interleaving one exploration item at every 5th feed slot (FEED-03).
+- `WhyStamp` component displaying dynamic tag reasoning chips.
+- `useImpression` hook tracking card visibility (>50% for 1s).
+- Relevance prompt cards for deterministic feedback (`hash(user_id || post_id) % 10 = 0`).
+- Culture page `/c/:slug` with relations, top posts, and exploring toggle.
+
+
+
+
+
