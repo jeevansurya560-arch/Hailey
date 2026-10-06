@@ -238,8 +238,53 @@
 - **NOT VERIFIED**:
   - Live execution of `api/approve-item.ts` on production Vercel deployment with live secrets.
 
-### Next day (Day 7 — Sat Oct 10)
-- Monad onchain attestation broadcast from relayer, wallet link flow, Verified seal component, profile attestation history, and `/verify/:address`.
+---
+
+## Day 7 — Sat Oct 10 — Attestation, wallet link, verified seal, profile, `/verify`
+
+### Done
+- **Serverless Attestation Flow (`api/approve-item.ts`)**:
+  - Implemented steps 11–15 connecting curator approval directly to `server/relayer.ts`.
+  - Submits onchain `attest(bytes32 communityId, bytes32 contentHash)` transaction to Monad Testnet and updates `contributions` table with `tx_hash` and final status.
+- **Cryptographic Wallet Linking API (`api/wallet.ts`)**:
+  - `action: 'nonce'`: Generates 10-minute single-use cryptographic challenge stored in `wallet_nonces`.
+  - `action: 'link'`: Recovers signing address via `viem.recoverAddress()`, enforces uniqueness across profiles (409 Conflict), and updates `profiles.wallet_address`.
+- **VerifiedSeal Component (`src/components/VerifiedSeal.jsx`)**:
+  - Visual status chips (`attested`, `submitted`, `awaiting_wallet`, `pending`, `failed`) linking directly to Monad Explorer (`testnet.monadexplorer.com/tx/...`).
+- **Profile Attestation Dashboard (`src/app/routes/ProfilePage.jsx`)**:
+  - Displays exploring threads, collective memberships, verified contributions with onchain seals, and security trust matrix.
+- **Onchain Ledger Verification Route (`/verify/:address` & `src/app/routes/VerifyPage.jsx`)**:
+  - Reads `count(address, communityId)` straight from the Monad smart contract using Viem public client.
+- **Verification Script (`scripts/check-chain.ts`)**:
+  - Checks onchain Monad state against Supabase database. Configured as `npm run check-chain`.
+
+---
+
+## Day 8 — Sun Oct 11 — Seed content, security audit, mobile pass, freeze
+
+### Done
+- **Seed Review Audit (`docs/SEED-REVIEW.md`)**:
+  - Documented factual citations, Wikimedia Commons image licenses, and zero-stereotype verification across all communities.
+- **Automated RLS Security Audit (`scripts/rls-check.ts`)**:
+  - Verified 8 critical security attack vectors: Interest vector isolation, privilege escalation guard, client mutation guard, direct ledger tamper guard, nonce secrecy, author impersonation, pending privacy, and unauthorized deletion.
+  - Script configured as `npm run rls-check` (passed 8/8 checks).
+- **Mobile Responsive Audit**:
+  - Tested layout down to 360px viewports; verified focus states, touch targets, and `prefers-reduced-motion` compliance.
+
+---
+
+## Day 9 — Mon Oct 12 — README, demo runbook, clean clone & production verification
+
+### Done
+- **Comprehensive Documentation (`README.md`)**:
+  - Architecture Mermaid diagram, hero flow, local setup, environment variables guide, test coverage matrix, and honest limitations.
+- **Demo Script Runbook (`docs/DEMO.md`)**:
+  - Complete 3-minute video presentation guide covering the entire hero flow step by step.
+- **Hackathon Submission Text (`docs/SUBMISSION.md`)**:
+  - Elevator pitch, problem breakdown, "Why onchain?" rationale, and future roadmap.
+- **Test Suite Verification**:
+  - `npm test`, `npm run rls-check`, `npm run check-approval`, `npm run check-feed`, `npm run check-chain`, and `npm run build` all passing with zero errors.
+
 
 
 

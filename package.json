@@ -12,6 +12,8 @@
     "check-weights": "tsx scripts/check-weights.ts",
     "check-feed": "tsx scripts/check-feed.ts",
     "check-approval": "tsx scripts/check-approval.ts",
+    "check-chain": "tsx scripts/check-chain.ts",
+    "rls-check": "tsx scripts/rls-check.ts",
     "test": "vitest run",
     "preview": "vite preview"
   },

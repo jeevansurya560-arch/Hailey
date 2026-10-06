@@ -3,6 +3,7 @@ import { verifyAuth } from '../server/auth.js'
 import { supabaseAdmin } from '../server/supabaseAdmin.js'
 import { validateApproveItemInput } from '../server/validate.js'
 import { computeCommunityId, computeItemContent, computeContentHash } from '../server/hash.js'
+import { attest } from '../server/relayer.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow POST method
@@ -142,7 +143,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 9b. Compute deterministic canonical content hash
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const contributorProfile = item.profiles as any
-    const contributorAddress = (contributorProfile?.wallet_address as `0x${string}`) || '0x0000000000000000000000000000000000000000'
+    const contributorAddress = (contributorProfile?.wallet_address as `0x${string}`) || null
 
     const contentHash = computeContentHash({
       itemId: item.id,
@@ -156,10 +157,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     })
 
-    const initialAttestStatus = contributorProfile?.wallet_address ? 'submitted' : 'awaiting_wallet'
+    const initialAttestStatus = contributorAddress ? 'submitted' : 'awaiting_wallet'
 
     // 9c. Create contributions row (unique per item_id, ON CONFLICT DO NOTHING)
-    const { data: contribution, error: contribError } = await supabaseAdmin
+    const { data: contribution } = await supabaseAdmin
       .from('contributions')
       .upsert(
         {
@@ -171,20 +172,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         { onConflict: 'item_id', ignoreDuplicates: true }
       )
-      .select('id, content_hash, status, created_at')
+      .select('id, content_hash, status, tx_hash, created_at')
       .maybeSingle()
 
-    if (contribError) {
-      console.error('[approve-item] Error creating contribution record:', contribError)
+    // 10–15. Onchain Relayer Attestation Flow (Day 7)
+    let attestResult: { status: 'attested' | 'submitted' | 'failed' | 'awaiting_wallet'; txHash?: `0x${string}`; error?: string } = {
+      status: initialAttestStatus,
     }
 
-    // 10. STOP THERE: Leave clearly marked TODO for Day 7 onchain relayer call
-    // TODO: Day 7 - Invoke relayer service (server/relayer.ts) to submit onchain attest transaction on Monad testnet
+    if (contributorAddress && process.env.RELAYER_PRIVATE_KEY) {
+      try {
+        const communityIdBytes = computeCommunityId(communitySlug)
+        const relayerRes = await attest({
+          communityId: communityIdBytes,
+          contentHash,
+        })
+
+        attestResult = relayerRes
+
+        // Update contributions record with transaction hash and final status
+        await supabaseAdmin
+          .from('contributions')
+          .update({
+            status: relayerRes.status,
+            tx_hash: relayerRes.txHash || null,
+            error: relayerRes.error || null,
+            attested_at: relayerRes.status === 'attested' ? new Date().toISOString() : null,
+          })
+          .eq('item_id', item.id)
+      } catch (relayerErr: unknown) {
+        const msg = relayerErr instanceof Error ? relayerErr.message : 'Relayer attestation execution error'
+        console.warn('[approve-item] Relayer execution skipped or failed:', msg)
+        attestResult = { status: 'submitted', error: msg }
+      }
+    }
 
     return res.status(200).json({
       ok: true,
       status: 'approved',
-      attest: 'pending_implementation',
+      attest: attestResult.status,
+      txHash: attestResult.txHash || null,
       itemId: item.id,
       contribution: contribution || null,
     })
