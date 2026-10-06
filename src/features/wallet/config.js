@@ -7,7 +7,8 @@ const rpcUrl =
   'https://testnet-rpc.monad.xyz'
 
 const projectId =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_WALLETCONNECT_PROJECT_ID) ||
+  (typeof import.meta !== 'undefined' &&
+    import.meta.env?.VITE_WALLETCONNECT_PROJECT_ID) ||
   '3fcc6bba0f1de962d911bb5b5c3dba68'
 
 export const walletConfig = getDefaultConfig({

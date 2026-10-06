@@ -11,7 +11,8 @@ export const monadTestnet = defineChain({
   rpcUrls: {
     default: {
       http: [
-        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_MONAD_RPC_URL) ||
+        (typeof import.meta !== 'undefined' &&
+          import.meta.env?.VITE_MONAD_RPC_URL) ||
           'https://testnet-rpc.monad.xyz',
       ],
     },
@@ -20,7 +21,8 @@ export const monadTestnet = defineChain({
     default: {
       name: 'MonadVision',
       url:
-        (typeof import.meta !== 'undefined' && import.meta.env?.VITE_EXPLORER_URL) ||
+        (typeof import.meta !== 'undefined' &&
+          import.meta.env?.VITE_EXPLORER_URL) ||
         'https://testnet.monadvision.com',
     },
   },

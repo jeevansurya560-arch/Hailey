@@ -1,18 +1,6 @@
+import React from 'react'
 import { Check, Hash } from 'lucide-react'
-import { getThreadColor, type TagKind } from '@/lib/threadColors'
-
-export interface TagStickerProps {
-  id?: number | string
-  name: string
-  slug?: string
-  kind?: TagKind
-  selected?: boolean
-  onClick?: () => void
-  disabled?: boolean
-  showKind?: boolean
-  size?: 'sm' | 'md' | 'lg'
-  className?: string
-}
+import { getThreadColor } from '@/lib/threadColors'
 
 export function TagSticker({
   name,
@@ -23,14 +11,15 @@ export function TagSticker({
   showKind = false,
   size = 'md',
   className = '',
-}: TagStickerProps) {
+}) {
   const threadColor = getThreadColor(kind)
 
-  const sizeClasses = {
-    sm: 'px-2 py-0.5 text-[11px] gap-1',
-    md: 'px-3 py-1.5 text-xs gap-1.5',
-    lg: 'px-4 py-2 text-sm gap-2',
-  }[size]
+  const sizeClasses =
+    {
+      sm: 'px-2 py-0.5 text-[11px] gap-1',
+      md: 'px-3 py-1.5 text-xs gap-1.5',
+      lg: 'px-4 py-2 text-sm gap-2',
+    }[size] || 'px-3 py-1.5 text-xs gap-1.5'
 
   return (
     <button

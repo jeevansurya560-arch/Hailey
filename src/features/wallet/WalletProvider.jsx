@@ -4,7 +4,7 @@ import { RainbowKitProvider, lightTheme } from '@rainbow-me/rainbowkit'
 import '@rainbow-me/rainbowkit/styles.css'
 import { walletConfig } from './config'
 
-export function WalletProvider({ children }: { children: React.ReactNode }) {
+export function WalletProvider({ children }) {
   return (
     <WagmiProvider config={walletConfig}>
       <RainbowKitProvider

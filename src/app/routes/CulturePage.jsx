@@ -5,27 +5,14 @@ import { Plus, Check, Users, Sparkles, Loader2, GitBranch } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
-import { PostCard, type PostItemData } from '@/features/posts/PostCard'
-import { getThreadColor, type TagKind } from '@/lib/threadColors'
-
-interface CultureTagDetails {
-  id: number
-  slug: string
-  name: string
-  kind: TagKind
-  description?: string
-  parent?: { id: number; name: string; slug: string; kind: TagKind } | null
-  childTags: { id: number; name: string; slug: string; kind: TagKind }[]
-  relatedTags: { id: number; name: string; slug: string; kind: TagKind; weight: number }[]
-  linkedCommunities: { id: string; name: string; slug: string }[]
-  isExploring: boolean
-}
+import { PostCard } from '@/features/posts/PostCard'
+import { getThreadColor } from '@/lib/threadColors'
 
 export function CulturePage() {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useParams()
   const { user } = useAuth()
   const queryClient = useQueryClient()
-  const [exploringOverride, setExploringOverride] = useState<boolean | null>(null)
+  const [exploringOverride, setExploringOverride] = useState(null)
 
   // 1. Fetch culture tag details, relations, and communities
   const { data: tag, isLoading: isTagLoading } = useQuery({
@@ -83,24 +70,21 @@ export function CulturePage() {
         isExploring = (interest?.weight ?? 0) > 0
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const relatedTags = (edgesData || []).map((e) => ({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ...(e.tags as any),
+        ...e.tags,
         weight: e.weight,
       })).filter(Boolean)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const linkedCommunities = (commTags || []).map((ct) => (ct.communities as any)).filter(Boolean)
+      const linkedCommunities = (commTags || []).map((ct) => ct.communities).filter(Boolean)
 
       return {
         ...baseTag,
         parent,
-        childTags: (childData || []) as { id: number; name: string; slug: string; kind: TagKind }[],
+        childTags: childData || [],
         relatedTags,
         linkedCommunities,
         isExploring,
-      } as CultureTagDetails
+      }
     },
   })
 
@@ -133,7 +117,7 @@ export function CulturePage() {
       if (error) throw error
 
       // User reactions
-      let userReactions: { post_id: string; kind: string }[] = []
+      let userReactions = []
       if (user) {
         const { data: reactionsData } = await supabase
           .from('post_reactions')
@@ -144,7 +128,7 @@ export function CulturePage() {
 
       // Counts
       const { data: allReactions } = await supabase.from('post_reactions').select('post_id, kind')
-      const reactionsCountMap = new Map<string, { likes: number; saves: number }>()
+      const reactionsCountMap = new Map()
       if (allReactions) {
         for (const r of allReactions) {
           const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
@@ -154,14 +138,12 @@ export function CulturePage() {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return (postTags || []).map((pt: any) => {
+      return (postTags || []).map((pt) => {
         const p = pt.posts
         if (!p) return null
         const pReactions = userReactions.filter((r) => r.post_id === p.id)
         const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tags = (p.post_tags || []).map((item: any) => item.tags).filter(Boolean)
+        const tags = (p.post_tags || []).map((item) => item.tags).filter(Boolean)
 
         return {
           id: p.id,
@@ -183,14 +165,14 @@ export function CulturePage() {
             isHidden: pReactions.some((r) => r.kind === 'hide'),
           },
         }
-      }).filter(Boolean) as PostItemData[]
+      }).filter(Boolean)
     },
     enabled: !!tag?.id,
   })
 
   // Toggle Exploring mutation (CULT-04)
   const toggleExploringMutation = useMutation({
-    mutationFn: async (shouldExplore: boolean) => {
+    mutationFn: async (shouldExplore) => {
       if (!user || !tag) throw new Error('Sign in required')
       if (shouldExplore) {
         const { error } = await supabase

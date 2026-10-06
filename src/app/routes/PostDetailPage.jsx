@@ -3,11 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
-import { PostCard, type PostItemData } from '@/features/posts/PostCard'
-import type { TagKind } from '@/lib/threadColors'
+import { PostCard } from '@/features/posts/PostCard'
 
 export function PostDetailPage() {
-  const { id } = useParams<{ id: string }>()
+  const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -38,7 +37,7 @@ export function PostDetailPage() {
       if (error || !p) throw error || new Error('Post not found')
 
       // Reactions
-      let userReactions: { post_id: string; kind: string }[] = []
+      let userReactions = []
       if (user) {
         const { data: reactionsData } = await supabase
           .from('post_reactions')
@@ -62,21 +61,13 @@ export function PostDetailPage() {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const tags = (p.post_tags || []).map((pt: any) => pt.tags).filter(Boolean) as {
-        id: number
-        name: string
-        slug: string
-        kind: TagKind
-      }[]
+      const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
 
       return {
         id: p.id,
         author_id: p.author_id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        author: p.profiles as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        community: p.communities as any,
+        author: p.profiles,
+        community: p.communities,
         body: p.body,
         media_url: p.media_url,
         media_credit: p.media_credit,
@@ -91,7 +82,7 @@ export function PostDetailPage() {
           isSaved: userReactions.some((r) => r.kind === 'save'),
           isHidden: userReactions.some((r) => r.kind === 'hide'),
         },
-      } as PostItemData
+      }
     },
   })
 

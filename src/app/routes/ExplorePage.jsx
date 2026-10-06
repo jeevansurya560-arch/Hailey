@@ -3,20 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { Search, Loader2, Compass } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { TagSticker } from '@/components/TagSticker'
-import { getThreadColor, type TagKind } from '@/lib/threadColors'
-
-interface Tag {
-  id: number
-  slug: string
-  name: string
-  kind: TagKind
-  parent_id?: number | null
-  description?: string
-}
+import { getThreadColor } from '@/lib/threadColors'
 
 export function ExplorePage() {
   const [filter, setFilter] = useState('')
-  const [selectedKind, setSelectedKind] = useState<string | null>(null)
+  const [selectedKind, setSelectedKind] = useState(null)
 
   // Fetch real taxonomy tags from Supabase
   const {
@@ -32,13 +23,13 @@ export function ExplorePage() {
         .order('name', { ascending: true })
 
       if (error) throw error
-      return (data || []) as Tag[]
+      return data || []
     },
   })
 
   // Extract distinct kinds for filter pills
   const kinds = useMemo(() => {
-    const set = new Set<string>()
+    const set = new Set()
     for (const t of tags) {
       if (t.kind) set.add(t.kind)
     }
@@ -61,7 +52,7 @@ export function ExplorePage() {
 
   // Group filtered tags by kind
   const groupedByKind = useMemo(() => {
-    const map = new Map<string, Tag[]>()
+    const map = new Map()
     for (const tag of filteredTags) {
       const group = map.get(tag.kind) || []
       group.push(tag)

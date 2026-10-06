@@ -5,19 +5,9 @@ import { Compass, Sparkles, ArrowRight, AlertCircle, Loader2 } from 'lucide-reac
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
-import type { TagKind } from '@/lib/threadColors'
-
-interface Tag {
-  id: number
-  slug: string
-  name: string
-  kind: TagKind
-  parent_id?: number | null
-  description?: string
-}
 
 // Visual category grouping for pleasant onboarding layout
-const KIND_GROUPS: { title: string; subtitle: string; kinds: string[] }[] = [
+const KIND_GROUPS = [
   {
     title: 'Heritage & Regional Traditions',
     subtitle: 'Living roots, ancestral practices, and geographic homelands',
@@ -54,8 +44,8 @@ export function OnboardingPage() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const [selectedTagIds, setSelectedTagIds] = useState<Set<number>>(new Set())
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [selectedTagIds, setSelectedTagIds] = useState(new Set())
+  const [errorMsg, setErrorMsg] = useState(null)
 
   // 1. Fetch tags from Supabase
   const {
@@ -71,7 +61,7 @@ export function OnboardingPage() {
         .order('name', { ascending: true })
 
       if (error) throw error
-      return (data || []) as Tag[]
+      return data || []
     },
   })
 
@@ -87,7 +77,7 @@ export function OnboardingPage() {
   }, [tags])
 
   // Toggle selection handler
-  const handleToggle = (tagId: number) => {
+  const handleToggle = (tagId) => {
     setErrorMsg(null)
     setSelectedTagIds((prev) => {
       const next = new Set(prev)
@@ -106,7 +96,7 @@ export function OnboardingPage() {
 
   // 2. Submit mutation: writes to user_interests
   const saveInterestsMutation = useMutation({
-    mutationFn: async (tagIds: number[]) => {
+    mutationFn: async (tagIds) => {
       if (!user) throw new Error('You must be signed in to save interests.')
       if (tagIds.length < 3) throw new Error('Please select at least 3 interests.')
       if (tagIds.length > 10) throw new Error('Maximum 10 interests allowed.')
@@ -129,7 +119,7 @@ export function OnboardingPage() {
       queryClient.invalidateQueries({ queryKey: ['user_interests', user?.id] })
       navigate('/', { replace: true })
     },
-    onError: (err: unknown) => {
+    onError: (err) => {
       const msg = err instanceof Error ? err.message : 'Failed to save interests'
       setErrorMsg(msg)
     },

@@ -3,10 +3,10 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 
 // Batched impressions queue
-const impressionQueue = new Set<string>()
-let flushTimer: NodeJS.Timeout | null = null
+const impressionQueue = new Set()
+let flushTimer = null
 
-function flushImpressions(userId: string) {
+function flushImpressions(userId) {
   if (impressionQueue.size === 0) return
   const postIds = Array.from(impressionQueue)
   impressionQueue.clear()
@@ -26,10 +26,10 @@ function flushImpressions(userId: string) {
     })
 }
 
-export function useImpression(postId?: string) {
+export function useImpression(postId) {
   const { user } = useAuth()
-  const elementRef = useRef<HTMLDivElement | null>(null)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const elementRef = useRef(null)
+  const timerRef = useRef(null)
   const hasRecordedRef = useRef(false)
 
   useEffect(() => {

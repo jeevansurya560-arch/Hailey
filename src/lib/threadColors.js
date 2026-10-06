@@ -1,20 +1,7 @@
-export type TagKind =
-  | 'culture'
-  | 'music'
-  | 'fashion'
-  | 'food'
-  | 'art'
-  | 'film'
-  | 'language'
-  | 'heritage'
-  | 'internet'
-  | 'place'
-  | string
-
 /**
  * Maps tag kind to design token color variable per System Design §11.1
  */
-export function getThreadColor(kind?: TagKind): string {
+export function getThreadColor(kind) {
   switch (kind) {
     case 'culture':
     case 'place':

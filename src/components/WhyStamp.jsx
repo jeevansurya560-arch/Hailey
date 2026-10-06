@@ -1,12 +1,7 @@
+import React from 'react'
 import { Sparkles, Compass } from 'lucide-react'
 
-export interface WhyStampProps {
-  why?: string[] | null
-  isExplore?: boolean
-  className?: string
-}
-
-export function WhyStamp({ why, isExplore = false, className = '' }: WhyStampProps) {
+export function WhyStamp({ why, isExplore = false, className = '' }) {
   if (!why || why.length === 0) return null
 
   const tagsFormatted = why.join(' + ').toUpperCase()
@@ -16,7 +11,11 @@ export function WhyStamp({ why, isExplore = false, className = '' }: WhyStampPro
       className={`
         inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] uppercase font-bold tracking-wider
         rounded-[var(--radius)] border shadow-[1.5px_1.5px_0_var(--ink)]
-        ${isExplore ? '-rotate-1 bg-amber-50 border-[var(--saffron)] text-[var(--saffron)]' : 'rotate-1 bg-[var(--paper)] border-[var(--ink)] text-[var(--ink)]'}
+        ${
+          isExplore
+            ? '-rotate-1 bg-amber-50 border-[var(--saffron)] text-[var(--saffron)]'
+            : 'rotate-1 bg-[var(--paper)] border-[var(--ink)] text-[var(--ink)]'
+        }
         ${className}
       `}
     >

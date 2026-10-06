@@ -5,15 +5,14 @@ import { Users, UserPlus, UserCheck, Shield, BookOpen, Loader2 } from 'lucide-re
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
-import { PostCard, type PostItemData } from '@/features/posts/PostCard'
+import { PostCard } from '@/features/posts/PostCard'
 import { PostComposer } from '@/features/posts/PostComposer'
-import type { TagKind } from '@/lib/threadColors'
 
 export function CommunityPage() {
-  const { slug } = useParams<{ slug: string }>()
+  const { slug } = useParams()
   const { user } = useAuth()
   const queryClient = useQueryClient()
-  const [isMemberOverride, setIsMemberOverride] = useState<boolean | null>(null)
+  const [isMemberOverride, setIsMemberOverride] = useState(null)
 
   // 1. Fetch community details, curators, and tags
   const { data: community, isLoading: isCommLoading } = useQuery({
@@ -43,16 +42,9 @@ export function CommunityPage() {
 
       const membersCount = memberships?.length || 0
       const isMember = !!(user && memberships?.some((m) => m.user_id === user.id))
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const curators = (memberships || []).filter((m) => m.role === 'curator').map((m) => (m.profiles as any))
+      const curators = (memberships || []).filter((m) => m.role === 'curator').map((m) => m.profiles)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const tags = (commTags || []).map((ct) => (ct.tags as any)).filter(Boolean) as {
-        id: number
-        name: string
-        slug: string
-        kind: TagKind
-      }[]
+      const tags = (commTags || []).map((ct) => ct.tags).filter(Boolean)
 
       return {
         ...comm,
@@ -90,7 +82,7 @@ export function CommunityPage() {
       if (error) throw error
 
       // Fetch user reactions
-      let userReactions: { post_id: string; kind: string }[] = []
+      let userReactions = []
       if (user) {
         const { data: reactionsData } = await supabase
           .from('post_reactions')
@@ -102,7 +94,7 @@ export function CommunityPage() {
       // Fetch all reactions counts
       const { data: allReactions } = await supabase.from('post_reactions').select('post_id, kind')
 
-      const reactionsCountMap = new Map<string, { likes: number; saves: number }>()
+      const reactionsCountMap = new Map()
       if (allReactions) {
         for (const r of allReactions) {
           const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
@@ -115,15 +107,12 @@ export function CommunityPage() {
       return (postsData || []).map((p) => {
         const postReactions = userReactions.filter((r) => r.post_id === p.id)
         const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const tags = (p.post_tags || []).map((pt: any) => pt.tags).filter(Boolean)
+        const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
 
         return {
           id: p.id,
           author_id: p.author_id,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          author: p.profiles as any,
+          author: p.profiles,
           community: { slug: community.slug, name: community.name },
           body: p.body,
           media_url: p.media_url,
@@ -140,14 +129,14 @@ export function CommunityPage() {
             isHidden: postReactions.some((r) => r.kind === 'hide'),
           },
         }
-      }) as PostItemData[]
+      })
     },
     enabled: !!community?.id,
   })
 
   // Join/Leave mutation
   const toggleMembershipMutation = useMutation({
-    mutationFn: async (isJoining: boolean) => {
+    mutationFn: async (isJoining) => {
       if (!user || !community) throw new Error('Sign in required')
       if (isJoining) {
         const { error } = await supabase
@@ -254,7 +243,7 @@ export function CommunityPage() {
               <Shield className="h-4 w-4 text-[var(--onchain)]" />
               <span>
                 Curators:{' '}
-                {community.curators.map((curator: { handle: string; display_name?: string }) => (
+                {community.curators.map((curator) => (
                   <Link
                     key={curator.handle}
                     to={`/u/${curator.handle}`}
@@ -271,7 +260,7 @@ export function CommunityPage() {
         {/* Community Topic Tags */}
         {community.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 pt-2">
-            {community.tags.map((tag: { id: number; name: string; slug: string; kind: TagKind }) => (
+            {community.tags.map((tag) => (
               <TagSticker
                 key={tag.id}
                 id={tag.id}

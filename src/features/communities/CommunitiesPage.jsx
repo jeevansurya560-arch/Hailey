@@ -5,22 +5,11 @@ import { Users, UserPlus, UserCheck, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
-import type { TagKind } from '@/lib/threadColors'
-
-interface CommunityWithDetails {
-  id: string
-  slug: string
-  name: string
-  description?: string
-  membersCount: number
-  isMember: boolean
-  tags: { id: number; name: string; slug: string; kind: TagKind }[]
-}
 
 export function CommunitiesPage() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
-  const [membershipOverrides, setMembershipOverrides] = useState<Record<string, boolean>>({})
+  const [membershipOverrides, setMembershipOverrides] = useState({})
 
   // Fetch communities, tags, and user memberships
   const { data: communities = [], isLoading } = useQuery({
@@ -43,19 +32,18 @@ export function CommunitiesPage() {
         .from('memberships')
         .select('community_id, user_id')
 
-      const commTagsMap = new Map<string, { id: number; name: string; slug: string; kind: TagKind }[]>()
+      const commTagsMap = new Map()
       if (commTagsData) {
         for (const item of commTagsData) {
           if (!item.community_id || !item.tags) continue
           const current = commTagsMap.get(item.community_id) || []
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          current.push(item.tags as any)
+          current.push(item.tags)
           commTagsMap.set(item.community_id, current)
         }
       }
 
-      const membersCountMap = new Map<string, number>()
-      const userJoinedSet = new Set<string>()
+      const membersCountMap = new Map()
+      const userJoinedSet = new Set()
 
       if (membershipsData) {
         for (const m of membershipsData) {
@@ -74,13 +62,13 @@ export function CommunitiesPage() {
         membersCount: membersCountMap.get(c.id) || 0,
         isMember: userJoinedSet.has(c.id),
         tags: commTagsMap.get(c.id) || [],
-      })) as CommunityWithDetails[]
+      }))
     },
   })
 
   // Join/Leave mutation
   const toggleMembershipMutation = useMutation({
-    mutationFn: async ({ communityId, isJoining }: { communityId: string; isJoining: boolean }) => {
+    mutationFn: async ({ communityId, isJoining }) => {
       if (!user) throw new Error('Sign in required')
       if (isJoining) {
         const { error } = await supabase

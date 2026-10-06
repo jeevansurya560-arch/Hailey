@@ -7,16 +7,16 @@ export function AuthPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [handle, setHandle] = useState('')
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState(null)
   const [submitting, setSubmitting] = useState(false)
 
   const { signIn, signUp } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
-  const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/'
+  const from = location.state?.from?.pathname || '/'
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMsg(null)
 
@@ -52,7 +52,7 @@ export function AuthPage() {
           navigate(from, { replace: true })
         }
       }
-    } catch (err: unknown) {
+    } catch (err) {
       if (err instanceof Error) {
         setErrorMsg(err.message)
       } else {

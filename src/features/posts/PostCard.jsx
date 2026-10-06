@@ -4,42 +4,8 @@ import { Heart, Bookmark, EyeOff, Trash2, ExternalLink, ShieldCheck } from 'luci
 import { useAuth } from '@/features/auth/useAuth'
 import { supabase } from '@/lib/supabase'
 import { TagSticker } from '@/components/TagSticker'
-import type { TagKind } from '@/lib/threadColors'
 
-export interface PostItemData {
-  id: string
-  author_id: string
-  author?: {
-    handle: string
-    display_name?: string
-  } | null
-  community?: {
-    slug: string
-    name: string
-  } | null
-  body: string
-  media_url?: string | null
-  media_credit?: string | null
-  source_url?: string | null
-  is_editorial?: boolean
-  created_at: string
-  tags?: { id: number; name: string; slug: string; kind: TagKind }[]
-  reactions?: {
-    likesCount: number
-    savesCount: number
-    isLiked: boolean
-    isSaved: boolean
-    isHidden: boolean
-  }
-}
-
-export interface PostCardProps {
-  post: PostItemData
-  onDelete?: (id: string) => void
-  onHide?: (id: string) => void
-}
-
-export function PostCard({ post, onDelete, onHide }: PostCardProps) {
+export function PostCard({ post, onDelete, onHide }) {
   const { user } = useAuth()
 
   // Optimistic reaction states

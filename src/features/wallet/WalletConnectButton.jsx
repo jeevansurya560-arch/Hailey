@@ -1,3 +1,4 @@
+import React from 'react'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Wallet, AlertCircle } from 'lucide-react'
 

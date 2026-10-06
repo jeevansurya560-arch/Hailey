@@ -5,8 +5,7 @@ import { Sparkles, Users, Loader2, ArrowRight, Compass } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { PostComposer } from '@/features/posts/PostComposer'
-import { FeedCard, type FeedItemData } from '@/features/feed/FeedCard'
-import type { TagKind } from '@/lib/threadColors'
+import { FeedCard } from '@/features/feed/FeedCard'
 
 const PAGE_SIZE = 15
 
@@ -54,7 +53,7 @@ export function HomePage() {
           let exploreIdx = 0
 
           // Merge & interleave explore items at every 5th slot
-          const orderedFeedItems: { post_id: string; score: number; why: string[]; isExplore: boolean }[] = []
+          const orderedFeedItems = []
           for (let i = 0; i < rpcFeed.length; i++) {
             orderedFeedItems.push({
               post_id: rpcFeed[i].post_id,
@@ -109,7 +108,7 @@ export function HomePage() {
               .select('post_id, kind')
               .in('post_id', postIds)
 
-            const reactionsCountMap = new Map<string, { likes: number; saves: number }>()
+            const reactionsCountMap = new Map()
             if (allReactions) {
               for (const r of allReactions) {
                 const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
@@ -124,7 +123,7 @@ export function HomePage() {
             )
 
             // Reconstruct in exact ranking order
-            const resultList: FeedItemData[] = []
+            const resultList = []
             for (const feedItem of orderedFeedItems) {
               if (hiddenPostIds.has(feedItem.post_id)) continue
               const p = postsMap.get(feedItem.post_id)
@@ -132,21 +131,13 @@ export function HomePage() {
 
               const pReactions = (userReactions || []).filter((r) => r.post_id === p.id)
               const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const tags = (p.post_tags || []).map((pt: any) => pt.tags).filter(Boolean) as {
-                id: number
-                name: string
-                slug: string
-                kind: TagKind
-              }[]
+              const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
 
               resultList.push({
                 id: p.id,
                 author_id: p.author_id,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                author: p.profiles as any,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                community: p.communities as any,
+                author: p.profiles,
+                community: p.communities,
                 body: p.body,
                 media_url: p.media_url,
                 media_credit: p.media_credit,
@@ -191,9 +182,8 @@ export function HomePage() {
         .order('created_at', { ascending: false })
         .limit(limit)
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const fallbackList: FeedItemData[] = (postsData || []).map((p: any) => {
-        const tags = (p.post_tags || []).map((pt: any) => pt.tags).filter(Boolean)
+      const fallbackList = (postsData || []).map((p) => {
+        const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
         return {
           id: p.id,
           author_id: p.author_id,

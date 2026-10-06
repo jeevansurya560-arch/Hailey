@@ -1,6 +1,13 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Heart, Bookmark, EyeOff, Trash2, ExternalLink, ShieldCheck } from 'lucide-react'
+import {
+  Heart,
+  Bookmark,
+  EyeOff,
+  Trash2,
+  ExternalLink,
+  ShieldCheck,
+} from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
 import { supabase } from '@/lib/supabase'
 import { TagSticker } from '@/components/TagSticker'
@@ -8,45 +15,9 @@ import { WhyStamp } from '@/components/WhyStamp'
 import { RelevancePrompt } from '@/components/RelevancePrompt'
 import { shouldShowRelevancePrompt } from '@/lib/relevance'
 import { useImpression } from '@/features/feed/useImpression'
-import { getThreadColor, type TagKind } from '@/lib/threadColors'
+import { getThreadColor } from '@/lib/threadColors'
 
-export interface FeedItemData {
-  id: string
-  author_id: string
-  author?: {
-    handle: string
-    display_name?: string
-  } | null
-  community?: {
-    slug: string
-    name: string
-  } | null
-  body: string
-  media_url?: string | null
-  media_credit?: string | null
-  source_url?: string | null
-  is_editorial?: boolean
-  created_at: string
-  tags?: { id: number; name: string; slug: string; kind: TagKind }[]
-  why?: string[] | null
-  score?: number
-  isExplore?: boolean
-  reactions?: {
-    likesCount: number
-    savesCount: number
-    isLiked: boolean
-    isSaved: boolean
-    isHidden: boolean
-  }
-}
-
-export interface FeedCardProps {
-  post: FeedItemData
-  onDelete?: (id: string) => void
-  onHide?: (id: string) => void
-}
-
-export function FeedCard({ post, onDelete, onHide }: FeedCardProps) {
+export function FeedCard({ post, onDelete, onHide }) {
   const { user } = useAuth()
   const impressionRef = useImpression(post.id)
 
@@ -159,7 +130,9 @@ export function FeedCard({ post, onDelete, onHide }: FeedCardProps) {
     }
   }
 
-  const showRelevance = user ? shouldShowRelevancePrompt(user.id, post.id) : false
+  const showRelevance = user
+    ? shouldShowRelevancePrompt(user.id, post.id)
+    : false
 
   return (
     <div ref={impressionRef} className="relative group">
@@ -196,7 +169,9 @@ export function FeedCard({ post, onDelete, onHide }: FeedCardProps) {
 
               {post.community && (
                 <>
-                  <span className="text-[var(--ink-2)] font-mono text-xs">in</span>
+                  <span className="text-[var(--ink-2)] font-mono text-xs">
+                    in
+                  </span>
                   <Link
                     to={`/communities/${post.community.slug}`}
                     className="font-mono text-xs text-[var(--clay)] font-semibold hover:underline"
@@ -306,7 +281,9 @@ export function FeedCard({ post, onDelete, onHide }: FeedCardProps) {
                   : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
               }`}
             >
-              <Heart className={`h-4 w-4 ${isLiked ? 'fill-[var(--clay)] text-[var(--clay)]' : ''}`} />
+              <Heart
+                className={`h-4 w-4 ${isLiked ? 'fill-[var(--clay)] text-[var(--clay)]' : ''}`}
+              />
               <span>{likesCount}</span>
             </button>
 
@@ -319,7 +296,9 @@ export function FeedCard({ post, onDelete, onHide }: FeedCardProps) {
                   : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
               }`}
             >
-              <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-[var(--saffron)] text-[var(--saffron)]' : ''}`} />
+              <Bookmark
+                className={`h-4 w-4 ${isSaved ? 'fill-[var(--saffron)] text-[var(--saffron)]' : ''}`}
+              />
               <span>{savesCount}</span>
             </button>
           </div>

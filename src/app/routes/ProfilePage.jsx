@@ -4,7 +4,7 @@ import { useAuth } from '@/features/auth/useAuth'
 import { LazyWalletSection } from '@/features/wallet/LazyWalletSection'
 
 export function ProfilePage() {
-  const { handle } = useParams<{ handle: string }>()
+  const { handle } = useParams()
   const { user } = useAuth()
 
   const isOwnProfile = user && (user.user_metadata?.handle === handle || user.email?.split('@')[0] === handle)

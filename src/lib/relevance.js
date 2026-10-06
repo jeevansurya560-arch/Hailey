@@ -2,7 +2,7 @@
  * Deterministic integer hash of (userId + postId)
  * Returns true if hash % 10 === 0 (~10% of posts)
  */
-export function shouldShowRelevancePrompt(userId?: string | null, postId?: string): boolean {
+export function shouldShowRelevancePrompt(userId, postId) {
   if (!userId || !postId) return false
   const combined = `${userId}:${postId}`
   let hash = 0

@@ -1,26 +1,23 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ThumbsUp, ThumbsDown, HelpCircle, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
-export interface RelevancePromptProps {
-  userId: string
-  postId: string
-  initialAnswer?: 'yes' | 'somewhat' | 'no' | null
-}
-
-export function RelevancePrompt({ userId, postId, initialAnswer = null }: RelevancePromptProps) {
-  const [selectedAnswer, setSelectedAnswer] = useState<'yes' | 'somewhat' | 'no' | null>(initialAnswer)
+export function RelevancePrompt({ userId, postId, initialAnswer = null }) {
+  const [selectedAnswer, setSelectedAnswer] = useState(initialAnswer)
   const [isSubmitted, setIsSubmitted] = useState(initialAnswer !== null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleAnswer = async (answer: 'yes' | 'somewhat' | 'no') => {
+  const handleAnswer = async (answer) => {
     if (isSubmitted || isSubmitting) return
     setSelectedAnswer(answer)
     setIsSubmitting(true)
 
     const { error } = await supabase
       .from('feedback')
-      .upsert({ user_id: userId, post_id: postId, answer }, { onConflict: 'user_id,post_id' })
+      .upsert(
+        { user_id: userId, post_id: postId, answer },
+        { onConflict: 'user_id,post_id' }
+      )
 
     setIsSubmitting(false)
     if (!error) {

@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react'
 
-const WalletProvider = React.lazy(() => import('./WalletProvider'))
+const WalletProvider = React.lazy(() => import('./WalletProvider.jsx'))
 const WalletConnectButton = React.lazy(() =>
-  import('./WalletConnectButton').then((module) => ({ default: module.WalletConnectButton }))
+  import('./WalletConnectButton.jsx').then((module) => ({
+    default: module.WalletConnectButton,
+  }))
 )
 
 export function LazyWalletSection() {

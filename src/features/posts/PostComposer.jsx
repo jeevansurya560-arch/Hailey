@@ -4,27 +4,8 @@ import { PenSquare, Send, Image, Link2, AlertCircle, Loader2, X } from 'lucide-r
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
-import type { TagKind } from '@/lib/threadColors'
 
-interface Tag {
-  id: number
-  name: string
-  slug: string
-  kind: TagKind
-}
-
-interface Community {
-  id: string
-  name: string
-  slug: string
-}
-
-interface PostComposerProps {
-  defaultCommunityId?: string
-  onPostCreated?: () => void
-}
-
-export function PostComposer({ defaultCommunityId, onPostCreated }: PostComposerProps) {
+export function PostComposer({ defaultCommunityId, onPostCreated }) {
   const { user } = useAuth()
   const queryClient = useQueryClient()
 
@@ -33,17 +14,17 @@ export function PostComposer({ defaultCommunityId, onPostCreated }: PostComposer
   const [mediaCredit, setMediaCredit] = useState('')
   const [sourceUrl, setSourceUrl] = useState('')
   const [selectedCommunityId, setSelectedCommunityId] = useState(defaultCommunityId || '')
-  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([])
+  const [selectedTagIds, setSelectedTagIds] = useState([])
   const [tagSearch, setTagSearch] = useState('')
   const [showExtras, setShowExtras] = useState(false)
-  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [errorMsg, setErrorMsg] = useState(null)
 
   // Fetch available tags
   const { data: tags = [] } = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
       const { data } = await supabase.from('tags').select('*').order('name')
-      return (data || []) as Tag[]
+      return data || []
     },
   })
 
@@ -52,11 +33,11 @@ export function PostComposer({ defaultCommunityId, onPostCreated }: PostComposer
     queryKey: ['communities'],
     queryFn: async () => {
       const { data } = await supabase.from('communities').select('id, name, slug').order('name')
-      return (data || []) as Community[]
+      return data || []
     },
   })
 
-  const toggleTag = (tagId: number) => {
+  const toggleTag = (tagId) => {
     setErrorMsg(null)
     if (selectedTagIds.includes(tagId)) {
       setSelectedTagIds(selectedTagIds.filter((id) => id !== tagId))
@@ -127,7 +108,7 @@ export function PostComposer({ defaultCommunityId, onPostCreated }: PostComposer
       queryClient.invalidateQueries({ queryKey: ['posts'] })
       onPostCreated?.()
     },
-    onError: (err: unknown) => {
+    onError: (err) => {
       const msg = err instanceof Error ? err.message : 'Error creating post'
       setErrorMsg(msg)
     },
