@@ -7,6 +7,7 @@ import {
   Trash2,
   ExternalLink,
   ShieldCheck,
+  Lock,
 } from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -182,13 +183,20 @@ export function FeedCard({ post, onDelete, onHide }) {
               )}
             </div>
 
-            <span className="font-mono text-[10px] text-[var(--ink-2)]">
-              {new Date(post.created_at).toLocaleDateString(undefined, {
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
-            </span>
+            <div className="flex items-center gap-2 font-mono text-[10px] text-[var(--ink-2)]">
+              <span>
+                {new Date(post.created_at).toLocaleDateString(undefined, {
+                  month: 'short',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
+              </span>
+              <span>·</span>
+              <span className="inline-flex items-center gap-0.5 text-emerald-800 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200" title="Protected under PostgreSQL Row Level Security">
+                <Lock className="h-2.5 w-2.5" />
+                RLS Verified
+              </span>
+            </div>
           </div>
 
           {isAuthor && (

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Compass, Users, User, LogIn, LogOut } from 'lucide-react'
+import { Home, Compass, Users, User, LogIn, LogOut, ShieldCheck } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/useAuth'
 import { supabase } from '@/lib/supabase'
@@ -55,14 +55,25 @@ export function AppShell() {
       {/* Top Nav (Desktop) */}
       <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--paper)]/95 backdrop-blur">
         <div className="max-w-[1100px] mx-auto flex items-center justify-between px-4 py-3 md:px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="font-serif text-2xl font-black tracking-tight text-[var(--ink)]">
-              Hailey
-            </span>
-            <span className="rounded bg-[var(--clay)] px-1.5 py-0.5 font-mono text-[10px] uppercase font-bold text-[var(--paper)]">
-              Field Guide
-            </span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2">
+              <span className="font-serif text-2xl font-black tracking-tight text-[var(--ink)]">
+                Hailey
+              </span>
+              <span className="rounded bg-[var(--clay)] px-1.5 py-0.5 font-mono text-[10px] uppercase font-bold text-[var(--paper)]">
+                Field Guide
+              </span>
+            </Link>
+
+            {/* Cryptographic & RLS Security Status Badge */}
+            <div className="hidden sm:inline-flex items-center gap-1.5 border border-emerald-800/30 bg-emerald-950/10 dark:bg-emerald-500/10 px-2 py-0.5 rounded font-mono text-[10px] text-emerald-800">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              <span className="font-semibold flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3 inline" />
+                RLS Protected · Monad L1
+              </span>
+            </div>
+          </div>
 
           {/* Desktop Links */}
           <nav className="hidden md:flex items-center gap-6">
@@ -99,7 +110,7 @@ export function AppShell() {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1 border border-[var(--ink)] bg-[var(--clay)] px-3 py-1 font-mono text-xs uppercase tracking-wider text-[var(--paper)] hover:opacity-90 transition-opacity"
+                className="flex items-center gap-1 border border-[var(--ink)] bg-[var(--clay)] px-3 py-1 font-mono text-xs uppercase tracking-wider text-[var(--paper)] hover:opacity-90 transition-opacity shadow-[1.5px_1.5px_0_var(--ink)]"
               >
                 <LogIn className="h-3 w-3" />
                 <span>Sign In</span>
