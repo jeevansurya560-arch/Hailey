@@ -205,7 +205,42 @@
 - Configured feed query in `HomePage.tsx` to handle both authenticated RPC responses and unauthenticated cold-start fallback cleanly.
 
 ### Next day (Day 6 — Fri Oct 9)
-- Moderation pipeline, curator triage dashboard (`/communities/:slug/mod`), report queue, and hiding posts with >= 3 reports.
+- Collections, proposals, and curator approve/reject through server function.
+
+---
+
+## Day 6 — Fri Oct 9 — Collections, proposals, curator approval
+
+### Done
+- **Server Utilities & Validation**:
+  - `server/auth.ts`: Supabase JWT verification via `Authorization: Bearer <token>` extracting authenticated user.
+  - `server/supabaseAdmin.ts`: Service-role Supabase client bypassing RLS for serverless handlers and CLI scripts.
+  - `server/validate.ts`: Request payload validation for item approval (`validateApproveItemInput`) and proposal submission (`validateProposeItemInput`).
+- **Serverless Approval Endpoint (`api/approve-item.ts`)**:
+  - Implements steps 1–10 of System Design §8.2.
+  - Verifies caller JWT, enforces `pending` status guard (409 Conflict if decided), checks community curator role in `memberships` (403 Forbidden), and prevents self-approval (`decided_by <> added_by`, 403 Forbidden).
+  - Updates `collection_items` status to `approved` or `rejected`.
+  - On approval, computes deterministic canonical content hash (EIP-712/keccak256) and creates a row in `contributions` (`status: 'submitted'` if wallet linked else `'awaiting_wallet'`).
+  - Marked with Day 7 TODO for onchain relayer attestation invocation.
+- **Collections UI & Proposal Flow (`src/features/collections`)**:
+  - `CreateCollectionModal.jsx`: Modal for creating community or personal archives.
+  - `ProposeItemModal.jsx`: Propose archival items (links, dispatches, or standalone notes).
+  - `CollectionDetailPage.jsx` (`/collections/:id`): Full collection archive page with item listings, provenance badges, and a **Curator Triage Queue** with Approve/Reject actions.
+  - Integrated real collection directory into `CommunityPage.jsx`.
+- **Automated Verification Script (`scripts/check-approval.ts`)**:
+  - Verified non-curator rejection (403), anti-self-dealing rejection (403), deterministic Keccak256 content hashing, and duplicate decision conflict guard (409).
+  - Configured in `package.json` as `npm run check-approval`.
+
+### Not done / Deferred
+- Onchain relayer broadcast (Day 7 scope).
+
+### Known issues / Not verified
+- **NOT VERIFIED**:
+  - Live execution of `api/approve-item.ts` on production Vercel deployment with live secrets.
+
+### Next day (Day 7 — Sat Oct 10)
+- Monad onchain attestation broadcast from relayer, wallet link flow, Verified seal component, profile attestation history, and `/verify/:address`.
+
 
 
 

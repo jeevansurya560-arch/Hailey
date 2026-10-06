@@ -1,0 +1,196 @@
+import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { verifyAuth } from '../server/auth.js'
+import { supabaseAdmin } from '../server/supabaseAdmin.js'
+import { validateApproveItemInput } from '../server/validate.js'
+import { computeCommunityId, computeItemContent, computeContentHash } from '../server/hash.js'
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Only allow POST method
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
+  }
+
+  try {
+    // 1. Authenticate caller via Supabase JWT
+    const { user, error: authError } = await verifyAuth(req.headers.authorization)
+    if (authError || !user) {
+      return res.status(401).json({ error: authError || 'Unauthorized. Valid Bearer token required.' })
+    }
+
+    // 2. Validate input payload
+    const { data: input, error: valError } = validateApproveItemInput(req.body)
+    if (valError || !input) {
+      return res.status(400).json({ error: valError || 'Invalid input payload.' })
+    }
+
+    const { itemId, action } = input
+
+    // 3. Fetch item, collection, and contributor profile
+    const { data: item, error: itemError } = await supabaseAdmin
+      .from('collection_items')
+      .select(`
+        id,
+        collection_id,
+        added_by,
+        kind,
+        post_id,
+        url,
+        note,
+        status,
+        collections (
+          id,
+          community_id,
+          communities (
+            id,
+            slug,
+            name
+          )
+        ),
+        profiles!collection_items_added_by_fkey (
+          id,
+          handle,
+          wallet_address
+        )
+      `)
+      .eq('id', itemId)
+      .single()
+
+    if (itemError || !item) {
+      return res.status(404).json({ error: 'Collection item not found.' })
+    }
+
+    // 4. Status must be 'pending' (409 Conflict otherwise)
+    if (item.status !== 'pending') {
+      return res.status(409).json({
+        error: `Item is already decided (current status: '${item.status}').`,
+        currentStatus: item.status,
+      })
+    }
+
+    // 5. Ensure collection is part of a community
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const collection = item.collections as any
+    if (!collection || !collection.community_id || !collection.communities) {
+      return res.status(400).json({
+        error: 'Personal collection items do not require curator approval.',
+      })
+    }
+
+    const communityId = collection.community_id
+    const communitySlug = collection.communities.slug
+
+    // 6. Verify caller is a curator of this community (403 Forbidden)
+    const { data: membership, error: memError } = await supabaseAdmin
+      .from('memberships')
+      .select('role')
+      .eq('community_id', communityId)
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    if (memError || !membership || membership.role !== 'curator') {
+      return res.status(403).json({
+        error: 'Forbidden. Only designated curators of this community can decide proposals.',
+      })
+    }
+
+    // 7. Anti-self-dealing check: Approver must not be the proposer (403 Forbidden)
+    if (item.added_by === user.id) {
+      return res.status(403).json({
+        error: 'Forbidden. Curators cannot approve or decide their own submissions.',
+      })
+    }
+
+    const decidedAt = new Date().toISOString()
+
+    // 8. Handle Rejection
+    if (action === 'reject') {
+      const { error: rejectError } = await supabaseAdmin
+        .from('collection_items')
+        .update({
+          status: 'rejected',
+          decided_by: user.id,
+          decided_at: decidedAt,
+        })
+        .eq('id', item.id)
+
+      if (rejectError) {
+        return res.status(500).json({ error: 'Failed to reject item: ' + rejectError.message })
+      }
+
+      return res.status(200).json({
+        ok: true,
+        status: 'rejected',
+        itemId: item.id,
+      })
+    }
+
+    // 9. Handle Approval
+    // 9a. Update collection_items status to 'approved'
+    const { error: approveError } = await supabaseAdmin
+      .from('collection_items')
+      .update({
+        status: 'approved',
+        decided_by: user.id,
+        decided_at: decidedAt,
+      })
+      .eq('id', item.id)
+
+    if (approveError) {
+      return res.status(500).json({ error: 'Failed to approve item: ' + approveError.message })
+    }
+
+    // 9b. Compute deterministic canonical content hash
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const contributorProfile = item.profiles as any
+    const contributorAddress = (contributorProfile?.wallet_address as `0x${string}`) || '0x0000000000000000000000000000000000000000'
+
+    const contentHash = computeContentHash({
+      itemId: item.id,
+      collectionId: collection.id,
+      communitySlug,
+      item: {
+        kind: item.kind,
+        post_id: item.post_id || undefined,
+        url: item.url || undefined,
+        note: item.note || undefined,
+      },
+    })
+
+    const initialAttestStatus = contributorProfile?.wallet_address ? 'submitted' : 'awaiting_wallet'
+
+    // 9c. Create contributions row (unique per item_id, ON CONFLICT DO NOTHING)
+    const { data: contribution, error: contribError } = await supabaseAdmin
+      .from('contributions')
+      .upsert(
+        {
+          item_id: item.id,
+          user_id: item.added_by,
+          community_id: communityId,
+          content_hash: contentHash,
+          status: initialAttestStatus,
+        },
+        { onConflict: 'item_id', ignoreDuplicates: true }
+      )
+      .select('id, content_hash, status, created_at')
+      .maybeSingle()
+
+    if (contribError) {
+      console.error('[approve-item] Error creating contribution record:', contribError)
+    }
+
+    // 10. STOP THERE: Leave clearly marked TODO for Day 7 onchain relayer call
+    // TODO: Day 7 - Invoke relayer service (server/relayer.ts) to submit onchain attest transaction on Monad testnet
+
+    return res.status(200).json({
+      ok: true,
+      status: 'approved',
+      attest: 'pending_implementation',
+      itemId: item.id,
+      contribution: contribution || null,
+    })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : 'Internal Server Error'
+    console.error('[approve-item] Unhandled error:', err)
+    return res.status(500).json({ error: message })
+  }
+}

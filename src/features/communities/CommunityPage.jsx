@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Users, UserPlus, UserCheck, Shield, BookOpen, Loader2 } from 'lucide-react'
+import { Users, UserPlus, UserCheck, Shield, BookOpen, Loader2, Plus } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
 import { PostCard } from '@/features/posts/PostCard'
 import { PostComposer } from '@/features/posts/PostComposer'
+import { CreateCollectionModal } from '@/features/collections/CreateCollectionModal'
 
 export function CommunityPage() {
   const { slug } = useParams()
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const [isMemberOverride, setIsMemberOverride] = useState(null)
+  const [isCreateColOpen, setIsCreateColOpen] = useState(false)
 
   // 1. Fetch community details, curators, and tags
   const { data: community, isLoading: isCommLoading } = useQuery({
@@ -130,6 +132,30 @@ export function CommunityPage() {
           },
         }
       })
+    },
+    enabled: !!community?.id,
+  })
+
+  // 3. Fetch community collections (COLL-01)
+  const { data: collections = [] } = useQuery({
+    queryKey: ['community_collections', community?.id],
+    queryFn: async () => {
+      if (!community?.id) return []
+      const { data, error } = await supabase
+        .from('collections')
+        .select(`
+          id,
+          title,
+          description,
+          created_at,
+          profiles (handle),
+          collection_items (count)
+        `)
+        .eq('community_id', community.id)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
     },
     enabled: !!community?.id,
   })
@@ -316,24 +342,78 @@ export function CommunityPage() {
           </div>
         </div>
 
-        {/* Right 1 Col: Collections section (prepared for Day 6) */}
+        {/* Right 1 Col: Collections section (COLL-01 / COLL-06) */}
         <div className="space-y-6">
-          <div className="border border-[var(--line)] bg-[var(--paper-2)] p-5 space-y-4">
-            <div className="flex items-center gap-2 text-[var(--saffron)] border-b border-[var(--line)] pb-2">
-              <BookOpen className="h-4 w-4" />
-              <h3 className="font-serif text-base font-bold text-[var(--ink)]">
-                Community Collections
-              </h3>
+          <div className="border border-[var(--line)] bg-[var(--paper-2)] p-5 space-y-4 shadow-[var(--shadow-hard)]">
+            <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
+              <div className="flex items-center gap-2 text-[var(--saffron)]">
+                <BookOpen className="h-4 w-4" />
+                <h3 className="font-serif text-base font-bold text-[var(--ink)]">
+                  Community Collections
+                </h3>
+              </div>
+
+              {user && (
+                <button
+                  type="button"
+                  onClick={() => setIsCreateColOpen(true)}
+                  className="flex items-center gap-1 font-mono text-[11px] font-bold text-[var(--clay)] hover:underline"
+                >
+                  <Plus className="h-3 w-3" />
+                  <span>New</span>
+                </button>
+              )}
             </div>
+
             <p className="text-xs text-[var(--ink-2)] leading-relaxed">
               Curated archives and verified contribution sets for this collective.
             </p>
-            <div className="border border-dashed border-[var(--line)] p-4 text-center font-mono text-[11px] text-[var(--ink-2)]">
-              Collections module will open in Day 6 curation cycle.
-            </div>
+
+            {collections.length === 0 ? (
+              <div className="border border-dashed border-[var(--line)] p-4 text-center font-mono text-[11px] text-[var(--ink-2)]">
+                No collections created yet. Start one today!
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {collections.map((col) => (
+                  <Link
+                    key={col.id}
+                    to={`/collections/${col.id}`}
+                    className="block p-3 border border-[var(--line)] bg-[var(--paper)] hover:border-[var(--ink)] transition-all space-y-1 group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-sm font-bold text-[var(--ink)] group-hover:text-[var(--clay)] transition-colors">
+                        {col.title}
+                      </span>
+                      <span className="font-mono text-[10px] text-[var(--ink-2)]">
+                        {col.collection_items?.[0]?.count || 0} items
+                      </span>
+                    </div>
+
+                    {col.description && (
+                      <p className="text-[11px] text-[var(--ink-2)] line-clamp-2">
+                        {col.description}
+                      </p>
+                    )}
+
+                    <div className="font-mono text-[10px] text-[var(--ink-2)] pt-1">
+                      by @{col.profiles?.handle}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Create Collection Modal */}
+      <CreateCollectionModal
+        isOpen={isCreateColOpen}
+        onClose={() => setIsCreateColOpen(false)}
+        communityId={community.id}
+        defaultCommunityName={community.name}
+      />
     </div>
   )
 }
