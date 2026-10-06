@@ -2,8 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { verifyAuth } from '../server/auth.js'
 import { supabaseAdmin } from '../server/supabaseAdmin.js'
 import { validateApproveItemInput } from '../server/validate.js'
-import { computeCommunityId, computeItemContent, computeContentHash } from '../server/hash.js'
-import { attest } from '../server/relayer.js'
+import { computeCommunityId, computeContentHash } from '../server/hash.js'
+import { relayer } from '../server/relayer.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow POST method
@@ -180,10 +180,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       status: initialAttestStatus,
     }
 
-    if (contributorAddress && process.env.RELAYER_PRIVATE_KEY) {
+    if (contributorAddress && (process.env.ATTESTOR_PRIVATE_KEY || process.env.RELAYER_PRIVATE_KEY)) {
       try {
         const communityIdBytes = computeCommunityId(communitySlug)
-        const relayerRes = await attest({
+        const relayerRes = await relayer.attest({
+          contributor: contributorAddress,
           communityId: communityIdBytes,
           contentHash,
         })

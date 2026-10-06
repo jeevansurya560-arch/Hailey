@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import crypto from 'node:crypto'
-import { recoverAddress } from 'viem'
+import { recoverMessageAddress } from 'viem'
 import { verifyAuth } from '../server/auth.js'
 import { supabaseAdmin } from '../server/supabaseAdmin.js'
 
@@ -74,7 +74,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const expectedMessage = `Sign this message to link your wallet to Hailey:\n\nNonce: ${nonceRow.nonce}\nUser: ${user.id}\nTimestamp: ${nonceRow.expires_at}`
 
       // Cryptographically recover signing public address
-      const recoveredAddress = await recoverAddress({
+      const recoveredAddress = await recoverMessageAddress({
         message: expectedMessage,
         signature: signature as `0x${string}`,
       })

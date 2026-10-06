@@ -117,7 +117,7 @@ async function runSecurityAudit() {
       attackVector: 'Direct client update collection_items',
       expected: 'No client update policy / 0 rows',
       actual: error ? `Rejected: ${error.code}` : 'Protected by RLS',
-      passed: true,
+      passed,
     })
   } catch {
     results.push({
@@ -243,7 +243,7 @@ async function runSecurityAudit() {
       attackVector: 'Anon delete on posts',
       expected: 'RLS delete policy failure',
       actual: error ? `Blocked: ${error.code}` : 'Protected by RLS',
-      passed: true,
+      passed,
     })
   } catch {
     results.push({
