@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createPublicClient, http, parseAbi } from 'viem'
 import { computeCommunityId } from '../server/hash.js'
 
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -51,7 +51,7 @@ const monadTestnet = {
   rpcUrls: {
     default: { http: [process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz'] },
   },
-} as const
+}
 
 const CONTRACT_ABI = parseAbi([
   'function count(address contributor, bytes32 communityId) view returns (uint256)',
@@ -61,8 +61,8 @@ const CONTRACT_ABI = parseAbi([
 async function runChainChecks() {
   console.log('🧪 Starting Day 7 Onchain Monad Verification Checks...\n')
 
-  const testAddress = (process.argv[2] || '0x1234567890123456789012345678901234567890') as `0x${string}`
-  const contractAddress = (process.env.CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000') as `0x${string}`
+  const testAddress = process.argv[2] || '0x1234567890123456789012345678901234567890'
+  const contractAddress = process.env.CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000'
 
   console.log(`📍 Testing Contributor Address: ${testAddress}`)
   console.log(`📍 Smart Contract: ${contractAddress}`)

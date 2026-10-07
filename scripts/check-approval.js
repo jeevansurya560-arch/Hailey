@@ -3,7 +3,7 @@ import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { computeCommunityId, computeItemContent, computeContentHash } from '../server/hash.js'
 
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -65,8 +65,8 @@ async function runApprovalChecks() {
 
   // ── TEST 1: Non-curator approval attempt -> 403 Forbidden ───────────────
   console.log('\n--- Test 1: Non-curator approval attempt ---')
-  const simulatedCallerRole: string = 'member' // Normal contributor role
-  const isCurator = (simulatedCallerRole as string) === 'curator'
+  const simulatedCallerRole = 'member' // Normal contributor role
+  const isCurator = simulatedCallerRole === 'curator'
 
   if (!isCurator) {
     console.log('✅ Non-curator check passed: Caller with role "member" is rejected (403 Forbidden).')
@@ -109,8 +109,8 @@ async function runApprovalChecks() {
 
   // ── TEST 4: Re-approval conflict check (409 Conflict) ─────────
   console.log('\n--- Test 4: Re-approving already decided item ---')
-  const itemStatus: string = 'approved'
-  const isPending = (itemStatus as string) === 'pending'
+  const itemStatus = 'approved'
+  const isPending = itemStatus === 'pending'
 
   if (!isPending) {
     console.log(`✅ Conflict check passed: Item already marked '${itemStatus}' -> rejected with 409 Conflict.`)

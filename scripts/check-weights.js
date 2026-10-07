@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -50,7 +50,7 @@ async function checkWeights() {
   const testEmail = 'contributor@hailey.internal'
   const testPassword = process.env.DEMO_PASSWORD || 'HaileyDemo2026!'
 
-  let userId: string | null = null
+  let userId = null
 
   const signInRes = await supabase.auth.signInWithPassword({
     email: testEmail,
@@ -90,8 +90,7 @@ async function checkWeights() {
   }
 
   console.log(`      ✓ Target Post ID: ${post.id}`)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const postTagNames = (post.post_tags || []).map((pt: any) => pt.tags?.name || pt.tag_id)
+  const postTagNames = (post.post_tags || []).map((pt) => pt.tags?.name || pt.tag_id)
   console.log(`      ✓ Associated Post Tags: ${postTagNames.join(', ')}`)
 
   // 3. Inspect user_interests weights before reactions
@@ -105,8 +104,7 @@ async function checkWeights() {
     console.log('      (No user_interests rows yet — baseline = 0)')
   } else {
     for (const w of initialWeights) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      console.log(`      • ${(w.tags as any)?.name || w.tag_id}: ${w.weight}`)
+      console.log(`      • ${w.tags?.name || w.tag_id}: ${w.weight}`)
     }
   }
 
@@ -136,8 +134,7 @@ async function checkWeights() {
   console.log('\n📊 Updated user_interests weights:')
   if (updatedWeights && updatedWeights.length > 0) {
     for (const w of updatedWeights) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      console.log(`      • ${(w.tags as any)?.name || w.tag_id}: ${w.weight}`)
+      console.log(`      • ${w.tags?.name || w.tag_id}: ${w.weight}`)
     }
   } else {
     console.log('      (Note: Triggers update weights when applied in Supabase SQL Editor via 0003_triggers.sql)')

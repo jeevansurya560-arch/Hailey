@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -42,18 +42,10 @@ if (!anonKey) {
 // Anonymous unauthenticated client
 const anonClient = createClient(supabaseUrl, anonKey)
 
-interface AuditResult {
-  checkName: string
-  attackVector: string
-  expected: string
-  actual: string
-  passed: boolean
-}
-
 async function runSecurityAudit() {
   console.log('🔒 Starting Hailey Comprehensive Row Level Security (RLS) & Access Control Audit...\n')
 
-  const results: AuditResult[] = []
+  const results = []
 
   // Check 1: Reading another user's private interests (anon client)
   try {
@@ -67,7 +59,7 @@ async function runSecurityAudit() {
       actual: error ? `Error: ${error.code}` : `${count} rows returned`,
       passed,
     })
-  } catch (err: unknown) {
+  } catch {
     results.push({
       checkName: 'Interest Vector Isolation',
       attackVector: 'Anon read user_interests',

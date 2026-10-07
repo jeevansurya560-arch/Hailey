@@ -1,33 +1,21 @@
 import { keccak256, stringToBytes } from 'viem'
 import { createHash } from 'node:crypto'
 
-export interface CollectionItemInput {
-  id: string
-  collection_id: string
-  kind: 'post' | 'link' | 'note'
-  post_id?: string | null
-  url?: string | null
-  note?: string | null
-}
-
 /**
  * Computes communityId = keccak256(utf8(community.slug))
- * @param slug The community slug, e.g. "streetwear-archive"
- * @returns bytes32 hex string starting with "0x"
+ * @param {string} slug The community slug, e.g. "streetwear-archive"
+ * @returns {string} bytes32 hex string starting with "0x"
  */
-export function computeCommunityId(slug: string): `0x${string}` {
+export function computeCommunityId(slug) {
   return keccak256(stringToBytes(slug.trim()))
 }
 
 /**
  * Computes itemContent = kind + ":" + (post_id | url | "") + ":" + (note | "")
+ * @param {{ kind: string, post_id?: string | null, url?: string | null, note?: string | null }} item
+ * @returns {string}
  */
-export function computeItemContent(item: {
-  kind: 'post' | 'link' | 'note' | string
-  post_id?: string | null
-  url?: string | null
-  note?: string | null
-}): string {
+export function computeItemContent(item) {
   let target = ''
   if (item.kind === 'post') {
     target = item.post_id || ''
@@ -43,18 +31,10 @@ export function computeItemContent(item: {
  * Computes contentHash = keccak256(utf8(
  *   "hailey:v1|" + itemId + "|" + collectionId + "|" + communitySlug + "|" + sha256hex(itemContent)
  * ))
+ * @param {{ itemId: string, collectionId: string, communitySlug: string, item: { kind: string, post_id?: string | null, url?: string | null, note?: string | null } }} params
+ * @returns {string}
  */
-export function computeContentHash(params: {
-  itemId: string
-  collectionId: string
-  communitySlug: string
-  item: {
-    kind: 'post' | 'link' | 'note' | string
-    post_id?: string | null
-    url?: string | null
-    note?: string | null
-  }
-}): `0x${string}` {
+export function computeContentHash(params) {
   const itemContent = computeItemContent(params.item)
   const sha256Hex = createHash('sha256').update(itemContent, 'utf8').digest('hex')
 

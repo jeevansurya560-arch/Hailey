@@ -1,10 +1,9 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
 import crypto from 'node:crypto'
 import { recoverMessageAddress } from 'viem'
 import { verifyAuth } from '../server/auth.js'
 import { supabaseAdmin } from '../server/supabaseAdmin.js'
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
@@ -76,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Cryptographically recover signing public address
       const recoveredAddress = await recoverMessageAddress({
         message: expectedMessage,
-        signature: signature as `0x${string}`,
+        signature,
       })
 
       const normalizedAddress = address.toLowerCase()
@@ -128,7 +127,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     return res.status(400).json({ error: "Invalid action. Supported actions are 'nonce' and 'link'." })
-  } catch (err: unknown) {
+  } catch (err) {
     const message = err instanceof Error ? err.message : 'Internal Server Error'
     console.error('[api/wallet] Unhandled error:', err)
     return res.status(500).json({ error: message })

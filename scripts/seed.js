@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -48,40 +48,6 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 
 const DEMO_PASSWORD = process.env.DEMO_PASSWORD || 'HaileyDemo2026!'
 
-interface TagItem {
-  slug: string
-  name: string
-  kind: string
-  parent_slug?: string | null
-  description?: string
-  cover_url?: string | null
-}
-
-interface EdgeItem {
-  src_slug: string
-  dst_slug: string
-  weight: number
-}
-
-interface CommunityItem {
-  slug: string
-  name: string
-  description: string
-  tag_slugs: string[]
-}
-
-interface PostItem {
-  slug_id: string
-  community_slug: string
-  author_handle: string
-  is_editorial: boolean
-  body: string
-  media_url?: string | null
-  media_credit?: string | null
-  source_url?: string | null
-  tag_slugs: string[]
-}
-
 async function seedAll() {
   console.log('🌱 ========================================')
   console.log('🌱 Hailey — Master Database Seed Engine')
@@ -90,10 +56,10 @@ async function seedAll() {
 
   // ── 1. TAGS & EDGES ──────────────────────────────────────────
   console.log('\n[1/5] Seeding Culture Taxonomy Graph...')
-  const tagsData: TagItem[] = JSON.parse(
+  const tagsData = JSON.parse(
     fs.readFileSync(path.resolve(process.cwd(), 'supabase/seed/tags.json'), 'utf8')
   )
-  const edgesData: EdgeItem[] = JSON.parse(
+  const edgesData = JSON.parse(
     fs.readFileSync(path.resolve(process.cwd(), 'supabase/seed/edges.json'), 'utf8')
   )
 
@@ -116,7 +82,7 @@ async function seedAll() {
 
   // Build slug -> ID mapping
   const { data: allTags } = await supabase.from('tags').select('id, slug')
-  const tagSlugToId = new Map<string, number>()
+  const tagSlugToId = new Map()
   if (allTags) {
     for (const t of allTags) {
       tagSlugToId.set(t.slug, t.id)
@@ -128,13 +94,13 @@ async function seedAll() {
     if (tag.parent_slug && tagSlugToId.has(tag.parent_slug) && tagSlugToId.has(tag.slug)) {
       await supabase
         .from('tags')
-        .update({ parent_id: tagSlugToId.get(tag.parent_slug)! })
-        .eq('id', tagSlugToId.get(tag.slug)!)
+        .update({ parent_id: tagSlugToId.get(tag.parent_slug) })
+        .eq('id', tagSlugToId.get(tag.slug))
     }
   }
 
   // Upsert Edges
-  const edgeRows: { src: number; dst: number; weight: number }[] = []
+  const edgeRows = []
   for (const e of edgesData) {
     const srcId = tagSlugToId.get(e.src_slug)
     const dstId = tagSlugToId.get(e.dst_slug)
@@ -171,11 +137,11 @@ async function seedAll() {
     },
   ]
 
-  const userHandleToId = new Map<string, string>()
+  const userHandleToId = new Map()
 
   // Try creating/fetching accounts via Admin API (or query existing profiles)
   for (const u of demoUsers) {
-    let userId: string | null = null
+    let userId = null
 
     // Check if user exists in auth or profiles
     const { data: existingProfile } = await supabase
@@ -221,13 +187,13 @@ async function seedAll() {
 
   // ── 3. COMMUNITIES & COMMUNITY TAGS ───────────────────────────
   console.log('\n[3/5] Seeding 8 Cultural Communities...')
-  const communitiesData: CommunityItem[] = JSON.parse(
+  const communitiesData = JSON.parse(
     fs.readFileSync(path.resolve(process.cwd(), 'supabase/seed/communities.json'), 'utf8')
   )
 
   const editorialId = userHandleToId.get('hailey_editorial') || null
 
-  const communitySlugToId = new Map<string, string>()
+  const communitySlugToId = new Map()
 
   for (const c of communitiesData) {
     const { data: comm } = await supabase
@@ -248,7 +214,7 @@ async function seedAll() {
       communitySlugToId.set(comm.slug, comm.id)
 
       // Link community tags
-      const commTagRows: { community_id: string; tag_id: number }[] = []
+      const commTagRows = []
       for (const tSlug of c.tag_slugs) {
         const tId = tagSlugToId.get(tSlug)
         if (tId) {
@@ -303,7 +269,7 @@ async function seedAll() {
 
   // ── 5. TEST POSTS & POST TAGS ─────────────────────────────────
   console.log('\n[5/5] Seeding Test Posts & Metadata...')
-  const postsData: PostItem[] = JSON.parse(
+  const postsData = JSON.parse(
     fs.readFileSync(path.resolve(process.cwd(), 'supabase/seed/posts.json'), 'utf8')
   )
 
@@ -343,7 +309,7 @@ async function seedAll() {
 
       if (postId) {
         postsSeededCount++
-        const postTagRows: { post_id: string; tag_id: number; weight: number }[] = []
+        const postTagRows = []
         for (const tSlug of p.tag_slugs) {
           const tId = tagSlugToId.get(tSlug)
           if (tId) {

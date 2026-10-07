@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { computeCommunityId, computeItemContent, computeContentHash } from '../hash'
+import { computeCommunityId, computeItemContent, computeContentHash } from '../hash.js'
 
 describe('server/hash', () => {
   it('computes deterministic communityId from slug', () => {
@@ -45,7 +45,7 @@ describe('server/hash', () => {
       collectionId: 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d',
       communitySlug: 'tokyo-vintage',
       item: {
-        kind: 'link' as const,
+        kind: 'link',
         url: 'https://archive.org/fashion-issue-1',
         note: 'Rare 90s issue scan',
       },

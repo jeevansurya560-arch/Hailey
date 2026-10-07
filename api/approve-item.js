@@ -1,11 +1,10 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { verifyAuth } from '../server/auth.js'
 import { supabaseAdmin } from '../server/supabaseAdmin.js'
 import { validateApproveItemInput } from '../server/validate.js'
 import { computeCommunityId, computeContentHash } from '../server/hash.js'
 import { relayer } from '../server/relayer.js'
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   // Only allow POST method
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
@@ -69,8 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 5. Ensure collection is part of a community
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const collection = item.collections as any
+    const collection = item.collections
     if (!collection || !collection.community_id || !collection.communities) {
       return res.status(400).json({
         error: 'Personal collection items do not require curator approval.',
@@ -141,9 +139,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // 9b. Compute deterministic canonical content hash
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contributorProfile = item.profiles as any
-    const contributorAddress = (contributorProfile?.wallet_address as `0x${string}`) || null
+    const contributorProfile = item.profiles
+    const contributorAddress = contributorProfile?.wallet_address || null
 
     const contentHash = computeContentHash({
       itemId: item.id,
@@ -176,7 +173,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .maybeSingle()
 
     // 10–15. Onchain Relayer Attestation Flow (Day 7)
-    let attestResult: { status: 'attested' | 'submitted' | 'failed' | 'awaiting_wallet'; txHash?: `0x${string}`; error?: string } = {
+    let attestResult = {
       status: initialAttestStatus,
     }
 
@@ -201,7 +198,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             attested_at: relayerRes.status === 'attested' ? new Date().toISOString() : null,
           })
           .eq('item_id', item.id)
-      } catch (relayerErr: unknown) {
+      } catch (relayerErr) {
         const msg = relayerErr instanceof Error ? relayerErr.message : 'Relayer attestation execution error'
         console.warn('[approve-item] Relayer execution skipped or failed:', msg)
         attestResult = { status: 'submitted', error: msg }
@@ -216,7 +213,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       itemId: item.id,
       contribution: contribution || null,
     })
-  } catch (err: unknown) {
+  } catch (err) {
     const message = err instanceof Error ? err.message : 'Internal Server Error'
     console.error('[approve-item] Unhandled error:', err)
     return res.status(500).json({ error: message })

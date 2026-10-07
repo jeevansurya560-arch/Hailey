@@ -1,21 +1,11 @@
-export interface ApproveItemInput {
-  itemId: string
-  action: 'approve' | 'reject'
-}
-
-export interface ValidationResult<T> {
-  data: T | null
-  error: string | null
-}
-
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
-export function validateApproveItemInput(body: unknown): ValidationResult<ApproveItemInput> {
+export function validateApproveItemInput(body) {
   if (!body || typeof body !== 'object') {
     return { data: null, error: 'Request body must be a JSON object' }
   }
 
-  const payload = body as Record<string, unknown>
+  const payload = body
 
   if (!payload.itemId || typeof payload.itemId !== 'string') {
     return { data: null, error: 'itemId is required and must be a string' }
@@ -38,26 +28,18 @@ export function validateApproveItemInput(body: unknown): ValidationResult<Approv
   }
 }
 
-export interface ProposeItemInput {
-  collectionId: string
-  kind: 'post' | 'link' | 'note'
-  postId?: string | null
-  url?: string | null
-  note?: string | null
-}
-
-export function validateProposeItemInput(body: unknown): ValidationResult<ProposeItemInput> {
+export function validateProposeItemInput(body) {
   if (!body || typeof body !== 'object') {
     return { data: null, error: 'Request body must be a JSON object' }
   }
 
-  const payload = body as Record<string, unknown>
+  const payload = body
 
   if (!payload.collectionId || typeof payload.collectionId !== 'string' || !UUID_REGEX.test(payload.collectionId)) {
     return { data: null, error: 'collectionId is required and must be a valid UUID' }
   }
 
-  if (!payload.kind || !['post', 'link', 'note'].includes(payload.kind as string)) {
+  if (!payload.kind || !['post', 'link', 'note'].includes(payload.kind)) {
     return { data: null, error: "kind must be one of 'post', 'link', or 'note'" }
   }
 
@@ -80,10 +62,10 @@ export function validateProposeItemInput(body: unknown): ValidationResult<Propos
   return {
     data: {
       collectionId: payload.collectionId,
-      kind: payload.kind as 'post' | 'link' | 'note',
-      postId: (payload.postId as string) || null,
-      url: (payload.url as string) || null,
-      note: (payload.note as string) || null,
+      kind: payload.kind,
+      postId: payload.postId || null,
+      url: payload.url || null,
+      note: payload.note || null,
     },
     error: null,
   }

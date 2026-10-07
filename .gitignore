@@ -27,4 +27,6 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+# Large Datasets
+Hailey_1M_Culture_Master_Dataset/
+*.parquet

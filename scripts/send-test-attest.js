@@ -1,11 +1,10 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { relayer } from '../server/relayer'
-import { computeCommunityId, computeContentHash } from '../server/hash'
-import type { Address } from 'viem'
+import { relayer } from '../server/relayer.js'
+import { computeCommunityId, computeContentHash } from '../server/hash.js'
 
 // Load .env.local and .env into process.env if present
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -32,9 +31,9 @@ async function main() {
 
   const contractAddress = process.env.CONTRACT_ADDRESS || process.env.VITE_CONTRACT_ADDRESS
   const explorerBase = process.env.VITE_EXPLORER_URL || 'https://testnet.monadvision.com'
-  const contributorAddress = (process.env.TEST_CONTRIBUTOR_ADDRESS ||
+  const contributorAddress = process.env.TEST_CONTRIBUTOR_ADDRESS ||
     process.env.ATTESTOR_ADDRESS ||
-    '0x000000000000000000000000000000000000dEaD') as Address
+    '0x000000000000000000000000000000000000dEaD'
 
   if (!contractAddress || contractAddress === '0x0000000000000000000000000000000000000000') {
     console.error('Error: CONTRACT_ADDRESS is not set. Please deploy HaileyContributions and add the address to .env.local')

@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 
-function loadEnv(filePath: string) {
+function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
   if (fs.existsSync(fullPath)) {
     const content = fs.readFileSync(fullPath, 'utf8')
@@ -48,7 +48,7 @@ async function checkFeed() {
 
   // 1. Fetch tags mapping
   const { data: allTags } = await supabase.from('tags').select('id, slug, name')
-  const tagSlugMap = new Map<string, number>()
+  const tagSlugMap = new Map()
   if (allTags) {
     for (const t of allTags) tagSlugMap.set(t.slug, t.id)
   }
@@ -78,14 +78,13 @@ async function checkFeed() {
   // Demonstrate deterministic scoring calculation
   for (let i = 0; i < Math.min(4, posts.length); i++) {
     const p = posts[i]
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pTags = (p.post_tags || []).map((pt: any) => pt.tags?.slug).filter(Boolean)
+    const pTags = (p.post_tags || []).map((pt) => pt.tags?.slug).filter(Boolean)
 
     console.log(`\n📄 Post #${i + 1}: "${p.body.slice(0, 60)}..."`)
     console.log(`   Tags: [${pTags.join(', ')}]`)
 
-    const userAMatches = pTags.filter((t: string) => ['streetwear', 'japanese', 'harajuku-fashion', 'archival-fashion'].includes(t))
-    const userBMatches = pTags.filter((t: string) => ['dub-reggae', 'sound-system', 'caribbean', 'london-sound'].includes(t))
+    const userAMatches = pTags.filter((t) => ['streetwear', 'japanese', 'harajuku-fashion', 'archival-fashion'].includes(t))
+    const userBMatches = pTags.filter((t) => ['dub-reggae', 'sound-system', 'caribbean', 'london-sound'].includes(t))
 
     if (userAMatches.length > 0) {
       console.log(`   🎯 User A Match: HIGH RELEVANCE → WHY Stamp: "BECAUSE · ${userAMatches.join(' + ').toUpperCase()}"`)

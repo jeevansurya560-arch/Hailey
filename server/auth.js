@@ -1,17 +1,11 @@
-import type { User } from '@supabase/supabase-js'
 import { supabaseAdmin } from './supabaseAdmin.js'
-
-export interface AuthResult {
-  user: User | null
-  error: string | null
-}
 
 /**
  * Verifies the Supabase JWT token from the Authorization header.
- * @param authHeader - Standard 'Bearer <token>' string
- * @returns {Promise<AuthResult>}
+ * @param {string | undefined} authHeader - Standard 'Bearer <token>' string
+ * @returns {Promise<{ user: any, error: string | null }>}
  */
-export async function verifyAuth(authHeader: string | undefined): Promise<AuthResult> {
+export async function verifyAuth(authHeader) {
   if (!authHeader) {
     return { user: null, error: 'Missing Authorization header' }
   }
@@ -32,7 +26,7 @@ export async function verifyAuth(authHeader: string | undefined): Promise<AuthRe
       return { user: null, error: error?.message || 'Invalid or expired authentication token' }
     }
     return { user, error: null }
-  } catch (err: unknown) {
+  } catch (err) {
     const msg = err instanceof Error ? err.message : 'Authentication verification failed'
     return { user: null, error: msg }
   }
