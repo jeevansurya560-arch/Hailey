@@ -1,43 +1,10 @@
-import { keccak256, stringToBytes } from 'viem'
-import { createHash } from 'node:crypto'
-
 /**
- * Computes communityId = keccak256(utf8(community.slug))
- * @param {string} slug The community slug, e.g. "streetwear-archive"
- * @returns {string} bytes32 hex string starting with "0x"
+ * Re-exports canonical hashing functions from shared/crypto/hashing.js
+ * Ensures backwards compatibility for serverless functions while maintaining
+ * single-source-of-truth cryptography without node:crypto.
  */
-export function computeCommunityId(slug) {
-  return keccak256(stringToBytes(slug.trim()))
-}
-
-/**
- * Computes itemContent = kind + ":" + (post_id | url | "") + ":" + (note | "")
- * @param {{ kind: string, post_id?: string | null, url?: string | null, note?: string | null }} item
- * @returns {string}
- */
-export function computeItemContent(item) {
-  let target = ''
-  if (item.kind === 'post') {
-    target = item.post_id || ''
-  } else if (item.kind === 'link') {
-    target = item.url || ''
-  }
-
-  const note = item.note || ''
-  return `${item.kind}:${target}:${note}`
-}
-
-/**
- * Computes contentHash = keccak256(utf8(
- *   "hailey:v1|" + itemId + "|" + collectionId + "|" + communitySlug + "|" + sha256hex(itemContent)
- * ))
- * @param {{ itemId: string, collectionId: string, communitySlug: string, item: { kind: string, post_id?: string | null, url?: string | null, note?: string | null } }} params
- * @returns {string}
- */
-export function computeContentHash(params) {
-  const itemContent = computeItemContent(params.item)
-  const sha256Hex = createHash('sha256').update(itemContent, 'utf8').digest('hex')
-
-  const canonicalString = `hailey:v1|${params.itemId}|${params.collectionId}|${params.communitySlug}|${sha256Hex}`
-  return keccak256(stringToBytes(canonicalString))
-}
+export {
+  computeCommunityId,
+  computeItemContent,
+  computeContentHash,
+} from '../shared/crypto/hashing.js'

@@ -2,11 +2,15 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Plus, Check, Users, Sparkles, Loader2, GitBranch } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  fetchCultureTagBySlug,
+  fetchCulturePostsByTag,
+  toggleUserInterest,
+} from '@/features/communities/services/communityService'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
 import { PostCard } from '@/features/posts/PostCard'
-import { getThreadColor } from '@/lib/threadColors'
+import { getThreadColor } from '@/features/communities/threadColors'
 
 export function CulturePage() {
   const { slug } = useParams()
@@ -14,179 +18,29 @@ export function CulturePage() {
   const queryClient = useQueryClient()
   const [exploringOverride, setExploringOverride] = useState(null)
 
-  // 1. Fetch culture tag details, relations, and communities
+  // 1. Fetch culture tag details, relations, and communities via communityService
   const { data: tag, isLoading: isTagLoading } = useQuery({
     queryKey: ['culture_tag', slug, user?.id],
-    queryFn: async () => {
-      if (!slug) return null
-
-      // Base Tag
-      const { data: baseTag, error: tagErr } = await supabase
-        .from('tags')
-        .select('id, slug, name, kind, description, parent_id')
-        .eq('slug', slug)
-        .single()
-      if (tagErr || !baseTag) throw tagErr || new Error('Tag not found')
-
-      // Parent tag if present
-      let parent = null
-      if (baseTag.parent_id) {
-        const { data: parentData } = await supabase
-          .from('tags')
-          .select('id, name, slug, kind')
-          .eq('id', baseTag.parent_id)
-          .maybeSingle()
-        parent = parentData
-      }
-
-      // Child tags
-      const { data: childData } = await supabase
-        .from('tags')
-        .select('id, name, slug, kind')
-        .eq('parent_id', baseTag.id)
-
-      // Related edges
-      const { data: edgesData } = await supabase
-        .from('tag_edges')
-        .select('dst, weight, tags!tag_edges_dst_fkey(id, name, slug, kind)')
-        .eq('src', baseTag.id)
-        .order('weight', { ascending: false })
-
-      // Linked communities
-      const { data: commTags } = await supabase
-        .from('community_tags')
-        .select('communities(id, name, slug)')
-        .eq('tag_id', baseTag.id)
-
-      // User Exploring status
-      let isExploring = false
-      if (user) {
-        const { data: interest } = await supabase
-          .from('user_interests')
-          .select('weight')
-          .eq('user_id', user.id)
-          .eq('tag_id', baseTag.id)
-          .maybeSingle()
-        isExploring = (interest?.weight ?? 0) > 0
-      }
-
-      const relatedTags = (edgesData || []).map((e) => ({
-        ...e.tags,
-        weight: e.weight,
-      })).filter(Boolean)
-
-      const linkedCommunities = (commTags || []).map((ct) => ct.communities).filter(Boolean)
-
-      return {
-        ...baseTag,
-        parent,
-        childTags: childData || [],
-        relatedTags,
-        linkedCommunities,
-        isExploring,
-      }
-    },
+    queryFn: () => fetchCultureTagBySlug(slug, user?.id),
+    enabled: !!slug,
   })
 
-  // 2. Fetch posts associated with this tag
+  // 2. Fetch posts associated with this tag via communityService (with scoped reactions)
   const { data: posts = [], isLoading: isPostsLoading } = useQuery({
-    queryKey: ['culture_posts', tag?.id],
-    queryFn: async () => {
-      if (!tag?.id) return []
-
-      const { data: postTags, error } = await supabase
-        .from('post_tags')
-        .select(`
-          posts (
-            id,
-            author_id,
-            body,
-            media_url,
-            media_credit,
-            source_url,
-            is_editorial,
-            created_at,
-            profiles(handle, display_name),
-            communities(slug, name),
-            post_tags(tags(id, name, slug, kind))
-          )
-        `)
-        .eq('tag_id', tag.id)
-        .limit(20)
-
-      if (error) throw error
-
-      // User reactions
-      let userReactions = []
-      if (user) {
-        const { data: reactionsData } = await supabase
-          .from('post_reactions')
-          .select('post_id, kind')
-          .eq('user_id', user.id)
-        userReactions = reactionsData || []
-      }
-
-      // Counts
-      const { data: allReactions } = await supabase.from('post_reactions').select('post_id, kind')
-      const reactionsCountMap = new Map()
-      if (allReactions) {
-        for (const r of allReactions) {
-          const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
-          if (r.kind === 'like') current.likes++
-          if (r.kind === 'save') current.saves++
-          reactionsCountMap.set(r.post_id, current)
-        }
-      }
-
-      return (postTags || []).map((pt) => {
-        const p = pt.posts
-        if (!p) return null
-        const pReactions = userReactions.filter((r) => r.post_id === p.id)
-        const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
-        const tags = (p.post_tags || []).map((item) => item.tags).filter(Boolean)
-
-        return {
-          id: p.id,
-          author_id: p.author_id,
-          author: p.profiles,
-          community: p.communities,
-          body: p.body,
-          media_url: p.media_url,
-          media_credit: p.media_credit,
-          source_url: p.source_url,
-          is_editorial: p.is_editorial,
-          created_at: p.created_at,
-          tags,
-          reactions: {
-            likesCount: counts.likes,
-            savesCount: counts.saves,
-            isLiked: pReactions.some((r) => r.kind === 'like'),
-            isSaved: pReactions.some((r) => r.kind === 'save'),
-            isHidden: pReactions.some((r) => r.kind === 'hide'),
-          },
-        }
-      }).filter(Boolean)
-    },
+    queryKey: ['culture_posts', tag?.id, user?.id],
+    queryFn: () => fetchCulturePostsByTag(tag?.id, user?.id),
     enabled: !!tag?.id,
   })
 
-  // Toggle Exploring mutation (CULT-04)
+  // Toggle Exploring mutation via communityService
   const toggleExploringMutation = useMutation({
     mutationFn: async (shouldExplore) => {
       if (!user || !tag) throw new Error('Sign in required')
-      if (shouldExplore) {
-        const { error } = await supabase
-          .from('user_interests')
-          .upsert({ user_id: user.id, tag_id: tag.id, weight: 5, source: 'culture_page' }, { onConflict: 'user_id,tag_id' })
-        if (error) throw error
-      } else {
-        const { error } = await supabase
-          .from('user_interests')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('tag_id', tag.id)
-        if (error) throw error
-      }
+      return toggleUserInterest({
+        userId: user.id,
+        tagId: tag.id,
+        shouldExplore,
+      })
     },
     onMutate: (shouldExplore) => {
       setExploringOverride(shouldExplore)

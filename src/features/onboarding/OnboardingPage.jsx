@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Compass, Sparkles, ArrowRight, AlertCircle, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { fetchCultureTags } from '@/features/communities/services/communityService'
+import { saveUserInterests } from '@/features/profile/services/profileService'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
 
@@ -47,22 +48,14 @@ export function OnboardingPage() {
   const [selectedTagIds, setSelectedTagIds] = useState(new Set())
   const [errorMsg, setErrorMsg] = useState(null)
 
-  // 1. Fetch tags from Supabase
+  // 1. Fetch tags via communityService
   const {
     data: tags = [],
     isLoading,
     isError,
   } = useQuery({
     queryKey: ['tags'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .order('name', { ascending: true })
-
-      if (error) throw error
-      return data || []
-    },
+    queryFn: fetchCultureTags,
   })
 
   // Group tags into visual buckets
@@ -94,26 +87,19 @@ export function OnboardingPage() {
     })
   }
 
-  // 2. Submit mutation: writes to user_interests
+  // 2. Submit mutation via profileService
   const saveInterestsMutation = useMutation({
     mutationFn: async (tagIds) => {
       if (!user) throw new Error('You must be signed in to save interests.')
       if (tagIds.length < 3) throw new Error('Please select at least 3 interests.')
       if (tagIds.length > 10) throw new Error('Maximum 10 interests allowed.')
 
-      const rows = tagIds.map((tagId) => ({
-        user_id: user.id,
-        tag_id: tagId,
+      return saveUserInterests({
+        userId: user.id,
+        tagIds,
         weight: 5,
         source: 'onboarding',
-      }))
-
-      const { error } = await supabase
-        .from('user_interests')
-        .upsert(rows, { onConflict: 'user_id,tag_id' })
-
-      if (error) throw error
-      return rows
+      })
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user_interests', user?.id] })

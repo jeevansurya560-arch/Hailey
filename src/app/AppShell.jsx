@@ -3,26 +3,17 @@ import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-do
 import { Home, Compass, Users, User, LogIn, LogOut, ShieldCheck } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/useAuth'
-import { supabase } from '@/lib/supabase'
+import { fetchUserInterestsCount } from '@/features/feed/services/feedService'
 
 export function AppShell() {
   const { user, signOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
-  // ONB-01: Check user interests count for signed-in users
+  // ONB-01: Check user interests count for signed-in users via feedService
   const { data: interestsCount, isLoading: checkingInterests } = useQuery({
     queryKey: ['user_interests_count', user?.id],
-    queryFn: async () => {
-      if (!user) return null
-      const { count, error } = await supabase
-        .from('user_interests')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-
-      if (error) return null
-      return count ?? 0
-    },
+    queryFn: () => (user ? fetchUserInterestsCount(user.id) : null),
     enabled: !!user,
   })
 

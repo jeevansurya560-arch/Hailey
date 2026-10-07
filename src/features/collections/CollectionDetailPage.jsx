@@ -10,12 +10,14 @@ import {
   CheckCircle2,
   XCircle,
   ShieldCheck,
-  Clock,
   Loader2,
   AlertCircle,
   Lock,
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  fetchCollectionDetail,
+  triageCollectionItem,
+} from '@/features/collections/services/collectionService'
 import { useAuth } from '@/features/auth/useAuth'
 import { ProposeItemModal } from './ProposeItemModal'
 
@@ -28,104 +30,14 @@ export function CollectionDetailPage() {
   const [triageActionError, setTriageActionError] = useState(null)
   const [triageSuccessMsg, setTriageSuccessMsg] = useState(null)
 
-  // 1. Fetch collection details, community, and items
+  // 1. Fetch collection details, community, and items via collectionService
   const { data, isLoading, isError } = useQuery({
     queryKey: ['collection_detail', id, user?.id],
-    queryFn: async () => {
-      if (!id) return null
-
-      // Fetch collection
-      const { data: coll, error: collErr } = await supabase
-        .from('collections')
-        .select(`
-          id,
-          title,
-          description,
-          created_at,
-          owner_id,
-          community_id,
-          profiles!collections_owner_id_fkey (
-            handle,
-            display_name
-          ),
-          communities (
-            id,
-            slug,
-            name
-          )
-        `)
-        .eq('id', id)
-        .single()
-
-      if (collErr || !coll) throw collErr || new Error('Collection not found')
-
-      // Check if current user is a curator of the community
-      let isCurator = false
-      if (user && coll.community_id) {
-        const { data: membership } = await supabase
-          .from('memberships')
-          .select('role')
-          .eq('community_id', coll.community_id)
-          .eq('user_id', user.id)
-          .maybeSingle()
-
-        isCurator = membership?.role === 'curator'
-      }
-
-      // Fetch items in this collection (RLS handles approved items, own pending items, or all pending if curator)
-      const { data: items, error: itemsErr } = await supabase
-        .from('collection_items')
-        .select(`
-          id,
-          collection_id,
-          added_by,
-          kind,
-          post_id,
-          url,
-          note,
-          status,
-          decided_at,
-          created_at,
-          profiles!collection_items_added_by_fkey (
-            handle,
-            display_name
-          ),
-          posts (
-            id,
-            body,
-            media_url,
-            created_at,
-            profiles (handle)
-          )
-        `)
-        .eq('collection_id', id)
-        .order('created_at', { ascending: false })
-
-      if (itemsErr) throw itemsErr
-
-      // Fetch user's own posts for the propose dropdown
-      let userPosts = []
-      if (user) {
-        const { data: myPosts } = await supabase
-          .from('posts')
-          .select('id, body, created_at')
-          .eq('author_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(20)
-        userPosts = myPosts || []
-      }
-
-      return {
-        collection: coll,
-        isCurator,
-        items: items || [],
-        userPosts,
-      }
-    },
+    queryFn: () => fetchCollectionDetail({ collectionId: id, currentUserId: user?.id }),
     enabled: !!id,
   })
 
-  // Curator triage mutation calling /api/approve-item
+  // Curator triage mutation calling collectionService
   const triageMutation = useMutation({
     mutationFn: async ({ itemId, action }) => {
       if (!session?.access_token) {
@@ -135,21 +47,11 @@ export function CollectionDetailPage() {
       setTriageActionError(null)
       setTriageSuccessMsg(null)
 
-      const response = await fetch('/api/approve-item', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${session.access_token}`,
-        },
-        body: JSON.stringify({ itemId, action }),
+      return triageCollectionItem({
+        itemId,
+        action,
+        accessToken: session.access_token,
       })
-
-      const result = await response.json()
-      if (!response.ok) {
-        throw new Error(result.error || `Failed to ${action} item (${response.status})`)
-      }
-
-      return result
     },
     onSuccess: (data, variables) => {
       setTriageSuccessMsg(

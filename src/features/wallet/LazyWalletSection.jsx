@@ -1,13 +1,13 @@
 import React, { Suspense } from 'react'
 
 const WalletProvider = React.lazy(() => import('./WalletProvider.jsx'))
-const WalletConnectButton = React.lazy(() =>
-  import('./WalletConnectButton.jsx').then((module) => ({
-    default: module.WalletConnectButton,
+const WalletLinkSection = React.lazy(() =>
+  import('./components/WalletLinkSection.jsx').then((module) => ({
+    default: module.WalletLinkSection,
   }))
 )
 
-export function LazyWalletSection() {
+export function LazyWalletSection({ profile }) {
   return (
     <Suspense
       fallback={
@@ -17,7 +17,7 @@ export function LazyWalletSection() {
       }
     >
       <WalletProvider>
-        <WalletConnectButton />
+        <WalletLinkSection profile={profile} />
       </WalletProvider>
     </Suspense>
   )

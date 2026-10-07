@@ -1,7 +1,7 @@
 import React from 'react'
 import { ShieldCheck, ExternalLink, Clock, AlertCircle, Sparkles } from 'lucide-react'
 
-export function VerifiedSeal({ status, txHash, contentHash, size = 'sm' }) {
+export function VerifiedSeal({ status, txHash }) {
   const explorerBaseUrl = import.meta.env.VITE_EXPLORER_URL || 'https://testnet.monadexplorer.com'
 
   if (status === 'attested') {

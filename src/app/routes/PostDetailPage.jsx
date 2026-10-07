@@ -1,7 +1,7 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { fetchPostById } from '@/features/feed/services/feedService'
 import { useAuth } from '@/features/auth/useAuth'
 import { PostCard } from '@/features/posts/PostCard'
 
@@ -13,77 +13,8 @@ export function PostDetailPage() {
 
   const { data: post, isLoading, isError } = useQuery({
     queryKey: ['post_detail', id, user?.id],
-    queryFn: async () => {
-      if (!id) return null
-
-      const { data: p, error } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          author_id,
-          body,
-          media_url,
-          media_credit,
-          source_url,
-          is_editorial,
-          created_at,
-          profiles(handle, display_name),
-          communities(slug, name),
-          post_tags(tags(id, name, slug, kind))
-        `)
-        .eq('id', id)
-        .single()
-
-      if (error || !p) throw error || new Error('Post not found')
-
-      // Reactions
-      let userReactions = []
-      if (user) {
-        const { data: reactionsData } = await supabase
-          .from('post_reactions')
-          .select('post_id, kind')
-          .eq('user_id', user.id)
-          .eq('post_id', id)
-        userReactions = reactionsData || []
-      }
-
-      const { data: allReactions } = await supabase
-        .from('post_reactions')
-        .select('post_id, kind')
-        .eq('post_id', id)
-
-      let likesCount = 0
-      let savesCount = 0
-      if (allReactions) {
-        for (const r of allReactions) {
-          if (r.kind === 'like') likesCount++
-          if (r.kind === 'save') savesCount++
-        }
-      }
-
-      const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
-
-      return {
-        id: p.id,
-        author_id: p.author_id,
-        author: p.profiles,
-        community: p.communities,
-        body: p.body,
-        media_url: p.media_url,
-        media_credit: p.media_credit,
-        source_url: p.source_url,
-        is_editorial: p.is_editorial,
-        created_at: p.created_at,
-        tags,
-        reactions: {
-          likesCount,
-          savesCount,
-          isLiked: userReactions.some((r) => r.kind === 'like'),
-          isSaved: userReactions.some((r) => r.kind === 'save'),
-          isHidden: userReactions.some((r) => r.kind === 'hide'),
-        },
-      }
-    },
+    queryFn: () => fetchPostById({ postId: id, currentUserId: user?.id }),
+    enabled: !!id,
   })
 
   if (isLoading) {

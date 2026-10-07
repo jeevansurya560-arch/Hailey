@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X, PlusCircle, AlertCircle, Loader2, FileText, Link2, StickyNote } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { proposeCollectionItem } from '@/features/collections/services/collectionService'
 import { useAuth } from '@/features/auth/useAuth'
 
 export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, userPosts = [] }) {
@@ -39,22 +39,15 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
 
       const initialStatus = isPersonal ? 'approved' : 'pending'
 
-      const { data, error } = await supabase
-        .from('collection_items')
-        .insert({
-          collection_id: collectionId,
-          added_by: user.id,
-          kind,
-          post_id: kind === 'post' ? postId : null,
-          url: kind === 'link' ? url.trim() : null,
-          note: note.trim() || null,
-          status: initialStatus,
-        })
-        .select('id')
-        .single()
-
-      if (error) throw error
-      return data
+      return proposeCollectionItem({
+        collectionId,
+        addedBy: user.id,
+        kind,
+        postId: kind === 'post' ? postId : null,
+        url: kind === 'link' ? url.trim() : null,
+        note: note.trim() || null,
+        status: initialStatus,
+      })
     },
     onSuccess: () => {
       setUrl('')

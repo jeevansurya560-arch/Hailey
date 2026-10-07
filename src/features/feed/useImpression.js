@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { supabase } from '@/lib/supabase'
+import { recordBatchImpressions } from '@/features/feed/services/feedService'
 import { useAuth } from '@/features/auth/useAuth'
 
 // Batched impressions queue
@@ -11,19 +11,7 @@ function flushImpressions(userId) {
   const postIds = Array.from(impressionQueue)
   impressionQueue.clear()
 
-  const rows = postIds.map((postId) => ({
-    user_id: userId,
-    post_id: postId,
-  }))
-
-  supabase
-    .from('impressions')
-    .upsert(rows, { onConflict: 'user_id,post_id' })
-    .then(({ error }) => {
-      if (error) {
-        // Silently ignore minor duplicate/offline errors
-      }
-    })
+  recordBatchImpressions(userId, postIds)
 }
 
 export function useImpression(postId) {

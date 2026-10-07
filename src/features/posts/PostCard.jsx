@@ -2,7 +2,11 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Heart, Bookmark, EyeOff, Trash2, ExternalLink, ShieldCheck, Lock } from 'lucide-react'
 import { useAuth } from '@/features/auth/useAuth'
-import { supabase } from '@/lib/supabase'
+import {
+  togglePostReaction,
+  hidePost,
+  deletePost,
+} from '@/features/feed/services/feedService'
 import { TagSticker } from '@/components/TagSticker'
 
 export function PostCard({ post, onDelete, onHide }) {
@@ -18,7 +22,7 @@ export function PostCard({ post, onDelete, onHide }) {
 
   const isAuthor = user && user.id === post.author_id
 
-  // Toggle Like
+  // Toggle Like with optimistic rollback via feedService
   const handleLike = async () => {
     if (!user) return
     const prevLiked = isLiked
@@ -28,29 +32,20 @@ export function PostCard({ post, onDelete, onHide }) {
     setIsLiked(!prevLiked)
     setLikesCount(prevLiked ? prevCount - 1 : prevCount + 1)
 
-    if (prevLiked) {
-      const { error } = await supabase
-        .from('post_reactions')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('post_id', post.id)
-        .eq('kind', 'like')
-      if (error) {
-        setIsLiked(prevLiked)
-        setLikesCount(prevCount)
-      }
-    } else {
-      const { error } = await supabase
-        .from('post_reactions')
-        .insert({ user_id: user.id, post_id: post.id, kind: 'like' })
-      if (error) {
-        setIsLiked(prevLiked)
-        setLikesCount(prevCount)
-      }
+    try {
+      await togglePostReaction({
+        userId: user.id,
+        postId: post.id,
+        kind: 'like',
+        isCurrentlyActive: prevLiked,
+      })
+    } catch {
+      setIsLiked(prevLiked)
+      setLikesCount(prevCount)
     }
   }
 
-  // Toggle Save
+  // Toggle Save with optimistic rollback via feedService
   const handleSave = async () => {
     if (!user) return
     const prevSaved = isSaved
@@ -59,51 +54,44 @@ export function PostCard({ post, onDelete, onHide }) {
     setIsSaved(!prevSaved)
     setSavesCount(prevSaved ? prevCount - 1 : prevCount + 1)
 
-    if (prevSaved) {
-      const { error } = await supabase
-        .from('post_reactions')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('post_id', post.id)
-        .eq('kind', 'save')
-      if (error) {
-        setIsSaved(prevSaved)
-        setSavesCount(prevCount)
-      }
-    } else {
-      const { error } = await supabase
-        .from('post_reactions')
-        .insert({ user_id: user.id, post_id: post.id, kind: 'save' })
-      if (error) {
-        setIsSaved(prevSaved)
-        setSavesCount(prevCount)
-      }
+    try {
+      await togglePostReaction({
+        userId: user.id,
+        postId: post.id,
+        kind: 'save',
+        isCurrentlyActive: prevSaved,
+      })
+    } catch {
+      setIsSaved(prevSaved)
+      setSavesCount(prevCount)
     }
   }
 
-  // Hide post
+  // Hide post via feedService
   const handleHide = async () => {
     if (!user) return
     setIsHidden(true)
     onHide?.(post.id)
 
-    await supabase
-      .from('post_reactions')
-      .insert({ user_id: user.id, post_id: post.id, kind: 'hide' })
+    try {
+      await hidePost({ userId: user.id, postId: post.id })
+    } catch (err) {
+      console.warn('Failed to hide post:', err)
+    }
   }
 
-  // Author-only delete (POST-04)
+  // Author-only delete (POST-04) via feedService
   const handleDelete = async () => {
     if (!isAuthor || isDeleting) return
     if (!window.confirm('Delete this cultural dispatch?')) return
 
     setIsDeleting(true)
-    const { error } = await supabase.from('posts').delete().eq('id', post.id)
-    if (!error) {
+    try {
+      await deletePost({ postId: post.id })
       onDelete?.(post.id)
-    } else {
+    } catch (err) {
       setIsDeleting(false)
-      alert('Failed to delete post: ' + error.message)
+      alert('Failed to delete post: ' + err.message)
     }
   }
 

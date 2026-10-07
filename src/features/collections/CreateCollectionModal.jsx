@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X, BookOpen, AlertCircle, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { createCollection } from '@/features/collections/services/collectionService'
 import { useAuth } from '@/features/auth/useAuth'
 
 export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCommunityName }) {
@@ -23,19 +23,12 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
         throw new Error('Description must be 500 characters or less.')
       }
 
-      const { data, error } = await supabase
-        .from('collections')
-        .insert({
-          owner_id: user.id,
-          community_id: communityId || null,
-          title: trimmedTitle,
-          description: description.trim() || null,
-        })
-        .select('id')
-        .single()
-
-      if (error) throw error
-      return data
+      return createCollection({
+        communityId: communityId || null,
+        ownerId: user.id,
+        title: trimmedTitle,
+        description: description.trim() || '',
+      })
     },
     onSuccess: () => {
       setTitle('')

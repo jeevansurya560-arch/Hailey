@@ -103,7 +103,7 @@ export default async function handler(req, res) {
 
     // 8. Handle Rejection
     if (action === 'reject') {
-      const { error: rejectError } = await supabaseAdmin
+      const { data: updatedReject, error: rejectError } = await supabaseAdmin
         .from('collection_items')
         .update({
           status: 'rejected',
@@ -111,9 +111,15 @@ export default async function handler(req, res) {
           decided_at: decidedAt,
         })
         .eq('id', item.id)
+        .eq('status', 'pending')
+        .select('id')
 
       if (rejectError) {
         return res.status(500).json({ error: 'Failed to reject item: ' + rejectError.message })
+      }
+
+      if (!updatedReject || updatedReject.length === 0) {
+        return res.status(409).json({ error: 'Item was already decided concurrently by another curator.' })
       }
 
       return res.status(200).json({
@@ -124,8 +130,8 @@ export default async function handler(req, res) {
     }
 
     // 9. Handle Approval
-    // 9a. Update collection_items status to 'approved'
-    const { error: approveError } = await supabaseAdmin
+    // 9a. Update collection_items status to 'approved' atomically
+    const { data: updatedApprove, error: approveError } = await supabaseAdmin
       .from('collection_items')
       .update({
         status: 'approved',
@@ -133,9 +139,15 @@ export default async function handler(req, res) {
         decided_at: decidedAt,
       })
       .eq('id', item.id)
+      .eq('status', 'pending')
+      .select('id')
 
     if (approveError) {
       return res.status(500).json({ error: 'Failed to approve item: ' + approveError.message })
+    }
+
+    if (!updatedApprove || updatedApprove.length === 0) {
+      return res.status(409).json({ error: 'Item was already decided concurrently by another curator.' })
     }
 
     // 9b. Compute deterministic canonical content hash

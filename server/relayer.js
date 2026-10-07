@@ -29,44 +29,9 @@ export const monadTestnet = defineChain({
   testnet: true,
 })
 
-export const haileyContributionsAbi = [
-  {
-    type: 'function',
-    name: 'attest',
-    inputs: [
-      { name: 'contributor', type: 'address' },
-      { name: 'communityId', type: 'bytes32' },
-      { name: 'contentHash', type: 'bytes32' },
-      { name: 'kind', type: 'uint8' },
-    ],
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    name: 'attested',
-    inputs: [{ name: 'contentHash', type: 'bytes32' }],
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'count',
-    inputs: [
-      { name: 'contributor', type: 'address' },
-      { name: 'communityId', type: 'bytes32' },
-    ],
-    outputs: [{ name: '', type: 'uint32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    name: 'attestor',
-    inputs: [],
-    outputs: [{ name: '', type: 'address' }],
-    stateMutability: 'view',
-  },
-]
+import { HAILEY_CONTRIBUTIONS_ABI } from '../shared/contracts/HaileyContributions.abi.js'
+
+export const haileyContributionsAbi = HAILEY_CONTRIBUTIONS_ABI
 
 export class RelayerService {
   constructor(config) {

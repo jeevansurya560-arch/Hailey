@@ -2,7 +2,12 @@ import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Users, UserPlus, UserCheck, Shield, BookOpen, Loader2, Plus } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  fetchCommunityBySlug,
+  fetchCommunityPosts,
+  toggleCommunityMembership,
+} from '@/features/communities/services/communityService'
+import { fetchCommunityCollections } from '@/features/collections/services/collectionService'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
 import { PostCard } from '@/features/posts/PostCard'
@@ -16,167 +21,36 @@ export function CommunityPage() {
   const [isMemberOverride, setIsMemberOverride] = useState(null)
   const [isCreateColOpen, setIsCreateColOpen] = useState(false)
 
-  // 1. Fetch community details, curators, and tags
+  // 1. Fetch community details, curators, and tags via communityService
   const { data: community, isLoading: isCommLoading } = useQuery({
     queryKey: ['community', slug, user?.id],
-    queryFn: async () => {
-      if (!slug) return null
-
-      // Community
-      const { data: comm, error } = await supabase
-        .from('communities')
-        .select('*')
-        .eq('slug', slug)
-        .single()
-      if (error || !comm) throw error || new Error('Community not found')
-
-      // Tags
-      const { data: commTags } = await supabase
-        .from('community_tags')
-        .select('tags(id, name, slug, kind)')
-        .eq('community_id', comm.id)
-
-      // Memberships & Curators
-      const { data: memberships } = await supabase
-        .from('memberships')
-        .select('user_id, role, profiles(handle, display_name)')
-        .eq('community_id', comm.id)
-
-      const membersCount = memberships?.length || 0
-      const isMember = !!(user && memberships?.some((m) => m.user_id === user.id))
-      const curators = (memberships || []).filter((m) => m.role === 'curator').map((m) => m.profiles)
-
-      const tags = (commTags || []).map((ct) => ct.tags).filter(Boolean)
-
-      return {
-        ...comm,
-        membersCount,
-        isMember,
-        curators,
-        tags,
-      }
-    },
+    queryFn: () => fetchCommunityBySlug(slug, user?.id),
+    enabled: !!slug,
   })
 
-  // 2. Fetch posts in this community
+  // 2. Fetch posts in this community with scoped reactions via communityService
   const { data: posts = [], isLoading: isPostsLoading } = useQuery({
-    queryKey: ['community_posts', community?.id],
-    queryFn: async () => {
-      if (!community?.id) return []
-
-      const { data: postsData, error } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          author_id,
-          body,
-          media_url,
-          media_credit,
-          source_url,
-          is_editorial,
-          created_at,
-          profiles(handle, display_name),
-          post_tags(tags(id, name, slug, kind))
-        `)
-        .eq('community_id', community.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-
-      // Fetch user reactions
-      let userReactions = []
-      if (user) {
-        const { data: reactionsData } = await supabase
-          .from('post_reactions')
-          .select('post_id, kind')
-          .eq('user_id', user.id)
-        userReactions = reactionsData || []
-      }
-
-      // Fetch all reactions counts
-      const { data: allReactions } = await supabase.from('post_reactions').select('post_id, kind')
-
-      const reactionsCountMap = new Map()
-      if (allReactions) {
-        for (const r of allReactions) {
-          const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
-          if (r.kind === 'like') current.likes++
-          if (r.kind === 'save') current.saves++
-          reactionsCountMap.set(r.post_id, current)
-        }
-      }
-
-      return (postsData || []).map((p) => {
-        const postReactions = userReactions.filter((r) => r.post_id === p.id)
-        const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
-        const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
-
-        return {
-          id: p.id,
-          author_id: p.author_id,
-          author: p.profiles,
-          community: { slug: community.slug, name: community.name },
-          body: p.body,
-          media_url: p.media_url,
-          media_credit: p.media_credit,
-          source_url: p.source_url,
-          is_editorial: p.is_editorial,
-          created_at: p.created_at,
-          tags,
-          reactions: {
-            likesCount: counts.likes,
-            savesCount: counts.saves,
-            isLiked: postReactions.some((r) => r.kind === 'like'),
-            isSaved: postReactions.some((r) => r.kind === 'save'),
-            isHidden: postReactions.some((r) => r.kind === 'hide'),
-          },
-        }
-      })
-    },
+    queryKey: ['community_posts', community?.id, user?.id],
+    queryFn: () => fetchCommunityPosts(community, user?.id),
     enabled: !!community?.id,
   })
 
-  // 3. Fetch community collections (COLL-01)
+  // 3. Fetch community collections via collectionService
   const { data: collections = [] } = useQuery({
     queryKey: ['community_collections', community?.id],
-    queryFn: async () => {
-      if (!community?.id) return []
-      const { data, error } = await supabase
-        .from('collections')
-        .select(`
-          id,
-          title,
-          description,
-          created_at,
-          profiles (handle),
-          collection_items (count)
-        `)
-        .eq('community_id', community.id)
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
-      return data || []
-    },
+    queryFn: () => fetchCommunityCollections(community?.id),
     enabled: !!community?.id,
   })
 
-  // Join/Leave mutation
+  // Join/Leave mutation via communityService
   const toggleMembershipMutation = useMutation({
     mutationFn: async (isJoining) => {
       if (!user || !community) throw new Error('Sign in required')
-      if (isJoining) {
-        const { error } = await supabase
-          .from('memberships')
-          .insert({ community_id: community.id, user_id: user.id, role: 'member' })
-        if (error) throw error
-      } else {
-        const { error } = await supabase
-          .from('memberships')
-          .delete()
-          .eq('community_id', community.id)
-          .eq('user_id', user.id)
-        if (error) throw error
-      }
+      return toggleCommunityMembership({
+        communityId: community.id,
+        userId: user.id,
+        isJoining,
+      })
     },
     onMutate: (isJoining) => {
       setIsMemberOverride(isJoining)

@@ -1,6 +1,5 @@
-import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
   User,
   ShieldCheck,
@@ -11,39 +10,30 @@ import {
   Database,
   Link2,
   Loader2,
-  AlertCircle,
   ExternalLink,
   Compass,
   Users,
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  fetchProfileByHandle,
+  fetchUserInterests,
+  fetchUserMemberships,
+  fetchUserContributions,
+} from '@/features/profile/services/profileService'
 import { useAuth } from '@/features/auth/useAuth'
 import { LazyWalletSection } from '@/features/wallet/LazyWalletSection'
 import { TagSticker } from '@/components/TagSticker'
-import { VerifiedSeal } from '@/components/VerifiedSeal'
+import { VerifiedSeal } from '@/features/verification/components/VerifiedSeal'
 
 export function ProfilePage() {
   const { handle } = useParams()
-  const { user, session } = useAuth()
-  const queryClient = useQueryClient()
-
-  const [linkStatusMsg, setLinkStatusMsg] = useState(null)
-  const [linkErrorMsg, setLinkErrorMsg] = useState(null)
+  const { user } = useAuth()
 
   // 1. Fetch profile by handle
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', handle],
-    queryFn: async () => {
-      if (!handle) return null
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('handle', handle)
-        .maybeSingle()
-
-      if (error) throw error
-      return data
-    },
+    queryFn: () => fetchProfileByHandle(handle),
+    enabled: !!handle,
   })
 
   const isOwnProfile = user && profile && user.id === profile.id
@@ -51,64 +41,21 @@ export function ProfilePage() {
   // 2. Fetch user's exploring topics (user_interests)
   const { data: userInterests = [] } = useQuery({
     queryKey: ['profile_interests', profile?.id],
-    queryFn: async () => {
-      if (!profile?.id) return []
-      const { data, error } = await supabase
-        .from('user_interests')
-        .select('tag_id, weight, tags (id, name, slug, kind)')
-        .eq('user_id', profile.id)
-        .gt('weight', 0)
-        .order('weight', { ascending: false })
-
-      if (error) return []
-      return (data || []).map((d) => d.tags).filter(Boolean)
-    },
+    queryFn: () => fetchUserInterests(profile.id),
     enabled: !!profile?.id,
   })
 
   // 3. Fetch user's community memberships
   const { data: memberships = [] } = useQuery({
     queryKey: ['profile_memberships', profile?.id],
-    queryFn: async () => {
-      if (!profile?.id) return []
-      const { data, error } = await supabase
-        .from('memberships')
-        .select('role, communities (id, name, slug)')
-        .eq('user_id', profile.id)
-
-      if (error) return []
-      return (data || []).map((m) => ({ role: m.role, ...(m.communities || {}) }))
-    },
+    queryFn: () => fetchUserMemberships(profile.id),
     enabled: !!profile?.id,
   })
 
   // 4. Fetch user's verified contributions (PROF-01..03)
   const { data: contributions = [] } = useQuery({
     queryKey: ['profile_contributions', profile?.id],
-    queryFn: async () => {
-      if (!profile?.id) return []
-      const { data, error } = await supabase
-        .from('contributions')
-        .select(`
-          id,
-          content_hash,
-          status,
-          tx_hash,
-          created_at,
-          communities (name, slug),
-          collection_items (
-            kind,
-            url,
-            note,
-            posts (body)
-          )
-        `)
-        .eq('user_id', profile.id)
-        .order('created_at', { ascending: false })
-
-      if (error) return []
-      return data || []
-    },
+    queryFn: () => fetchUserContributions(profile.id),
     enabled: !!profile?.id,
   })
 
@@ -177,7 +124,7 @@ export function ProfilePage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {isOwnProfile && <LazyWalletSection />}
+            {isOwnProfile && <LazyWalletSection profile={profile} />}
             <div className="flex items-center gap-2 border border-[var(--onchain)]/30 bg-[var(--paper)] px-3 py-1.5 text-xs shadow-[1.5px_1.5px_0_var(--ink)]">
               <ShieldCheck className="h-4 w-4 text-[var(--onchain)]" />
               <span className="font-mono text-[11px] text-[var(--ink)]">

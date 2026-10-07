@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { PenSquare, Send, Image, Link2, AlertCircle, Loader2, X } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { createPost } from '@/features/feed/services/feedService'
+import {
+  fetchCultureTags,
+  fetchCommunities,
+} from '@/features/communities/services/communityService'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
 
@@ -19,22 +23,16 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
   const [showExtras, setShowExtras] = useState(false)
   const [errorMsg, setErrorMsg] = useState(null)
 
-  // Fetch available tags
+  // Fetch available tags via communityService
   const { data: tags = [] } = useQuery({
     queryKey: ['tags'],
-    queryFn: async () => {
-      const { data } = await supabase.from('tags').select('*').order('name')
-      return data || []
-    },
+    queryFn: fetchCultureTags,
   })
 
-  // Fetch communities
+  // Fetch communities via communityService
   const { data: communities = [] } = useQuery({
     queryKey: ['communities'],
-    queryFn: async () => {
-      const { data } = await supabase.from('communities').select('id, name, slug').order('name')
-      return data || []
-    },
+    queryFn: () => fetchCommunities(),
   })
 
   const toggleTag = (tagId) => {
@@ -68,34 +66,15 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
         throw new Error('Source URL must be a valid http:// or https:// web address.')
       }
 
-      // 1. Insert into posts
-      const { data: post, error: postError } = await supabase
-        .from('posts')
-        .insert({
-          author_id: user.id,
-          body: trimmedBody,
-          community_id: selectedCommunityId || null,
-          media_url: mediaUrl.trim() || null,
-          media_credit: mediaCredit.trim() || null,
-          source_url: sourceUrl.trim() || null,
-          is_editorial: false,
-        })
-        .select('id')
-        .single()
-
-      if (postError || !post) throw postError || new Error('Failed to create post')
-
-      // 2. Insert into post_tags
-      const postTagRows = selectedTagIds.map((tagId) => ({
-        post_id: post.id,
-        tag_id: tagId,
-        weight: 1.0,
-      }))
-
-      const { error: tagError } = await supabase.from('post_tags').insert(postTagRows)
-      if (tagError) throw tagError
-
-      return post
+      return createPost({
+        authorId: user.id,
+        body: trimmedBody,
+        communityId: selectedCommunityId || null,
+        mediaUrl: mediaUrl.trim() || null,
+        mediaCredit: mediaCredit.trim() || null,
+        sourceUrl: sourceUrl.trim() || null,
+        tagIds: selectedTagIds,
+      })
     },
     onSuccess: () => {
       setBody('')

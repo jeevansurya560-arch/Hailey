@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Sparkles, Users, Loader2, ArrowRight, Compass } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  fetchUserInterestsCount,
+  fetchFeedStream,
+} from '@/features/feed/services/feedService'
 import { useAuth } from '@/features/auth/useAuth'
 import { PostComposer } from '@/features/posts/PostComposer'
 import { FeedCard } from '@/features/feed/FeedCard'
@@ -14,206 +17,23 @@ export function HomePage() {
   const queryClient = useQueryClient()
   const [page, setPage] = useState(0)
 
-  // 1. Fetch user's interest weights count
+  // 1. Fetch user's interest weights count via feedService
   const { data: userInterestsCount = 0 } = useQuery({
     queryKey: ['user_interests_count', user?.id],
-    queryFn: async () => {
-      if (!user) return 0
-      const { count } = await supabase
-        .from('user_interests')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .gt('weight', 0)
-      return count ?? 0
-    },
+    queryFn: () => fetchUserInterestsCount(user?.id),
     enabled: !!user,
   })
 
-  // 2. Fetch personalized feed items via get_feed RPC
+  // 2. Fetch personalized or fallback feed stream via feedService
   const { data: feedData, isLoading: isFeedLoading } = useQuery({
     queryKey: ['feed', user?.id, page, userInterestsCount],
-    queryFn: async () => {
-      const limit = (page + 1) * PAGE_SIZE
-
-      // If user is signed in and has positive weights, call get_feed RPC
-      if (user && userInterestsCount > 0) {
-        // Try RPC call
-        const { data: rpcFeed, error: rpcErr } = await supabase.rpc('get_feed', {
-          p_limit: limit,
-          p_offset: 0,
-        })
-
-        // Also fetch get_explore items for interleaving (FEED-03)
-        const { data: rpcExplore } = await supabase.rpc('get_explore', {
-          p_limit: Math.max(3, Math.floor(limit / 5)),
-        })
-
-        if (!rpcErr && rpcFeed && rpcFeed.length > 0) {
-          const exploreList = rpcExplore || []
-          let exploreIdx = 0
-
-          // Merge & interleave explore items at every 5th slot
-          const orderedFeedItems = []
-          for (let i = 0; i < rpcFeed.length; i++) {
-            orderedFeedItems.push({
-              post_id: rpcFeed[i].post_id,
-              score: rpcFeed[i].score,
-              why: rpcFeed[i].why,
-              isExplore: false,
-            })
-
-            // Interleave explore item at 5th position
-            if ((i + 1) % 4 === 0 && exploreIdx < exploreList.length) {
-              orderedFeedItems.push({
-                post_id: exploreList[exploreIdx].post_id,
-                score: exploreList[exploreIdx].score,
-                why: exploreList[exploreIdx].why,
-                isExplore: true,
-              })
-              exploreIdx++
-            }
-          }
-
-          const postIds = orderedFeedItems.map((item) => item.post_id)
-
-          // Fetch full post metadata preserving ranking order
-          const { data: fullPosts, error: postErr } = await supabase
-            .from('posts')
-            .select(`
-              id,
-              author_id,
-              body,
-              media_url,
-              media_credit,
-              source_url,
-              is_editorial,
-              created_at,
-              profiles(handle, display_name),
-              communities(slug, name),
-              post_tags(tags(id, name, slug, kind))
-            `)
-            .in('id', postIds)
-
-          if (!postErr && fullPosts) {
-            const postsMap = new Map(fullPosts.map((p) => [p.id, p]))
-
-            // Fetch user reactions
-            const { data: userReactions } = await supabase
-              .from('post_reactions')
-              .select('post_id, kind')
-              .eq('user_id', user.id)
-
-            const { data: allReactions } = await supabase
-              .from('post_reactions')
-              .select('post_id, kind')
-              .in('post_id', postIds)
-
-            const reactionsCountMap = new Map()
-            if (allReactions) {
-              for (const r of allReactions) {
-                const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
-                if (r.kind === 'like') current.likes++
-                if (r.kind === 'save') current.saves++
-                reactionsCountMap.set(r.post_id, current)
-              }
-            }
-
-            const hiddenPostIds = new Set(
-              (userReactions || []).filter((r) => r.kind === 'hide').map((r) => r.post_id)
-            )
-
-            // Reconstruct in exact ranking order
-            const resultList = []
-            for (const feedItem of orderedFeedItems) {
-              if (hiddenPostIds.has(feedItem.post_id)) continue
-              const p = postsMap.get(feedItem.post_id)
-              if (!p) continue
-
-              const pReactions = (userReactions || []).filter((r) => r.post_id === p.id)
-              const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
-              const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
-
-              resultList.push({
-                id: p.id,
-                author_id: p.author_id,
-                author: p.profiles,
-                community: p.communities,
-                body: p.body,
-                media_url: p.media_url,
-                media_credit: p.media_credit,
-                source_url: p.source_url,
-                is_editorial: p.is_editorial,
-                created_at: p.created_at,
-                tags,
-                why: feedItem.why,
-                score: feedItem.score,
-                isExplore: feedItem.isExplore,
-                reactions: {
-                  likesCount: counts.likes,
-                  savesCount: counts.saves,
-                  isLiked: pReactions.some((r) => r.kind === 'like'),
-                  isSaved: pReactions.some((r) => r.kind === 'save'),
-                  isHidden: false,
-                },
-              })
-            }
-
-            return { items: resultList, hasPersonalization: true, hasMore: rpcFeed.length >= limit }
-          }
-        }
-      }
-
-      // Fallback: newest posts (or editorial fallback if 0 weights) (FEED-08)
-      const { data: postsData } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          author_id,
-          body,
-          media_url,
-          media_credit,
-          source_url,
-          is_editorial,
-          created_at,
-          profiles(handle, display_name),
-          communities(slug, name),
-          post_tags(tags(id, name, slug, kind))
-        `)
-        .order('created_at', { ascending: false })
-        .limit(limit)
-
-      const fallbackList = (postsData || []).map((p) => {
-        const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
-        return {
-          id: p.id,
-          author_id: p.author_id,
-          author: p.profiles,
-          community: p.communities,
-          body: p.body,
-          media_url: p.media_url,
-          media_credit: p.media_credit,
-          source_url: p.source_url,
-          is_editorial: p.is_editorial,
-          created_at: p.created_at,
-          tags,
-          why: tags.length > 0 ? [tags[0].name] : ['Culture'],
-          isExplore: false,
-          reactions: {
-            likesCount: 0,
-            savesCount: 0,
-            isLiked: false,
-            isSaved: false,
-            isHidden: false,
-          },
-        }
-      })
-
-      return {
-        items: fallbackList,
-        hasPersonalization: false,
-        hasMore: fallbackList.length >= limit,
-      }
-    },
+    queryFn: () =>
+      fetchFeedStream({
+        user,
+        userInterestsCount,
+        page,
+        pageSize: PAGE_SIZE,
+      }),
   })
 
   const posts = feedData?.items || []

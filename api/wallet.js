@@ -86,6 +86,18 @@ export default async function handler(req, res) {
         })
       }
 
+      // Atomically consume nonce to protect against replay and concurrent races
+      const { data: consumedNonce, error: consumeErr } = await supabaseAdmin
+        .from('wallet_nonces')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('nonce', nonceRow.nonce)
+        .select('nonce')
+
+      if (consumeErr || !consumedNonce || consumedNonce.length === 0) {
+        return res.status(409).json({ error: 'Nonce was already consumed or invalidated.' })
+      }
+
       // Check if address is already linked to another profile (409 Conflict)
       const { data: existingProfile } = await supabaseAdmin
         .from('profiles')
@@ -109,9 +121,6 @@ export default async function handler(req, res) {
       if (updateErr) {
         return res.status(500).json({ error: 'Failed to update profile wallet address: ' + updateErr.message })
       }
-
-      // Delete used nonce (single-use)
-      await supabaseAdmin.from('wallet_nonces').delete().eq('user_id', user.id)
 
       // Promote any existing contributions waiting for wallet to 'submitted'
       await supabaseAdmin

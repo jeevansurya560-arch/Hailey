@@ -1,6 +1,6 @@
 import React from 'react'
 import { Check, Hash } from 'lucide-react'
-import { getThreadColor } from '@/lib/threadColors'
+import { getThreadColor } from '@/features/communities/threadColors'
 
 export function TagSticker({
   name,

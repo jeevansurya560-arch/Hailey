@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Users, UserPlus, UserCheck, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import {
+  fetchCommunities,
+  toggleCommunityMembership,
+} from '@/features/communities/services/communityService'
 import { useAuth } from '@/features/auth/useAuth'
 import { TagSticker } from '@/components/TagSticker'
 
@@ -11,78 +14,21 @@ export function CommunitiesPage() {
   const queryClient = useQueryClient()
   const [membershipOverrides, setMembershipOverrides] = useState({})
 
-  // Fetch communities, tags, and user memberships
+  // Fetch communities, tags, and user memberships via communityService
   const { data: communities = [], isLoading } = useQuery({
     queryKey: ['communities_list', user?.id],
-    queryFn: async () => {
-      // 1. Fetch communities
-      const { data: commsData, error: commsErr } = await supabase
-        .from('communities')
-        .select('*')
-        .order('name')
-      if (commsErr) throw commsErr
-
-      // 2. Fetch community tags
-      const { data: commTagsData } = await supabase
-        .from('community_tags')
-        .select('community_id, tags(id, name, slug, kind)')
-
-      // 3. Fetch all memberships
-      const { data: membershipsData } = await supabase
-        .from('memberships')
-        .select('community_id, user_id')
-
-      const commTagsMap = new Map()
-      if (commTagsData) {
-        for (const item of commTagsData) {
-          if (!item.community_id || !item.tags) continue
-          const current = commTagsMap.get(item.community_id) || []
-          current.push(item.tags)
-          commTagsMap.set(item.community_id, current)
-        }
-      }
-
-      const membersCountMap = new Map()
-      const userJoinedSet = new Set()
-
-      if (membershipsData) {
-        for (const m of membershipsData) {
-          membersCountMap.set(m.community_id, (membersCountMap.get(m.community_id) || 0) + 1)
-          if (user && m.user_id === user.id) {
-            userJoinedSet.add(m.community_id)
-          }
-        }
-      }
-
-      return (commsData || []).map((c) => ({
-        id: c.id,
-        slug: c.slug,
-        name: c.name,
-        description: c.description,
-        membersCount: membersCountMap.get(c.id) || 0,
-        isMember: userJoinedSet.has(c.id),
-        tags: commTagsMap.get(c.id) || [],
-      }))
-    },
+    queryFn: () => fetchCommunities(user?.id),
   })
 
-  // Join/Leave mutation
+  // Join/Leave mutation via communityService
   const toggleMembershipMutation = useMutation({
     mutationFn: async ({ communityId, isJoining }) => {
       if (!user) throw new Error('Sign in required')
-      if (isJoining) {
-        const { error } = await supabase
-          .from('memberships')
-          .insert({ community_id: communityId, user_id: user.id, role: 'member' })
-        if (error) throw error
-      } else {
-        const { error } = await supabase
-          .from('memberships')
-          .delete()
-          .eq('community_id', communityId)
-          .eq('user_id', user.id)
-        if (error) throw error
-      }
+      return toggleCommunityMembership({
+        communityId,
+        userId: user.id,
+        isJoining,
+      })
     },
     onMutate: ({ communityId, isJoining }) => {
       setMembershipOverrides((prev) => ({ ...prev, [communityId]: isJoining }))

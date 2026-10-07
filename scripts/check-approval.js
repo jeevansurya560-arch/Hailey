@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { computeCommunityId, computeItemContent, computeContentHash } from '../server/hash.js'
+import { validateApproveItemInput, validateProposeItemInput } from '../server/validate.js'
 
 function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
@@ -44,17 +45,21 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 })
 
 async function runApprovalChecks() {
-  console.log('🧪 Starting Day 6 Curator Approval & Collection Verification Checks...\n')
+  console.log('🧪 Starting Curator Approval & Validation Checks...\n')
 
-  // 1. Fetch community or load from seed
+  // 1. Fetch community from real Supabase DB
   let communitySlug = 'tokyo-underground'
   let communityName = 'Tokyo Underground & Street Culture'
 
-  const { data: dbCommunity } = await supabase
+  const { data: dbCommunity, error: commError } = await supabase
     .from('communities')
     .select('id, slug, name')
     .limit(1)
     .maybeSingle()
+
+  if (commError) {
+    console.warn('⚠️ Warning querying communities:', commError.message)
+  }
 
   if (dbCommunity) {
     communitySlug = dbCommunity.slug
@@ -63,28 +68,48 @@ async function runApprovalChecks() {
 
   console.log(`📍 Testing with Community Collective: "${communityName}" (${communitySlug})`)
 
-  // ── TEST 1: Non-curator approval attempt -> 403 Forbidden ───────────────
-  console.log('\n--- Test 1: Non-curator approval attempt ---')
-  const simulatedCallerRole = 'member' // Normal contributor role
-  const isCurator = simulatedCallerRole === 'curator'
-
-  if (!isCurator) {
-    console.log('✅ Non-curator check passed: Caller with role "member" is rejected (403 Forbidden).')
-  } else {
-    console.error('❌ Test 1 Failed: Non-curator was allowed.')
+  // ── TEST 1: Server Validation Layer Tests ───────────────
+  console.log('\n--- Test 1: Real Server Input Validation ---')
+  const badActionRes = validateApproveItemInput({
+    itemId: '550e8400-e29b-41d4-a716-446655440000',
+    action: 'delete',
+  })
+  if (!badActionRes.error) {
+    throw new Error('FAILED: validateApproveItemInput allowed invalid action "delete"')
   }
+  console.log(`✅ Invalid action rejected: "${badActionRes.error}"`)
 
-  // ── TEST 2: Self-approval attempt -> 403 Forbidden (Anti-self-dealing) ──
-  console.log('\n--- Test 2: Self-approval attempt (Anti-self-dealing check) ---')
-  const proposerId = '550e8400-e29b-41d4-a716-446655440001'
-  const deciderId = '550e8400-e29b-41d4-a716-446655440001' // Same user
-
-  const isSelfDealing = proposerId === deciderId
-  if (isSelfDealing) {
-    console.log('✅ Anti-self-dealing check passed: Proposer equals Decider -> rejected by constraint (403 Forbidden).')
+  const badUuidRes = validateApproveItemInput({
+    itemId: 'invalid-uuid-string',
+    action: 'approve',
+  })
+  if (!badUuidRes.error) {
+    throw new Error('FAILED: validateApproveItemInput allowed invalid non-UUID itemId')
   }
+  console.log(`✅ Invalid UUID rejected: "${badUuidRes.error}"`)
 
-  // ── TEST 3: Deterministic Canonical Content Hashing (EIP-712 & Keccak256) ──
+  const validRes = validateApproveItemInput({
+    itemId: '550e8400-e29b-41d4-a716-446655440000',
+    action: 'approve',
+  })
+  if (validRes.error || !validRes.data) {
+    throw new Error(`FAILED: validateApproveItemInput rejected valid input: ${validRes.error}`)
+  }
+  console.log('✅ Valid approval payload accepted by server validator.')
+
+  // ── TEST 2: Propose Item Server Validation ──
+  console.log('\n--- Test 2: Propose Item Server Validation ---')
+  const badProposeRes = validateProposeItemInput({
+    collectionId: '550e8400-e29b-41d4-a716-446655440001',
+    kind: 'link',
+    url: 'ftp://unsupported.com',
+  })
+  if (!badProposeRes.error) {
+    throw new Error('FAILED: validateProposeItemInput allowed non-http URL')
+  }
+  console.log(`✅ Invalid protocol rejected: "${badProposeRes.error}"`)
+
+  // ── TEST 3: Deterministic Canonical Content Hashing (Keccak256) ──
   console.log('\n--- Test 3: Deterministic Canonical Content Hashing ---')
   const communityIdBytes = computeCommunityId(communitySlug)
   const itemContent = computeItemContent({
@@ -103,20 +128,31 @@ async function runApprovalChecks() {
     },
   })
 
+  if (!communityIdBytes.startsWith('0x') || communityIdBytes.length !== 66) {
+    throw new Error(`FAILED: communityIdBytes format invalid: ${communityIdBytes}`)
+  }
+  if (!contentHash.startsWith('0x') || contentHash.length !== 66) {
+    throw new Error(`FAILED: contentHash format invalid: ${contentHash}`)
+  }
+
   console.log(`✅ Community ID Bytes32: ${communityIdBytes}`)
   console.log(`✅ Canonical Item Serialization: "${itemContent}"`)
   console.log(`✅ Deterministic Content Hash (Keccak256): ${contentHash}`)
 
-  // ── TEST 4: Re-approval conflict check (409 Conflict) ─────────
-  console.log('\n--- Test 4: Re-approving already decided item ---')
-  const itemStatus = 'approved'
-  const isPending = itemStatus === 'pending'
+  // ── TEST 4: Real Database Collections / Items Query Check ──
+  console.log('\n--- Test 4: Database Items & Collections Inspection ---')
+  const { data: items, error: itemsErr } = await supabase
+    .from('collection_items')
+    .select('id, status, collection_id')
+    .limit(5)
 
-  if (!isPending) {
-    console.log(`✅ Conflict check passed: Item already marked '${itemStatus}' -> rejected with 409 Conflict.`)
+  if (itemsErr) {
+    console.warn('⚠️ Note: collection_items query returned error:', itemsErr.message)
+  } else {
+    console.log(`✅ Successfully queried collection_items table (${items?.length || 0} items inspected).`)
   }
 
-  console.log('\n✨ All Day 6 Curator Approval verification checks PASSED successfully!')
+  console.log('\n✨ All Curator Approval & Validation checks PASSED successfully!')
 }
 
 runApprovalChecks().catch((err) => {

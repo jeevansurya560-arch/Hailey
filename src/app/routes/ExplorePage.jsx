@@ -1,30 +1,22 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Search, Loader2, Compass } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { fetchCultureTags } from '@/features/communities/services/communityService'
 import { TagSticker } from '@/components/TagSticker'
-import { getThreadColor } from '@/lib/threadColors'
+import { getThreadColor } from '@/features/communities/threadColors'
 
 export function ExplorePage() {
   const [filter, setFilter] = useState('')
   const [selectedKind, setSelectedKind] = useState(null)
 
-  // Fetch real taxonomy tags from Supabase
+  // Fetch real taxonomy tags via communityService
   const {
     data: tags = [],
     isLoading,
     isError,
   } = useQuery({
     queryKey: ['tags'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('tags')
-        .select('*')
-        .order('name', { ascending: true })
-
-      if (error) throw error
-      return data || []
-    },
+    queryFn: fetchCultureTags,
   })
 
   // Extract distinct kinds for filter pills

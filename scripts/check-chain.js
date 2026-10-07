@@ -1,8 +1,9 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
-import { createPublicClient, http, parseAbi } from 'viem'
+import { createPublicClient, http } from 'viem'
 import { computeCommunityId } from '../server/hash.js'
+import { HAILEY_CONTRIBUTIONS_ABI } from '../shared/contracts/HaileyContributions.abi.js'
 
 function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)
@@ -53,10 +54,7 @@ const monadTestnet = {
   },
 }
 
-const CONTRACT_ABI = parseAbi([
-  'function count(address contributor, bytes32 communityId) view returns (uint256)',
-  'function totalAttestations() view returns (uint256)',
-])
+const CONTRACT_ABI = HAILEY_CONTRIBUTIONS_ABI
 
 async function runChainChecks() {
   console.log('🧪 Starting Day 7 Onchain Monad Verification Checks...\n')

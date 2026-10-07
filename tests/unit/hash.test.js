@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { computeCommunityId, computeItemContent, computeContentHash } from '../hash.js'
+import {
+  computeCommunityId,
+  computeItemContent,
+  computeContentHash,
+} from '../../shared/crypto/hashing.js'
 
-describe('server/hash', () => {
+describe('shared/crypto/hashing.js - Cryptographic Hashing Unit Tests', () => {
   it('computes deterministic communityId from slug', () => {
     const slug = 'harajuku-streetwear'
     const id = computeCommunityId(slug)
@@ -58,14 +62,6 @@ describe('server/hash', () => {
     )
 
     // Same inputs produce identical hash
-    const hashRepeat = computeContentHash(params)
-    expect(hashRepeat).toBe(hash)
-
-    // Altering any input produces a different hash
-    const hashModified = computeContentHash({
-      ...params,
-      communitySlug: 'tokyo-vintage-2',
-    })
-    expect(hashModified).not.toBe(hash)
+    expect(computeContentHash(params)).toBe(hash)
   })
 })

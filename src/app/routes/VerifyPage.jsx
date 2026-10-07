@@ -1,15 +1,10 @@
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { createPublicClient, http, parseAbi } from 'viem'
-import { ShieldCheck, ExternalLink, Loader2, ArrowLeft, Building2 } from 'lucide-react'
-import { monadTestnet } from '@/features/wallet/chain'
-import { supabase } from '@/lib/supabase'
-import { computeCommunityId } from '../../../server/hash'
-
-const CONTRACT_ABI = parseAbi([
-  'function count(address contributor, bytes32 communityId) view returns (uint256)',
-  'function totalAttestations() view returns (uint256)',
-])
+import { ShieldCheck, ExternalLink, Loader2, ArrowLeft, Building2, AlertCircle } from 'lucide-react'
+import {
+  fetchCommunitiesForVerification,
+  getCommunityAttestationCounts,
+} from '@/features/verification/services/attestationService'
 
 export function VerifyPage() {
   const { address } = useParams()
@@ -18,55 +13,25 @@ export function VerifyPage() {
 
   const normalizedAddress = address?.toLowerCase() || '0x0000000000000000000000000000000000000000'
 
-  // 1. Fetch communities from Supabase
+  // 1. Fetch communities via Attestation service
   const { data: communities = [] } = useQuery({
     queryKey: ['communities_verify'],
-    queryFn: async () => {
-      const { data } = await supabase.from('communities').select('id, name, slug').order('name')
-      return data || []
-    },
+    queryFn: fetchCommunitiesForVerification,
   })
 
-  // 2. Query Monad Testnet blockchain for counts per community
+  // 2. Query Monad Testnet blockchain for counts per community via Attestation service
   const { data: onchainCounts = [], isLoading, isError } = useQuery({
-    queryKey: ['onchain_verify', normalizedAddress, communities.length],
-    queryFn: async () => {
-      if (!communities.length) return []
-
-      const client = createPublicClient({
-        chain: monadTestnet,
-        transport: http(),
-      })
-
-      const results = await Promise.all(
-        communities.map(async (comm) => {
-          const communityIdBytes = computeCommunityId(comm.slug)
-          try {
-            const count = await client.readContract({
-              address: contractAddress,
-              abi: CONTRACT_ABI,
-              functionName: 'count',
-              args: [normalizedAddress, communityIdBytes],
-            })
-            return {
-              community: comm,
-              count: Number(count),
-            }
-          } catch {
-            return {
-              community: comm,
-              count: 0,
-            }
-          }
-        })
-      )
-
-      return results
-    },
+    queryKey: ['onchain_verify', normalizedAddress, communities.length, contractAddress],
+    queryFn: () => getCommunityAttestationCounts(normalizedAddress, communities, contractAddress),
     enabled: !!normalizedAddress && communities.length > 0,
   })
 
-  const totalVerifiedCount = onchainCounts.reduce((acc, curr) => acc + curr.count, 0)
+  const totalVerifiedCount = onchainCounts.reduce(
+    (acc, curr) => acc + (typeof curr.count === 'number' ? curr.count : 0),
+    0
+  )
+
+  const hasAnyUnavailable = onchainCounts.some((item) => item.status === 'unavailable')
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -100,6 +65,11 @@ export function VerifyPage() {
             <div className="flex items-center gap-1.5 text-[var(--ink)]">
               <span>Total Attestations:</span>
               <strong className="text-[var(--onchain)] text-sm">{totalVerifiedCount}</strong>
+              {hasAnyUnavailable && (
+                <span className="text-amber-600 text-[10px] flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" /> (some queries unavailable)
+                </span>
+              )}
             </div>
 
             <a
@@ -146,7 +116,7 @@ export function VerifyPage() {
 
         {!isLoading && onchainCounts.length > 0 && (
           <div className="divide-y divide-[var(--line)]">
-            {onchainCounts.map(({ community, count }) => (
+            {onchainCounts.map(({ community, count, status, errorMessage }) => (
               <div
                 key={community.id}
                 className="py-3 flex items-center justify-between font-mono text-xs"
@@ -164,15 +134,21 @@ export function VerifyPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span
-                    className={`px-2.5 py-1 rounded font-bold ${
-                      count > 0
-                        ? 'bg-[var(--onchain)]/20 text-[var(--onchain)] border border-[var(--onchain)]/30'
-                        : 'bg-gray-100 text-[var(--ink-2)]'
-                    }`}
-                  >
-                    {count} {count === 1 ? 'Attestation' : 'Attestations'}
-                  </span>
+                  {status === 'unavailable' ? (
+                    <span className="px-2.5 py-1 rounded font-bold bg-amber-50 text-amber-700 border border-amber-200" title={errorMessage}>
+                      Verification unavailable
+                    </span>
+                  ) : (
+                    <span
+                      className={`px-2.5 py-1 rounded font-bold ${
+                        count > 0
+                          ? 'bg-[var(--onchain)]/20 text-[var(--onchain)] border border-[var(--onchain)]/30'
+                          : 'bg-gray-100 text-[var(--ink-2)]'
+                      }`}
+                    >
+                      {count} {count === 1 ? 'Attestation' : 'Attestations'}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}

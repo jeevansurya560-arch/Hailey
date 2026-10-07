@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import { ThumbsUp, ThumbsDown, HelpCircle, Check } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { submitRelevanceAnswer } from '@/features/feed/services/feedService'
 
-export function RelevancePrompt({ userId, postId, initialAnswer = null }) {
+export function RelevancePrompt({ userId, postId, initialAnswer = null, onAnswerSubmitted }) {
   const [selectedAnswer, setSelectedAnswer] = useState(initialAnswer)
   const [isSubmitted, setIsSubmitted] = useState(initialAnswer !== null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -12,16 +12,14 @@ export function RelevancePrompt({ userId, postId, initialAnswer = null }) {
     setSelectedAnswer(answer)
     setIsSubmitting(true)
 
-    const { error } = await supabase
-      .from('feedback')
-      .upsert(
-        { user_id: userId, post_id: postId, answer },
-        { onConflict: 'user_id,post_id' }
-      )
-
-    setIsSubmitting(false)
-    if (!error) {
+    try {
+      await submitRelevanceAnswer({ userId, postId, answer })
       setIsSubmitted(true)
+      if (onAnswerSubmitted) onAnswerSubmitted(answer)
+    } catch (err) {
+      console.warn('[RelevancePrompt] Failed to record feedback:', err)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
