@@ -18,8 +18,6 @@ function apiDevPlugin() {
         if (!urlPath.startsWith('/api/')) return next()
 
         const endpoint = urlPath.replace('/api/', '')
-        if (endpoint !== 'wallet' && endpoint !== 'approve-item') return next()
-
         const absPath = path.resolve(process.cwd(), 'api', `${endpoint}.js`)
         if (!fs.existsSync(absPath)) return next()
 

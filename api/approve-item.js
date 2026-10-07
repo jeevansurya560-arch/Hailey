@@ -169,7 +169,7 @@ export default async function handler(req, res) {
     const initialAttestStatus = contributorAddress ? 'submitted' : 'awaiting_wallet'
 
     // 9c. Create contributions row (unique per item_id, ON CONFLICT DO NOTHING)
-    const { data: contribution } = await supabaseAdmin
+    const { data: contribution, error: contribError } = await supabaseAdmin
       .from('contributions')
       .upsert(
         {
@@ -184,12 +184,30 @@ export default async function handler(req, res) {
       .select('id, content_hash, status, tx_hash, created_at')
       .maybeSingle()
 
+    if (contribError) {
+      console.error('[approve-item] Contribution creation error:', contribError)
+      return res.status(500).json({ error: 'Failed to record contribution: ' + contribError.message })
+    }
+
+    // 9d. Enqueue idempotent attestation job
+    if (contribution?.id) {
+      await supabaseAdmin
+        .from('attestation_jobs')
+        .upsert(
+          {
+            contribution_id: contribution.id,
+            status: initialAttestStatus === 'awaiting_wallet' ? 'queued' : 'processing',
+          },
+          { onConflict: 'contribution_id' }
+        )
+    }
+
     // 10–15. Onchain Relayer Attestation Flow (Day 7)
     let attestResult = {
       status: initialAttestStatus,
     }
 
-    if (contributorAddress && (process.env.ATTESTOR_PRIVATE_KEY || process.env.RELAYER_PRIVATE_KEY)) {
+    if (contributorAddress && (process.env.RELAYER_PRIVATE_KEY || process.env.ATTESTOR_PRIVATE_KEY)) {
       try {
         const communityIdBytes = computeCommunityId(communitySlug)
         const relayerRes = await relayer.attest({
@@ -210,6 +228,18 @@ export default async function handler(req, res) {
             attested_at: relayerRes.status === 'attested' ? new Date().toISOString() : null,
           })
           .eq('item_id', item.id)
+
+        if (contribution?.id) {
+          await supabaseAdmin
+            .from('attestation_jobs')
+            .update({
+              status: relayerRes.status === 'attested' ? 'confirmed' : relayerRes.status === 'submitted' ? 'submitted' : 'failed',
+              tx_hash: relayerRes.txHash || null,
+              last_error: relayerRes.error || null,
+              completed_at: relayerRes.status === 'attested' ? new Date().toISOString() : null,
+            })
+            .eq('contribution_id', contribution.id)
+        }
       } catch (relayerErr) {
         const msg = relayerErr instanceof Error ? relayerErr.message : 'Relayer attestation execution error'
         console.warn('[approve-item] Relayer execution skipped or failed:', msg)

@@ -123,11 +123,22 @@ export default async function handler(req, res) {
       }
 
       // Promote any existing contributions waiting for wallet to 'submitted'
-      await supabaseAdmin
+      const { data: promoted } = await supabaseAdmin
         .from('contributions')
         .update({ status: 'submitted' })
         .eq('user_id', user.id)
         .eq('status', 'awaiting_wallet')
+        .select('id')
+
+      if (promoted && promoted.length > 0) {
+        const jobRows = promoted.map((p) => ({
+          contribution_id: p.id,
+          status: 'queued',
+        }))
+        await supabaseAdmin
+          .from('attestation_jobs')
+          .upsert(jobRows, { onConflict: 'contribution_id' })
+      }
 
       return res.status(200).json({
         ok: true,

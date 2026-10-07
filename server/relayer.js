@@ -47,8 +47,8 @@ export class RelayerService {
       '0x0000000000000000000000000000000000000000'
     this.privateKey =
       config?.privateKey ||
-      process.env.ATTESTOR_PRIVATE_KEY ||
-      process.env.RELAYER_PRIVATE_KEY
+      process.env.RELAYER_PRIVATE_KEY ||
+      process.env.ATTESTOR_PRIVATE_KEY
     this.minBalance =
       config?.minBalance ||
       parseFloat(process.env.RELAYER_MIN_BALANCE || '0.01')
@@ -63,7 +63,7 @@ export class RelayerService {
 
   getWalletClient() {
     if (!this.privateKey) {
-      throw new Error('ATTESTOR_PRIVATE_KEY is not configured')
+      throw new Error('RELAYER_PRIVATE_KEY is not configured')
     }
     const account = privateKeyToAccount(this.privateKey)
     return createWalletClient({
@@ -76,7 +76,7 @@ export class RelayerService {
   async checkBalance() {
     const publicClient = this.getPublicClient()
     if (!this.privateKey) {
-      throw new Error('ATTESTOR_PRIVATE_KEY is not configured')
+      throw new Error('RELAYER_PRIVATE_KEY is not configured')
     }
     const account = privateKeyToAccount(this.privateKey)
     const balanceWei = await publicClient.getBalance({ address: account.address })

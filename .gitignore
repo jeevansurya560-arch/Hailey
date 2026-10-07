@@ -27,6 +27,9 @@ dist-ssr
 *.ntvs*
 *.njsproj
 *.sln
+# Supabase CLI temp
+supabase/.temp/
+
 # Large Datasets
 Hailey_1M_Culture_Master_Dataset/
 *.parquet

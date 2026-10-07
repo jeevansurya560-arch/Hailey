@@ -14,6 +14,8 @@ import { CulturePage } from '@/app/routes/CulturePage'
 import { CollectionDetailPage } from '@/features/collections/CollectionDetailPage'
 import { VerifyPage } from '@/app/routes/VerifyPage'
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute'
+import { TicketingPage } from '@/features/ticketing/pages/TicketingPage'
+import { MarketsPage } from '@/features/markets/pages/MarketsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -37,6 +39,8 @@ export function App() {
               <Route path="/communities" element={<CommunitiesPage />} />
               <Route path="/communities/:slug" element={<CommunityPage />} />
               <Route path="/collections/:id" element={<CollectionDetailPage />} />
+              <Route path="/tickets" element={<TicketingPage />} />
+              <Route path="/markets" element={<MarketsPage />} />
               <Route path="/verify/:address" element={<VerifyPage />} />
               <Route path="/post/:id" element={<PostDetailPage />} />
               <Route

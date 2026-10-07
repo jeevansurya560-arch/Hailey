@@ -18,8 +18,8 @@ import {
   fetchCollectionDetail,
   triageCollectionItem,
 } from '@/features/collections/services/collectionService'
-import { useAuth } from '@/features/auth/useAuth'
 import { ProposeItemModal } from './ProposeItemModal'
+import { SupportCuratorModal } from '@/features/payments/components/SupportCuratorModal'
 
 export function CollectionDetailPage() {
   const { id } = useParams()
@@ -27,6 +27,7 @@ export function CollectionDetailPage() {
   const queryClient = useQueryClient()
 
   const [isProposeOpen, setIsProposeOpen] = useState(false)
+  const [isSupportOpen, setIsSupportOpen] = useState(false)
   const [triageActionError, setTriageActionError] = useState(null)
   const [triageSuccessMsg, setTriageSuccessMsg] = useState(null)
 
@@ -146,16 +147,28 @@ export function CollectionDetailPage() {
             </div>
           </div>
 
-          {user && (
-            <button
-              type="button"
-              onClick={() => setIsProposeOpen(true)}
-              className="flex items-center gap-1.5 border border-[var(--ink)] bg-[var(--clay)] px-4 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90 transition-all self-start md:self-auto"
-            >
-              <Plus className="h-4 w-4" />
-              <span>{isPersonal ? 'Add Item' : 'Propose Item'}</span>
-            </button>
-          )}
+          <div className="flex items-center gap-2 flex-wrap self-start md:self-auto">
+            {collection.created_by !== user?.id && (
+              <button
+                type="button"
+                onClick={() => setIsSupportOpen(true)}
+                className="flex items-center gap-1.5 border border-amber-600 bg-amber-500/10 text-amber-800 dark:text-amber-300 px-4 py-2 font-mono text-xs uppercase tracking-wider rounded shadow hover:bg-amber-500/20 transition-all"
+              >
+                <span>⚡ Support Curator</span>
+              </button>
+            )}
+
+            {user && (
+              <button
+                type="button"
+                onClick={() => setIsProposeOpen(true)}
+                className="flex items-center gap-1.5 border border-[var(--ink)] bg-[var(--clay)] px-4 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90 transition-all"
+              >
+                <Plus className="h-4 w-4" />
+                <span>{isPersonal ? 'Add Item' : 'Propose Item'}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -357,6 +370,16 @@ export function CollectionDetailPage() {
         collectionId={collection.id}
         isPersonal={isPersonal}
         userPosts={userPosts}
+      />
+
+      {/* Paid Curation Support Modal */}
+      <SupportCuratorModal
+        isOpen={isSupportOpen}
+        onClose={() => setIsSupportOpen(false)}
+        curatorId={collection.created_by}
+        curatorHandle={collection.profiles?.handle || 'curator'}
+        collectionId={collection.id}
+        collectionTitle={collection.title}
       />
     </div>
   )

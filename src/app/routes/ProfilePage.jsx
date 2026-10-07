@@ -24,6 +24,7 @@ import { useAuth } from '@/features/auth/useAuth'
 import { LazyWalletSection } from '@/features/wallet/LazyWalletSection'
 import { TagSticker } from '@/components/TagSticker'
 import { VerifiedSeal } from '@/features/verification/components/VerifiedSeal'
+import { CuratorEarningsCard } from '@/features/payments/components/CuratorEarningsCard'
 
 export function ProfilePage() {
   const { handle } = useParams()
@@ -134,6 +135,9 @@ export function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Curator Revenue Dashboard (Claim A) */}
+      {isOwnProfile && <CuratorEarningsCard />}
 
       {/* Exploring Threads (PROF-01) */}
       {userInterests.length > 0 && (

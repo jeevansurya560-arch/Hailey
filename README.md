@@ -57,8 +57,30 @@ graph TD
 - **Frontend**: React 19, Vite, React Router v7, TanStack Query v5, Tailwind CSS v4.
 - **Web3 & Blockchain**: Viem, Wagmi, RainbowKit, Solidity 0.8.24, Foundry, Monad Testnet (`10143`).
 - **Backend & Database**: Supabase (PostgreSQL 15+), Row Level Security (RLS), PL/pgSQL RPC ranking functions.
-- **Serverless API**: Vercel Serverless Functions (`/api/approve-item`, `/api/wallet`, `/api/health`).
-- **Testing & Tooling**: Vitest, TSX, Oxlint.
+- **Serverless API**: Vercel Serverless Functions (`/api/approve-item`, `/api/wallet`, `/api/payments`, `/api/tickets`, `/api/markets`).
+- **Testing & Tooling**: Vitest (58 tests across 10 test suites), Oxlint (0 warnings, 0 errors).
+
+---
+
+## The 3 Core Product Capabilities
+
+### A. Paid Curation
+- **Concept**: Curation is directly funded by the people who benefit from it.
+- **Implementation**: `curation_payments` records payer, curator, collection/post, amount, 5% protocol fee, and 95% curator payout.
+- **Security**: Authoritative server-side calculation, replay protection against duplicate transaction hashes, and strict RLS blocking unauthenticated inserts or payout tampering.
+- **UI**: Support Curator button on collections, `SupportCuratorModal`, and Curator Earnings dashboard on profile.
+
+### B. Wallet-Native Person Identity & Ticketing
+- **Concept**: Access passes that follow a person's cryptographic identity rather than an email address.
+- **Implementation**: `tickets` table stores event passes bound to lowercase EVM addresses. Verification uses cryptographic wallet challenge signatures without requiring email.
+- **Security**: SIWE-style challenge with atomic single-use nonce consumption. RLS prevents client-side ticket tampering.
+- **UI**: `TicketingPage` (`/tickets`), `TicketPassCard`, and `TicketVerifierModal` gatekeeper.
+
+### C. Cultural Outcome Markets
+- **Concept**: Prediction markets on cultural milestones (exhibition sellouts, archive attestations) rather than financial instruments.
+- **Implementation**: `markets`, `market_options`, `positions`, and `market_resolutions`. Explicit state machine (`open` -> `closed` -> `resolved`).
+- **Settlement**: Pari-mutuel proportional payout with mathematical fund conservation. Verified with objective evidence audits.
+- **UI**: `MarketsPage` (`/markets`), `MarketCard`, `CreateMarketModal`, and `MarketDetailModal`.
 
 ---
 
@@ -70,39 +92,18 @@ Create `.env.local` for local development. Only browser-safe variables use the `
 # Browser-safe (Public)
 VITE_SUPABASE_URL=https://<your-project-id>.supabase.co
 VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
-VITE_WALLET_CONNECT_ID=<your-reown-project-id>
+VITE_CHAIN_ID=10143
+VITE_MONAD_RPC_URL=https://testnet-rpc.monad.xyz
 VITE_CONTRACT_ADDRESS=<your-deployed-contract-address>
-VITE_EXPLORER_URL=https://testnet.monadexplorer.com
+VITE_EXPLORER_URL=https://testnet.monadvision.com
 
 # Server-only (Never exposed to browser)
 SUPABASE_URL=https://<your-project-id>.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<your-supabase-service-role-key>
 RELAYER_PRIVATE_KEY=<your-funded-monad-private-key>
 MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-```
-
----
-
-## Local Setup & Quickstart
-
-```bash
-# 1. Clone repository & install dependencies
-git clone https://github.com/jeevansurya560-arch/Hailey.git
-cd Hailey
-npm install
-
-# 2. Seed database with taxonomy, demo accounts & communities
-npm run seed
-
-# 3. Start local development server
-npm run dev
-
-# 4. Run test suites & verification checks
-npm test                    # Vitest unit test suite
-npm run rls-check           # Security & RLS attack vector audit
-npm run check-approval      # Curator approval triage test
-npm run check-feed          # In-database feed ranking test
-npm run check-chain         # Monad contract verification check
+CONTRACT_ADDRESS=<your-deployed-contract-address>
+RELAYER_MIN_BALANCE=0.01
 ```
 
 ---
@@ -113,17 +114,15 @@ All test suites and verification benchmarks pass cleanly:
 
 | Test Suite | Command | Coverage | Result |
 | :--- | :--- | :--- | :--- |
-| **Hashing Engine** | `npm test` | Canonical serialization & EIP-712 keccak256 | ✅ 3/3 Tests Passed |
-| **RLS Security Audit** | `npm run rls-check` | 8 isolation & privilege escalation attack vectors | ✅ 8/8 Checks Passed |
-| **Curator Triage** | `npm run check-approval` | Non-curator rejection, anti-self-dealing & duplicate guard | ✅ 4/4 Checks Passed |
-| **Feed Ranking** | `npm run check-feed` | Explainable attribution stamps & exploration interleaving | ✅ Verified |
-| **Monad Ledger** | `npm run check-chain` | Onchain state sync & public Viem read | ✅ Verified |
-| **Production Build** | `npm run build` | Vite asset bundling & zero syntax errors | ✅ Built in 1.25s |
+| **Comprehensive Vitest Suite** | `npm test` | 58 tests across 10 suites (Architecture, ABI, Validation, Scoring, Concurrency, Payments, Markets, Tickets, Security) | ✅ 58/58 Passed |
+| **Live RLS Security Audit** | `npm run rls-check` | 14 adversarial privilege escalation attack vectors | ✅ 14/14 Blocked |
+| **Client/Server Isolation** | `npm test tests/architecture/boundary.test.js` | Zero imports of `server/`, `api/`, or `node:*` from `src/` | ✅ 3/3 Passed |
+| **Linter & Code Health** | `npm run lint` | Oxlint verification across 88 project files | ✅ 0 errors, 0 warnings |
+| **Production Build** | `npm run build` | Vite asset bundling & rolldown compilation | ✅ Built in ~2.0s |
 
 ---
 
-## Honest Limitations
+## Operational Limitations & State
 
-1. **Testnet Environment**: Deployed on Monad Testnet (Chain ID `10143`). Smart contracts are designed for hackathon demonstration and have not undergone a third-party security audit.
-2. **Single Relayer Model**: Gasless attestations are sponsored via a centralized backend relayer for seamless UX without requiring users to acquire testnet faucet tokens.
-3. **Transparent Heuristic Ranking**: Feed personalization uses an explainable in-database dot-product with exponential time decay, intentionally avoiding opaque neural networks or black-box tracking.
+1. **Monad Testnet Smart Contract**: Live onchain verification requires deploying `contracts/src/HaileyContributions.sol` and configuring a funded `RELAYER_PRIVATE_KEY` and non-zero `CONTRACT_ADDRESS`. When unconfigured (`0x0`), onchain reconciliation scripts explicitly report status as `BLOCKED`.
+2. **Transparent Heuristic Ranking**: Feed personalization uses an explainable in-database dot-product with exponential time decay, intentionally avoiding opaque neural networks or black-box tracking.
