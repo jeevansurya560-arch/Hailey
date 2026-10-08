@@ -3,8 +3,8 @@ import {
   createPaymentIntent,
   confirmCryptoPayment,
   getCuratorEarnings,
-} from '../../server/payments/paymentService.js'
-import { supabaseAdmin } from '../../server/supabaseAdmin.js'
+} from '../../server/services/payments/paymentService.js'
+import { supabaseAdmin } from '../../server/config/supabaseAdmin.js'
 
 describe('Paid Curation Economic Service (Unit Tests)', () => {
   beforeEach(() => {

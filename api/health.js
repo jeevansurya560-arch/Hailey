@@ -1,3 +1,1 @@
-export default function handler(_req, res) {
-  res.status(200).json({ ok: true })
-}
+export { default } from '../server/api/routes/health.js'
