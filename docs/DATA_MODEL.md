@@ -62,3 +62,34 @@ The Hailey relational schema is partitioned into five distinct domain clusters:
   - Columns: `id (uuid pk)`, `reporter_user_id (uuid)`, `target_type (text in ('post', 'comment', 'user', 'collection_item'))`, `target_id (text)`, `reason (text)`, `status (text in ('PENDING', 'REVIEWED', 'ACTIONED', 'DISMISSED'))`, `moderator_user_id (uuid)`, `action_taken (text)`, `reviewed_at (timestamptz)`.
 - **`audit_logs`**: Tamper-proof forensic trail.
   - Columns: `id (uuid pk)`, `who (text)`, `what (text)`, `target (text)`, `result (text)`, `ip_address (text)`, `metadata (jsonb)`, `created_at (timestamptz)`.
+
+---
+
+### Cluster 5: 1,000,000 Culture Master Dataset (`0007_culture_master_dataset.sql`)
+- **`culture_master_dataset`**: Structured research nodes covering 50 preserved seed cultures and 999,950 expanded nodes (India 220k, US 190k, Germany 150k, Japan 120k).
+  - Columns:
+    - `id (uuid pk default gen_random_uuid())`
+    - `slug (text unique not null)`
+    - `name (text not null)`
+    - `kind (text not null)`
+    - `origin (text not null)`
+    - `era (text)`
+    - `description (text not null)`
+    - `related_tags (text[] not null default '{}')`
+    - `community_slug (text)`
+    - `experiences (jsonb not null default '[]'::jsonb)`
+    - `places (jsonb not null default '[]'::jsonb)`
+    - `people (jsonb not null default '[]'::jsonb)`
+    - `practices (jsonb not null default '[]'::jsonb)`
+    - `artifacts (jsonb not null default '[]'::jsonb)`
+    - `timeline (jsonb not null default '[]'::jsonb)`
+    - `media (jsonb not null default '{}'::jsonb)`
+    - `sources (jsonb not null default '[]'::jsonb)`
+    - `editorial_status (text not null)`
+    - `expansion_metadata (jsonb not null default '{}'::jsonb)`
+    - `is_original_seed (boolean not null default false)`
+    - `created_at (timestamptz)`, `updated_at (timestamptz)`
+  - Indexes: B-tree on `slug`, `origin`, `kind`, `is_original_seed`, `community_slug`; GIN index on `related_tags`; Composite GIN Full-Text Search index on `(name || ' ' || description || ' ' || origin)`.
+  - Analytical View: `v_culture_master_summary` aggregating node counts across origins and kinds.
+  - Stored Procedures: `search_culture_master_nodes(...)` and `get_culture_master_stats()`.
+

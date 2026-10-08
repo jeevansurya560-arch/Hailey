@@ -1,11 +1,13 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Search, Loader2, Compass } from 'lucide-react'
+import { Search, Loader2, Compass, Database, Layers } from 'lucide-react'
 import { fetchCultureTags } from '@/features/communities/services/communityService'
 import { TagSticker } from '@/components/ui/TagSticker'
 import { getThreadColor } from '@/features/communities/threadColors'
+import { CultureMasterExplorer } from '../components/CultureMasterExplorer'
 
 export function ExplorePage() {
+  const [activeTab, setActiveTab] = useState('master_1m') // 'master_1m' | 'taxonomy'
   const [filter, setFilter] = useState('')
   const [selectedKind, setSelectedKind] = useState(null)
 
@@ -55,21 +57,54 @@ export function ExplorePage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Banner */}
-      <div className="border-b border-[var(--line)] pb-4">
-        <div className="flex items-center gap-2 text-[var(--clay)] mb-1">
-          <Compass className="h-5 w-5" />
-          <span className="font-mono text-xs uppercase tracking-widest font-bold">
-            Taxonomy Directory
-          </span>
-        </div>
-        <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)]">
-          Explore Cultural Threads
-        </h1>
-        <p className="mt-1 text-sm text-[var(--ink-2)] max-w-2xl">
-          Browse the living culture graph across regional heritages, sonic undergrounds, design movements, and culinary traditions.
-        </p>
+      {/* View Switcher Bar */}
+      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-3">
+        <button
+          type="button"
+          onClick={() => setActiveTab('master_1m')}
+          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+            activeTab === 'master_1m'
+              ? 'bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
+              : 'text-[var(--ink-2)] hover:text-[var(--clay)]'
+          }`}
+        >
+          <Database className="h-3.5 w-3.5" />
+          <span>1,000,000 Culture Master Atlas</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('taxonomy')}
+          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+            activeTab === 'taxonomy'
+              ? 'bg-[var(--ink)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
+              : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+          }`}
+        >
+          <Layers className="h-3.5 w-3.5" />
+          <span>Living Taxonomy Graph ({tags.length})</span>
+        </button>
       </div>
+
+      {activeTab === 'master_1m' ? (
+        <CultureMasterExplorer />
+      ) : (
+        <div className="space-y-6">
+          {/* Header Banner */}
+          <div className="border-b border-[var(--line)] pb-4">
+            <div className="flex items-center gap-2 text-[var(--clay)] mb-1">
+              <Compass className="h-5 w-5" />
+              <span className="font-mono text-xs uppercase tracking-widest font-bold">
+                Taxonomy Directory
+              </span>
+            </div>
+            <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)]">
+              Explore Cultural Threads
+            </h1>
+            <p className="mt-1 text-sm text-[var(--ink-2)] max-w-2xl">
+              Browse the living culture graph across regional heritages, sonic undergrounds, design movements, and culinary traditions.
+            </p>
+          </div>
 
       {/* Search & Filter Controls */}
       <div className="space-y-3">
@@ -182,6 +217,8 @@ export function ExplorePage() {
           </div>
         ))}
       </div>
+      </div>
+      )}
     </div>
   )
 }

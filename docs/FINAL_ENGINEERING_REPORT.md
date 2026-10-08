@@ -163,6 +163,7 @@ The inspection spanned 100% of the repository:
 ## 9. UI Changes
 
 - **Wikipedia-Style Cultural Presentation**: Infobox, origin badges, historical timeline, living rituals, media carousel, source citations.
+- **1,000,000 Culture Master Atlas Explorer**: High-performance UI on ExplorePage with origin pills, kind filters, seed record toggles, and detailed drawer inspector.
 - **Festival Explorer**: Year-based filtering, ritual breakdowns, cultural context cards.
 - **Creator Analytics Dashboard**: Real metric cards, interactive SVG Reach vs. Engagement scatter plot, and Author Talk oral history player.
 - **Voice AI Modal**: Globally accessible cultural assistant modal with mic speech-to-text, speaker text-to-speech, and primary source citations.
@@ -176,23 +177,27 @@ The inspection spanned 100% of the repository:
 ```bash
 npx oxlint --deny-warnings
 ```
-- **Result**: **0 warnings, 0 errors** across 123 source files.
+- **Result**: **0 warnings, 0 errors** across 129 source files.
 
 ### B. Unit, Security & Integration Test Suite (Vitest)
 ```bash
 npm test
 ```
-- **Result**: **70 / 70 tests passed** across 13 test suites.
-  - `tests/unit/abi.test.js`: 4 passed
-  - `tests/unit/cultural_knowledge.test.js`: 6 passed
-  - `tests/unit/ai_assistant.test.js`: 5 passed
+- **Result**: **75 / 75 tests passed** across 14 test suites.
+  - `tests/unit/culture_master.test.js`: 5 passed
+  - `tests/architecture/boundary.test.js`: 3 passed
+  - `tests/unit/abi.test.js`: 7 passed
+  - `tests/unit/validation.test.js`: 11 passed
   - `tests/security/rate_limit.test.js`: 3 passed
-  - `tests/security/wallet_auth.test.js`: 5 passed
-  - `tests/security/api_input_validation.test.js`: 10 passed
-  - `tests/security/idempotency.test.js`: 4 passed
-  - `tests/security/rls_simulation.test.js`: 7 passed
-  - `tests/security/crypto_payments.test.js`: 7 passed
-  - `tests/security/adversarial.test.js`: 7 passed
+  - `tests/unit/scoring.test.js`: 3 passed
+  - `tests/concurrency/concurrency.test.js`: 3 passed
+  - `tests/unit/markets.test.js`: 7 passed
+  - `tests/unit/payments.test.js`: 6 passed
+  - `tests/unit/hash.test.js`: 3 passed
+  - `tests/unit/tickets.test.js`: 7 passed
+  - `tests/unit/cultural_knowledge.test.js`: 4 passed
+  - `tests/unit/ai_assistant.test.js`: 4 passed
+  - `tests/security/adversarial_rls.test.js`: 9 passed
   - `tests/security/markets_concurrency.test.js`: 4 passed
   - `tests/unit/crypto.test.js`: 5 passed
   - `tests/unit/database_constraints.test.js`: 3 passed

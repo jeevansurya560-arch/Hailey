@@ -8,6 +8,7 @@ import {
   toggleUserInterest,
 } from '@/features/communities/services/communityService'
 import { fetchCulturalEntityBySlug } from '../services/culturalKnowledgeService'
+import { fetchCultureMasterNodeBySlug } from '../services/cultureMasterService'
 import { WikipediaCulturalArticle } from '../components/WikipediaCulturalArticle'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { TagSticker } from '@/components/ui/TagSticker'
@@ -35,20 +36,56 @@ export function CulturePage() {
     enabled: !!slug,
   })
 
+  // 1c. Fetch 1M Culture Master Dataset node if tag is absent
+  const { data: masterNode, isLoading: isMasterLoading } = useQuery({
+    queryKey: ['culture_master_node', slug],
+    queryFn: () => fetchCultureMasterNodeBySlug(slug),
+    enabled: !!slug && !tag,
+  })
+
+  // Resolve effective tag and entity from either taxonomy or 1M dataset
+  const effectiveTag = tag || (masterNode ? {
+    id: masterNode.slug,
+    slug: masterNode.slug,
+    name: masterNode.name,
+    kind: masterNode.kind,
+    description: masterNode.description,
+    childTags: [],
+    relatedTags: [],
+    linkedCommunities: masterNode.community_slug ? [{ id: masterNode.community_slug, slug: masterNode.community_slug, name: masterNode.community_slug }] : [],
+    isExploring: false,
+  } : null)
+
+  const effectiveEntity = culturalEntity || (masterNode ? {
+    name: masterNode.name,
+    slug: masterNode.slug,
+    region: masterNode.origin,
+    country: masterNode.origin,
+    origins: `Historical and living tradition rooted in ${masterNode.origin}.`,
+    summary: masterNode.description,
+    history: masterNode.description,
+    practices: masterNode.practices?.map((p) => p.name || p) || [],
+    timeline: masterNode.timeline || [],
+    sources: masterNode.sources || [],
+    clothing: masterNode.artifacts?.[0]?.name || null,
+    music: masterNode.kind === 'music' ? masterNode.name : null,
+  } : null)
+
   // 2. Fetch posts associated with this tag via communityService (with scoped reactions)
   const { data: posts = [], isLoading: isPostsLoading } = useQuery({
-    queryKey: ['culture_posts', tag?.id, user?.id],
-    queryFn: () => fetchCulturePostsByTag(tag?.id, user?.id),
-    enabled: !!tag?.id,
+    queryKey: ['culture_posts', effectiveTag?.id, user?.id],
+    queryFn: () => fetchCulturePostsByTag(effectiveTag?.id, user?.id),
+    enabled: !!effectiveTag?.id && typeof effectiveTag.id === 'number',
   })
 
   // Toggle Exploring mutation via communityService
   const toggleExploringMutation = useMutation({
     mutationFn: async (shouldExplore) => {
-      if (!user || !tag) throw new Error('Sign in required')
+      if (!user || !effectiveTag) throw new Error('Sign in required')
+      if (typeof effectiveTag.id !== 'number') return null
       return toggleUserInterest({
         userId: user.id,
-        tagId: tag.id,
+        tagId: effectiveTag.id,
         shouldExplore,
       })
     },
@@ -61,7 +98,7 @@ export function CulturePage() {
     },
   })
 
-  if (isTagLoading) {
+  if (isTagLoading || (isMasterLoading && !tag)) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-3">
         <Loader2 className="h-6 w-6 animate-spin text-[var(--clay)]" />
@@ -72,18 +109,19 @@ export function CulturePage() {
     )
   }
 
-  if (!tag) {
+  if (!effectiveTag) {
     return (
       <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-8 text-center space-y-3">
         <h2 className="font-serif text-2xl font-bold text-[var(--ink)]">Culture Thread Not Found</h2>
         <Link to="/explore" className="font-mono text-xs text-[var(--clay)] underline">
-          ← Return to Taxonomy
+          ← Return to Taxonomy & 1M Atlas
         </Link>
       </div>
     )
   }
 
-  const isExploring = exploringOverride ?? tag.isExploring
+  const isExploring = exploringOverride ?? effectiveTag.isExploring
+  const activeTag = effectiveTag
 
   return (
     <div className="space-y-8">
@@ -94,31 +132,31 @@ export function CulturePage() {
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span
                 className="font-mono text-xs uppercase tracking-widest font-bold px-2 py-0.5 rounded text-white"
-                style={{ backgroundColor: getThreadColor(tag.kind) }}
+                style={{ backgroundColor: getThreadColor(activeTag.kind) }}
               >
-                {tag.kind}
+                {activeTag.kind}
               </span>
 
-              {tag.parent && (
+              {activeTag.parent && (
                 <div className="flex items-center gap-1 font-mono text-xs text-[var(--ink-2)]">
                   <span>child of</span>
                   <Link
-                    to={`/c/${tag.parent.slug}`}
+                    to={`/c/${activeTag.parent.slug}`}
                     className="text-[var(--clay)] font-semibold hover:underline"
                   >
-                    {tag.parent.name}
+                    {activeTag.parent.name}
                   </Link>
                 </div>
               )}
             </div>
 
             <h1 className="font-serif text-3xl md:text-5xl font-bold tracking-tight text-[var(--ink)]">
-              {tag.name}
+              {activeTag.name}
             </h1>
 
-            {tag.description && (
+            {activeTag.description && (
               <p className="mt-2 text-sm md:text-base text-[var(--ink-2)] max-w-2xl leading-relaxed">
-                {tag.description}
+                {activeTag.description}
               </p>
             )}
           </div>
@@ -127,7 +165,7 @@ export function CulturePage() {
             <button
               type="button"
               onClick={() => toggleExploringMutation.mutate(!isExploring)}
-              disabled={toggleExploringMutation.isPending}
+              disabled={toggleExploringMutation.isPending || typeof activeTag.id !== 'number'}
               className={`flex items-center gap-1.5 px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-[var(--radius)] border self-start md:self-auto transition-all ${
                 isExploring
                   ? 'border-[var(--moss)] bg-emerald-50 text-[var(--moss)] hover:bg-red-50 hover:text-red-700 hover:border-red-300'
@@ -150,13 +188,13 @@ export function CulturePage() {
         </div>
 
         {/* Child Sub-threads */}
-        {tag.childTags.length > 0 && (
+        {activeTag.childTags && activeTag.childTags.length > 0 && (
           <div className="border-t border-[var(--line)] pt-3 space-y-2">
             <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-2)] font-bold">
               Sub-movements & Variations:
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {tag.childTags.map((child) => (
+              {activeTag.childTags.map((child) => (
                 <Link key={child.id} to={`/c/${child.slug}`}>
                   <TagSticker
                     id={child.id}
@@ -172,14 +210,14 @@ export function CulturePage() {
         )}
 
         {/* Related Topic Edges */}
-        {tag.relatedTags.length > 0 && (
+        {activeTag.relatedTags && activeTag.relatedTags.length > 0 && (
           <div className="border-t border-[var(--line)] pt-3 space-y-2">
             <div className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-2)] font-bold">
               <GitBranch className="h-3.5 w-3.5 text-[var(--clay)]" />
               <span>Related Cultural Threads (Culture Graph):</span>
             </div>
             <div className="flex flex-wrap gap-2">
-              {tag.relatedTags.map((rel) => (
+              {activeTag.relatedTags.map((rel) => (
                 <Link key={rel.id} to={`/c/${rel.slug}`} className="flex items-center">
                   <TagSticker
                     id={rel.id}
@@ -228,12 +266,12 @@ export function CulturePage() {
       {activeTab === 'encyclopedia' ? (
         <WikipediaCulturalArticle
           entity={
-            culturalEntity || {
-              name: tag.name,
-              summary: tag.description || `Living cultural thread of ${tag.name}.`,
-              history: `Historical genesis and development of ${tag.name} within regional and global networks.`,
+            effectiveEntity || {
+              name: activeTag.name,
+              summary: activeTag.description || `Living cultural thread of ${activeTag.name}.`,
+              history: `Historical genesis and development of ${activeTag.name} within regional and global networks.`,
               origins: `Originated in cultural homelands and traditional practices.`,
-              practices: [tag.name + ' oral tradition', 'Craft and artifact stewardship'],
+              practices: [activeTag.name + ' oral tradition', 'Craft and artifact stewardship'],
               sources: [
                 {
                   title: 'Hailey Cultural Living Archives Documentation',
@@ -253,7 +291,7 @@ export function CulturePage() {
             <div className="border-b border-[var(--line)] pb-2 flex items-center justify-between">
               <h2 className="font-serif text-xl font-bold text-[var(--ink)] flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-[var(--clay)]" />
-                Top Dispatches on {tag.name} ({posts.length})
+                Top Dispatches on {activeTag.name} ({posts.length})
               </h2>
             </div>
 
@@ -265,7 +303,7 @@ export function CulturePage() {
 
           {!isPostsLoading && posts.length === 0 && (
             <div className="border border-dashed border-[var(--line)] p-8 text-center font-mono text-xs text-[var(--ink-2)]">
-              No dispatches tagged with {tag.name} yet.
+              No dispatches tagged with {activeTag.name} yet.
             </div>
           )}
 
@@ -275,7 +313,7 @@ export function CulturePage() {
                 key={post.id}
                 post={post}
                 onDelete={() => {
-                  queryClient.invalidateQueries({ queryKey: ['culture_posts', tag.id] })
+                  queryClient.invalidateQueries({ queryKey: ['culture_posts', activeTag.id] })
                 }}
               />
             ))}
@@ -291,11 +329,11 @@ export function CulturePage() {
                 Linked Collectives
               </h3>
             </div>
-            {tag.linkedCommunities.length === 0 ? (
+            {!activeTag.linkedCommunities || activeTag.linkedCommunities.length === 0 ? (
               <p className="text-xs text-[var(--ink-2)]">No community collectives directly linked.</p>
             ) : (
               <div className="space-y-2">
-                {tag.linkedCommunities.map((comm) => (
+                {activeTag.linkedCommunities.map((comm) => (
                   <Link
                     key={comm.id}
                     to={`/communities/${comm.slug}`}
