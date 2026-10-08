@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAuth } from '@/features/auth/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { createMarket } from '../services/marketService'
 
 export function CreateMarketModal({ isOpen, onClose, onCreated }) {

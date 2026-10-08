@@ -9,7 +9,7 @@ import {
 } from '@/features/communities/services/communityService'
 import { fetchCommunityCollections } from '@/features/collections/services/collectionService'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 import { PostCard } from '@/features/posts/components/PostCard'
 import { PostComposer } from '@/features/posts/components/PostComposer'
 import { CreateCollectionModal } from '@/features/collections/components/CreateCollectionModal'

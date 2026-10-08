@@ -1,6 +1,6 @@
 import React from 'react'
 import { ShieldCheck, Link2, AlertCircle, Loader2 } from 'lucide-react'
-import { WalletConnectButton } from '../WalletConnectButton'
+import { WalletConnectButton } from './WalletConnectButton'
 import { useWalletLink } from '../hooks/useWalletLink'
 
 export function WalletLinkSection({ profile }) {

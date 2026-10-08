@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAccount, useSignMessage } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
-import { useAuth } from '@/features/auth/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { requestChallengeNonce, verifyAndLinkWallet } from '../services/walletService'
 
 export function useWalletLink() {

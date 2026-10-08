@@ -8,7 +8,7 @@ import {
   toggleUserInterest,
 } from '@/features/communities/services/communityService'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 import { PostCard } from '@/features/posts/components/PostCard'
 import { getThreadColor } from '@/features/communities/threadColors'
 

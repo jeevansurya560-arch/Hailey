@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useAuth } from '@/features/auth/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { getCuratorEarnings } from '../services/paymentService'
 
 export function CuratorEarningsCard() {

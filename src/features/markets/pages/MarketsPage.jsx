@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAuth } from '@/features/auth/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useQuery } from '@tanstack/react-query'
 import { listMarkets } from '../services/marketService'
 import { MarketCard } from '../components/MarketCard'

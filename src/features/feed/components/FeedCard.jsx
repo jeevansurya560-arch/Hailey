@@ -15,7 +15,7 @@ import {
   hidePost,
   deletePost,
 } from '@/features/feed/services/feedService'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 import { WhyStamp } from './WhyStamp'
 import { RelevancePrompt } from './RelevancePrompt'
 import { shouldShowRelevancePrompt } from '../lib/relevance'

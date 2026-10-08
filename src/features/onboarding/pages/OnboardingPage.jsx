@@ -5,7 +5,7 @@ import { Compass, Sparkles, ArrowRight, AlertCircle, Loader2 } from 'lucide-reac
 import { fetchCultureTags } from '@/features/communities/services/communityService'
 import { saveUserInterests } from '@/features/profile/services/profileService'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 
 // Visual category grouping for pleasant onboarding layout
 const KIND_GROUPS = [

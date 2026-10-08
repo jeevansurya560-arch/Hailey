@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAuth } from '@/features/auth/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useAccount } from 'wagmi'
 import { useQuery } from '@tanstack/react-query'
 import { listUserTickets, claimTicket } from '../services/ticketService'

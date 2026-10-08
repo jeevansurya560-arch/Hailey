@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/client'
 
 /**
  * Fetch collection detail, curator status for user, collection items, and user's recent posts

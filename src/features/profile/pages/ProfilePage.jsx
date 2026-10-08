@@ -21,8 +21,8 @@ import {
   fetchUserContributions,
 } from '@/features/profile/services/profileService'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { LazyWalletSection } from '@/features/wallet/LazyWalletSection'
-import { TagSticker } from '@/components/TagSticker'
+import { LazyWalletSection } from '@/features/wallet/components/LazyWalletSection'
+import { TagSticker } from '@/components/ui/TagSticker'
 import { VerifiedSeal } from '@/features/verification/components/VerifiedSeal'
 import { CuratorEarningsCard } from '@/features/payments/components/CuratorEarningsCard'
 

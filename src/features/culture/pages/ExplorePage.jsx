@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Search, Loader2, Compass } from 'lucide-react'
 import { fetchCultureTags } from '@/features/communities/services/communityService'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 import { getThreadColor } from '@/features/communities/threadColors'
 
 export function ExplorePage() {

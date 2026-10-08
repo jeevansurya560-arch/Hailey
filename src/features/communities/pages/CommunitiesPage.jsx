@@ -7,7 +7,7 @@ import {
   toggleCommunityMembership,
 } from '@/features/communities/services/communityService'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 
 export function CommunitiesPage() {
   const { user } = useAuth()

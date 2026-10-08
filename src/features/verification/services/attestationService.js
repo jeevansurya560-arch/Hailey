@@ -1,6 +1,6 @@
 import { createPublicClient, http, isAddress } from 'viem'
-import { monadTestnet } from '@/features/wallet/chain'
-import { supabase } from '@/lib/supabase'
+import { monadTestnet } from '@/lib/wallet/chain'
+import { supabase } from '@/lib/supabase/client'
 import { computeCommunityId } from '@shared/crypto/hashing.js'
 import { HAILEY_CONTRIBUTIONS_ABI } from '@shared/contracts/HaileyContributions.abi.js'
 

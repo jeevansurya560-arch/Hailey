@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { validateApproveItemInput, validateProposeItemInput } from '../../server/validate.js'
+import { validateApproveItemInput, validateProposeItemInput } from '../../server/security/validation/validate.js'
 
-describe('server/validate.js - Input Validation Unit Tests', () => {
+describe('server/security/validation/validate.js - Input Validation Unit Tests', () => {
   describe('validateApproveItemInput', () => {
     it('rejects null or non-object payloads', () => {
       expect(validateApproveItemInput(null).error).toContain('JSON object')

@@ -7,7 +7,7 @@ import {
   hidePost,
   deletePost,
 } from '@/features/feed/services/feedService'
-import { TagSticker } from '@/components/TagSticker'
+import { TagSticker } from '@/components/ui/TagSticker'
 
 export function PostCard({ post, onDelete, onHide }) {
   const { user } = useAuth()

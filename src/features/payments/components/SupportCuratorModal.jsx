@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useAuth } from '@/features/auth/useAuth'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import { createPaymentIntent, confirmCryptoPayment } from '../services/paymentService'
 
 export function SupportCuratorModal({
