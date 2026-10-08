@@ -6,10 +6,25 @@ import {
   consumeTicket,
 } from '../../services/tickets/ticketService.js'
 import { supabaseAdmin } from '../../config/supabaseAdmin.js'
+import { rateLimiter } from '../../security/rateLimit.js'
+import { logAuditEvent } from '../../observability/auditLogger.js'
 
 export default async function ticketsRoute(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
+  }
+
+  const ip =
+    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    '127.0.0.1'
+
+  const limit = rateLimiter.check(`tickets:${ip}`, 40, 60000)
+  if (!limit.allowed) {
+    return res.status(429).json({
+      error: 'Ticket operation rate limit exceeded. Please wait a moment.',
+      retryAfterSeconds: Math.ceil(limit.resetMs / 1000),
+    })
   }
 
   const { action } = req.body || {}
@@ -27,6 +42,14 @@ export default async function ticketsRoute(req, res) {
         walletAddress,
         signature,
         challenge,
+      })
+
+      await logAuditEvent({
+        who: walletAddress,
+        what: 'TICKET_VERIFIED',
+        target: eventId,
+        result: result.accessGranted ? 'SUCCESS' : 'DENIED',
+        ipAddress: ip,
       })
 
       return res.status(200).json(result)
@@ -69,6 +92,14 @@ export default async function ticketsRoute(req, res) {
         ticketType: ticketType || 'general',
         metadata: metadata || {},
         expiresAt: expiresAt || null,
+      })
+
+      await logAuditEvent({
+        who: user.id,
+        what: 'TICKET_ISSUED',
+        target: ticket.id,
+        result: 'SUCCESS',
+        ipAddress: ip,
       })
 
       return res.status(200).json({ ok: true, ticket })

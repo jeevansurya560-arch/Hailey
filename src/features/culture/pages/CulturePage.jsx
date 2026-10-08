@@ -7,6 +7,8 @@ import {
   fetchCulturePostsByTag,
   toggleUserInterest,
 } from '@/features/communities/services/communityService'
+import { fetchCulturalEntityBySlug } from '../services/culturalKnowledgeService'
+import { WikipediaCulturalArticle } from '../components/WikipediaCulturalArticle'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { TagSticker } from '@/components/ui/TagSticker'
 import { PostCard } from '@/features/posts/components/PostCard'
@@ -17,11 +19,19 @@ export function CulturePage() {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const [exploringOverride, setExploringOverride] = useState(null)
+  const [activeTab, setActiveTab] = useState('dispatches') // 'dispatches' | 'encyclopedia'
 
   // 1. Fetch culture tag details, relations, and communities via communityService
   const { data: tag, isLoading: isTagLoading } = useQuery({
     queryKey: ['culture_tag', slug, user?.id],
     queryFn: () => fetchCultureTagBySlug(slug, user?.id),
+    enabled: !!slug,
+  })
+
+  // 1b. Fetch encyclopedic record
+  const { data: culturalEntity } = useQuery({
+    queryKey: ['cultural_entity', slug],
+    queryFn: () => fetchCulturalEntityBySlug(slug),
     enabled: !!slug,
   })
 
@@ -188,15 +198,64 @@ export function CulturePage() {
         )}
       </div>
 
-      {/* Main Grid: Dispatches and Communities */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <div className="border-b border-[var(--line)] pb-2 flex items-center justify-between">
-            <h2 className="font-serif text-xl font-bold text-[var(--ink)] flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-[var(--clay)]" />
-              Top Dispatches on {tag.name} ({posts.length})
-            </h2>
-          </div>
+      {/* View Switcher: Dispatches vs Encyclopedic Record */}
+      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab('dispatches')}
+          className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+            activeTab === 'dispatches'
+              ? 'bg-[var(--ink)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
+              : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+          }`}
+        >
+          Community Dispatches ({posts.length})
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('encyclopedia')}
+          className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+            activeTab === 'encyclopedia'
+              ? 'bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
+              : 'text-[var(--ink-2)] hover:text-[var(--clay)]'
+          }`}
+        >
+          Encyclopedic Archive {culturalEntity ? '· Verified' : ''}
+        </button>
+      </div>
+
+      {activeTab === 'encyclopedia' ? (
+        <WikipediaCulturalArticle
+          entity={
+            culturalEntity || {
+              name: tag.name,
+              summary: tag.description || `Living cultural thread of ${tag.name}.`,
+              history: `Historical genesis and development of ${tag.name} within regional and global networks.`,
+              origins: `Originated in cultural homelands and traditional practices.`,
+              practices: [tag.name + ' oral tradition', 'Craft and artifact stewardship'],
+              sources: [
+                {
+                  title: 'Hailey Cultural Living Archives Documentation',
+                  author: 'Hailey Protocol',
+                  publisher: 'Autonomous Field Guide',
+                  year: '2026',
+                  license: 'CC-BY-SA-4.0',
+                },
+              ],
+            }
+          }
+        />
+      ) : (
+        /* Main Grid: Dispatches and Communities */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            <div className="border-b border-[var(--line)] pb-2 flex items-center justify-between">
+              <h2 className="font-serif text-xl font-bold text-[var(--ink)] flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-[var(--clay)]" />
+                Top Dispatches on {tag.name} ({posts.length})
+              </h2>
+            </div>
 
           {isPostsLoading && (
             <div className="py-8 text-center font-mono text-xs text-[var(--ink-2)]">
@@ -252,6 +311,7 @@ export function CulturePage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   )
 }

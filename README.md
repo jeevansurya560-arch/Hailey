@@ -16,7 +16,7 @@
 4. **Join Collectives**: Participate in 8 focused cultural collectives (such as Tokyo Underground, Bronx Hip-Hop Origins, and Dub Sound Systems).
 5. **Contribute**: Propose archival dispatches, link citations, and primary sources to community collections.
 6. **Curate & Triage**: Designated collective curators review pending proposals via an anti-self-dealing triage workflow.
-7. **Verify Onchain**: Approved contributions are canonically hashed (EIP-712 / Keccak256) and recorded on the **Monad Testnet**, granting immutable provenance and onchain verification seals.
+7. **Verify Onchain**: Approved contributions are canonically hashed via domain-separated Keccak-256 (`hailey:v1|...`) and recorded on the **Monad Testnet**, granting immutable provenance and onchain verification seals.
 
 ---
 

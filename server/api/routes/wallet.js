@@ -2,11 +2,27 @@ import crypto from 'node:crypto'
 import { recoverMessageAddress } from 'viem'
 import { verifyAuth } from '../../security/authorization/auth.js'
 import { supabaseAdmin } from '../../config/supabaseAdmin.js'
+import { rateLimiter } from '../../security/rateLimit.js'
+import { logAuditEvent } from '../../observability/auditLogger.js'
 
 export default async function walletRoute(req, res) {
   // Only allow POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
+  }
+
+  const ip =
+    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    '127.0.0.1'
+
+  // Apply rate limiter: 20 challenge/link attempts per minute
+  const limit = rateLimiter.check(`wallet:${ip}`, 20, 60000)
+  if (!limit.allowed) {
+    return res.status(429).json({
+      error: 'Too many wallet challenge requests. Please wait a moment before trying again.',
+      retryAfterSeconds: Math.ceil(limit.resetMs / 1000),
+    })
   }
 
   try {
@@ -39,6 +55,14 @@ export default async function walletRoute(req, res) {
       }
 
       const message = `Sign this message to link your wallet to Hailey:\n\nNonce: ${nonce}\nUser: ${user.id}\nTimestamp: ${expiresAt}`
+
+      await logAuditEvent({
+        who: user.id,
+        what: 'WALLET_NONCE_GENERATED',
+        target: user.id,
+        result: 'SUCCESS',
+        ipAddress: ip,
+      })
 
       return res.status(200).json({
         ok: true,
@@ -142,6 +166,14 @@ export default async function walletRoute(req, res) {
       } catch (retroErr) {
         console.warn('[api/wallet] Error queuing retroactive attestations:', retroErr)
       }
+
+      await logAuditEvent({
+        who: user.id,
+        what: 'WALLET_LINKED',
+        target: normalizedAddress,
+        result: 'SUCCESS',
+        ipAddress: ip,
+      })
 
       return res.status(200).json({
         ok: true,

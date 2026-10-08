@@ -78,4 +78,15 @@ describe('shared/contracts/HaileyContributions.abi.js - Canonical ABI Drift & St
     )
     expect(attestorUpdatedEvent).toBeDefined()
   })
+
+  it('contains the canonical custom errors for zero-address and replay guards', () => {
+    const errorNames = HAILEY_CONTRIBUTIONS_ABI.filter((item) => item.type === 'error').map(
+      (item) => item.name
+    )
+    expect(errorNames).toContain('NotAttestor')
+    expect(errorNames).toContain('AlreadyAttested')
+    expect(errorNames).toContain('ZeroAddress')
+    expect(errorNames).toContain('ZeroContentHash')
+    expect(errorNames).toContain('ZeroCommunityId')
+  })
 })

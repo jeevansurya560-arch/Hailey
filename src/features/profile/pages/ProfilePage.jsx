@@ -315,7 +315,7 @@ export function ProfilePage() {
               <span>Ledger & Cryptography</span>
             </div>
             <p className="text-[11px] text-[var(--ink-2)] leading-relaxed">
-              Monad Testnet smart contract (EIP-712 / keccak256) sponsorship with zero gas fees required.
+              Monad Testnet smart contract domain-separated Keccak-256 attestation with zero gas fees required.
             </p>
             <div className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold pt-1">
               <CheckCircle2 className="h-3 w-3" />

@@ -7,6 +7,8 @@ import { CulturePage } from '@/features/culture/pages/CulturePage'
 import { CommunitiesPage } from '@/features/communities/pages/CommunitiesPage'
 import { CommunityPage } from '@/features/communities/pages/CommunityPage'
 import { CollectionDetailPage } from '@/features/collections/pages/CollectionDetailPage'
+import { FestivalsPage } from '@/features/festivals/pages/FestivalsPage'
+import { CreatorAnalyticsPage } from '@/features/analytics/pages/CreatorAnalyticsPage'
 import { TicketingPage } from '@/features/ticketing/pages/TicketingPage'
 import { MarketsPage } from '@/features/markets/pages/MarketsPage'
 import { VerifyPage } from '@/features/verification/pages/VerifyPage'
@@ -22,6 +24,8 @@ export function AppRoutes() {
       <Route element={<AppShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
+        <Route path="/festivals" element={<FestivalsPage />} />
+        <Route path="/analytics" element={<CreatorAnalyticsPage />} />
         <Route path="/c/:slug" element={<CulturePage />} />
         <Route path="/communities" element={<CommunitiesPage />} />
         <Route path="/communities/:slug" element={<CommunityPage />} />

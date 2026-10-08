@@ -105,6 +105,42 @@ contract HaileyContributionsTest is Test {
         );
     }
 
+    // 3b. Zero contributor address reverts with ZeroAddress()
+    function test_Attest_RevertsOnZeroContributor() public {
+        vm.prank(attestor);
+        vm.expectRevert(HaileyContributions.ZeroAddress.selector);
+        registry.attest(
+            address(0),
+            communityId,
+            contentHash,
+            HaileyContributions.Kind.Collection
+        );
+    }
+
+    // 3c. Zero community ID reverts with ZeroCommunityId()
+    function test_Attest_RevertsOnZeroCommunityId() public {
+        vm.prank(attestor);
+        vm.expectRevert(HaileyContributions.ZeroCommunityId.selector);
+        registry.attest(
+            contributor,
+            bytes32(0),
+            contentHash,
+            HaileyContributions.Kind.Collection
+        );
+    }
+
+    // 3d. Zero content hash reverts with ZeroContentHash()
+    function test_Attest_RevertsOnZeroContentHash() public {
+        vm.prank(attestor);
+        vm.expectRevert(HaileyContributions.ZeroContentHash.selector);
+        registry.attest(
+            contributor,
+            communityId,
+            bytes32(0),
+            HaileyContributions.Kind.Collection
+        );
+    }
+
     // 4. setAttestor works only by current attestor; non-attestor reverts
     function test_SetAttestor_Success() public {
         address newAttestor = address(0xDA7A);

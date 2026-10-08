@@ -5,10 +5,25 @@ import {
   getCuratorEarnings,
   getPayerHistory,
 } from '../../services/payments/paymentService.js'
+import { rateLimiter } from '../../security/rateLimit.js'
+import { logAuditEvent } from '../../observability/auditLogger.js'
 
 export default async function paymentsRoute(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
+  }
+
+  const ip =
+    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    '127.0.0.1'
+
+  const limit = rateLimiter.check(`payments:${ip}`, 30, 60000)
+  if (!limit.allowed) {
+    return res.status(429).json({
+      error: 'Payment request rate limit exceeded. Please wait a moment.',
+      retryAfterSeconds: Math.ceil(limit.resetMs / 1000),
+    })
   }
 
   try {
@@ -33,6 +48,15 @@ export default async function paymentsRoute(req, res) {
         paymentMethod,
       })
 
+      await logAuditEvent({
+        who: user.id,
+        what: 'PAYMENT_INTENT_CREATED',
+        target: payment.id,
+        result: 'SUCCESS',
+        ipAddress: ip,
+        metadata: { amount, currency, paymentMethod },
+      })
+
       return res.status(200).json({ ok: true, payment })
     }
 
@@ -44,6 +68,15 @@ export default async function paymentsRoute(req, res) {
         paymentId,
         txHash,
         payerUserId: user.id,
+      })
+
+      await logAuditEvent({
+        who: user.id,
+        what: 'PAYMENT_CONFIRMED',
+        target: paymentId,
+        result: result.status === 'confirmed' ? 'SUCCESS' : 'FAILURE',
+        ipAddress: ip,
+        metadata: { txHash },
       })
 
       return res.status(200).json(result)

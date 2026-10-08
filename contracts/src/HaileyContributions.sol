@@ -26,6 +26,8 @@ contract HaileyContributions {
     error NotAttestor();
     error AlreadyAttested();
     error ZeroAddress();
+    error ZeroContentHash();
+    error ZeroCommunityId();
 
     constructor(address _attestor) {
         if (_attestor == address(0)) revert ZeroAddress();
@@ -47,6 +49,9 @@ contract HaileyContributions {
         Kind kind
     ) external {
         if (msg.sender != attestor) revert NotAttestor();
+        if (contributor == address(0)) revert ZeroAddress();
+        if (communityId == bytes32(0)) revert ZeroCommunityId();
+        if (contentHash == bytes32(0)) revert ZeroContentHash();
         if (attested[contentHash]) revert AlreadyAttested();
 
         attested[contentHash] = true;

@@ -66,6 +66,31 @@ export const HAILEY_CONTRIBUTIONS_ABI = [
       { name: 'newAttestor', type: 'address', indexed: true },
     ],
   },
+  {
+    type: 'error',
+    name: 'NotAttestor',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'AlreadyAttested',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ZeroAddress',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ZeroContentHash',
+    inputs: [],
+  },
+  {
+    type: 'error',
+    name: 'ZeroCommunityId',
+    inputs: [],
+  },
 ]
 
 export const DEFAULT_CONTRACT_ADDRESS = '0x0000000000000000000000000000000000000000'

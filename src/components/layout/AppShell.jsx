@@ -1,14 +1,16 @@
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Compass, Users, User, LogOut, ShieldCheck, Ticket, TrendingUp } from 'lucide-react'
+import { Home, Compass, Users, User, LogOut, ShieldCheck, Ticket, TrendingUp, Calendar, BarChart3, Sparkles } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { fetchUserInterestsCount } from '@/features/feed/services/feedService'
+import { CulturalAssistantModal } from '@/features/assistant/components/CulturalAssistantModal'
 
 export function AppShell() {
   const { user, signOut } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false)
 
   // ONB-01: Check user interests count for signed-in users via feedService
   const { data: interestsCount, isLoading: checkingInterests } = useQuery({
@@ -33,9 +35,11 @@ export function AppShell() {
   const navItems = [
     { to: '/', label: 'Home', icon: Home },
     { to: '/explore', label: 'Explore', icon: Compass },
-    { to: '/communities', label: 'Communities', icon: Users },
+    { to: '/festivals', label: 'Festivals', icon: Calendar },
+    { to: '/communities', label: 'Collectives', icon: Users },
     { to: '/tickets', label: 'Passes', icon: Ticket },
     { to: '/markets', label: 'Markets', icon: TrendingUp },
+    { to: '/analytics', label: 'Analytics', icon: BarChart3 },
     {
       to: user ? `/u/${user.user_metadata?.handle || user.email?.split('@')[0] || 'me'}` : '/login',
       label: 'Profile',
@@ -86,6 +90,16 @@ export function AppShell() {
               </NavLink>
             ))}
 
+            {/* Global AI Assistant Trigger */}
+            <button
+              type="button"
+              onClick={() => setIsAiModalOpen(true)}
+              className="flex items-center gap-1.5 border border-[var(--clay)] bg-[var(--paper)] text-[var(--clay)] px-2.5 py-1 font-mono text-xs uppercase tracking-wider font-bold rounded shadow-[1px_1px_0_var(--clay)] hover:bg-[var(--clay)] hover:text-[var(--paper)] transition-all"
+            >
+              <Sparkles className="h-3 w-3" />
+              <span>Ask AI</span>
+            </button>
+
             {user ? (
               <div className="flex items-center gap-3 pl-4 border-l border-[var(--line)]">
                 <span className="font-mono text-xs text-[var(--ink-2)] truncate max-w-[120px]">
@@ -116,6 +130,12 @@ export function AppShell() {
       <main className="flex-1 max-w-[1100px] w-full mx-auto px-4 py-6 md:px-6 md:py-8 mb-16 md:mb-0">
         <Outlet />
       </main>
+
+      {/* Cultural Assistant Modal */}
+      <CulturalAssistantModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+      />
 
       {/* Bottom Nav (Mobile Only) */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-[var(--line)] bg-[var(--paper)]/95 backdrop-blur md:hidden">

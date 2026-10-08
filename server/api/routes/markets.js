@@ -6,10 +6,25 @@ import {
   takePosition,
   resolveMarket,
 } from '../../services/markets/marketService.js'
+import { rateLimiter } from '../../security/rateLimit.js'
+import { logAuditEvent } from '../../observability/auditLogger.js'
 
 export default async function marketsRoute(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
+  }
+
+  const ip =
+    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+    req.socket?.remoteAddress ||
+    '127.0.0.1'
+
+  const limit = rateLimiter.check(`markets:${ip}`, 40, 60000)
+  if (!limit.allowed) {
+    return res.status(429).json({
+      error: 'Market operation rate limit exceeded. Please wait a moment.',
+      retryAfterSeconds: Math.ceil(limit.resetMs / 1000),
+    })
   }
 
   const { action } = req.body || {}
@@ -51,6 +66,14 @@ export default async function marketsRoute(req, res) {
         options,
       })
 
+      await logAuditEvent({
+        who: user.id,
+        what: 'MARKET_CREATED',
+        target: created.id,
+        result: 'SUCCESS',
+        ipAddress: ip,
+      })
+
       return res.status(200).json({ ok: true, market: created })
     }
 
@@ -67,6 +90,15 @@ export default async function marketsRoute(req, res) {
         amount,
       })
 
+      await logAuditEvent({
+        who: user.id,
+        what: 'MARKET_POSITION_TAKEN',
+        target: position.id,
+        result: 'SUCCESS',
+        ipAddress: ip,
+        metadata: { marketId, optionId, amount },
+      })
+
       return res.status(200).json({ ok: true, position })
     }
 
@@ -79,6 +111,15 @@ export default async function marketsRoute(req, res) {
         evidenceUrl,
         sourceDescription,
         resolvedByUserId: user.id,
+      })
+
+      await logAuditEvent({
+        who: user.id,
+        what: 'MARKET_RESOLVED',
+        target: marketId,
+        result: 'SUCCESS',
+        ipAddress: ip,
+        metadata: { winningOptionId },
       })
 
       return res.status(200).json(result)
