@@ -5,8 +5,8 @@ import {
   verifyTicketAccess,
   consumeTicket,
   revokeTicket,
-} from '../../server/services/tickets/ticketService.js'
-import { supabaseAdmin } from '../../server/config/supabaseAdmin.js'
+} from '../../backend/server/services/tickets/ticketService.js'
+import { supabaseAdmin } from '../../backend/server/config/supabaseAdmin.js'
 
 describe('Wallet-Native Ticketing Service (Unit Tests)', () => {
   beforeEach(() => {

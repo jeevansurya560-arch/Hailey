@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { rateLimiter } from '../../server/security/rateLimit.js'
+import { rateLimiter } from '../../backend/server/security/rateLimit.js'
 
 describe('server/security/rateLimit.js - Sliding Window Abuse Protection', () => {
   beforeEach(() => {

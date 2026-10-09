@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { computeCommunityId, computeItemContent, computeContentHash } from '../../shared/crypto/hashing.js'
-import { validateApproveItemInput, validateProposeItemInput } from '../../server/security/validation/validate.js'
+import { validateApproveItemInput, validateProposeItemInput } from '../../backend/server/security/validation/validate.js'
 
 function loadEnv(filePath) {
   const fullPath = path.resolve(process.cwd(), filePath)

@@ -50,60 +50,38 @@ For the migration audit and verification evidence, see [docs/MVP_STRUCTURE_MIGRA
 ```
 Hailey/
 │
-├── src/                             # Client-side React 19 application
-│   ├── app/                         # Application root, routing, and providers
-│   │   ├── App.jsx                  # Root shell container
-│   │   ├── router.jsx               # Central React Router configuration
-│   │   └── providers/               # AppProviders (QueryClient, Auth, Wagmi, RainbowKit)
-│   ├── components/                  # Domain-agnostic reusable UI
-│   │   ├── ui/                      # Primitive design system (TagSticker, etc.)
-│   │   └── layout/                  # Global structural layout (AppShell, etc.)
-│   ├── features/                    # Feature-First modules (self-contained)
-│   │   ├── auth/                    # Authentication (AuthPage, ProtectedRoute, useAuth)
-│   │   ├── onboarding/              # 3-step onboarding flow (OnboardingPage)
-│   │   ├── feed/                    # Personalized feed & Why explainability (HomePage, FeedCard)
-│   │   ├── posts/                   # Post creation and detail (PostDetailPage, PostCard, PostComposer)
-│   │   ├── culture/                 # Culture taxonomy graph & exploration (CulturePage, ExplorePage)
-│   │   ├── festivals/               # Festivals and live events
-│   │   ├── communities/             # Cultural collectives (CommunitiesPage, CommunityPage)
-│   │   ├── collections/             # Archival collections & proposals (CollectionDetailPage, Modals)
-│   │   ├── profile/                 # Contributor and curator profile (ProfilePage)
-│   │   ├── creators/                # Creator tools & registry
-│   │   ├── search/                  # Atlas tag search & filtering
-│   │   ├── wallet/                  # Web3 connection & signing (WalletConnectButton, LazyWalletSection)
-│   │   ├── verification/            # Onchain proof verification (/verify)
-│   │   ├── payments/                # Paid curation & curator tipping
-│   │   ├── ticketing/               # Wallet-native ticketing & entrance gating
-│   │   └── markets/                 # Cultural prediction & outcome markets
-│   ├── hooks/                       # Shared custom hooks
-│   ├── lib/                         # Client utilities grouped by technology
-│   │   ├── supabase/                # Browser Supabase client
-│   │   ├── wallet/                  # Wagmi / RainbowKit chain configuration
-│   │   └── utils/                   # Shared formatting and DOM helpers
-│   ├── styles/                      # Tailwind CSS entrypoint
-│   └── types/                       # Shared type definitions
+├── frontend/                        # Client-side React 19 application
+│   ├── public/                      # Static assets (favicons, manifests, SVGs)
+│   ├── index.html                   # HTML entrypoint
+│   └── src/                         # Application source
+│       ├── app/                     # Application root, routing, and providers
+│       │   ├── App.jsx              # Root shell container
+│       │   ├── router.jsx           # Central React Router configuration
+│       │   └── providers/           # AppProviders (QueryClient, Auth, Wagmi, RainbowKit)
+│       ├── components/              # Domain-agnostic reusable UI
+│       │   ├── ui/                  # Primitive design system (TagSticker, etc.)
+│       │   └── layout/              # Global structural layout (AppShell, etc.)
+│       ├── features/                # Feature-First modules (self-contained)
+│       ├── lib/                     # Client utilities (supabase, wallet, utils)
+│       └── styles/                  # Tailwind CSS & design tokens
 │
-├── server/                          # Secure backend execution layer
-│   ├── api/
-│   │   ├── routes/                  # Authoritative route handlers
-│   │   └── middleware/              # Auth & session middleware
-│   ├── services/                    # Core business domains
-│   │   ├── payments/                # Curation economics & fee settlement
-│   │   ├── tickets/                 # Ticket lifecycle & signature verification
-│   │   └── markets/                 # Market lifecycle & payout settlement
-│   ├── jobs/
-│   │   └── attestation/             # Asynchronous attestation background worker
-│   ├── blockchain/
-│   │   └── relayer/                 # Monad Testnet gas-sponsored attestation relayer
-│   ├── security/
-│   │   ├── validation/              # Input sanitization and payload validators
-│   │   └── authorization/           # Supabase JWT token verification
-│   └── config/                      # Privileged admin configurations (supabaseAdmin)
+├── backend/                         # Secure backend execution layer
+│   ├── api/                         # Canonical serverless route adapters
+│   └── server/                      # Server runtime & services
+│       ├── api/
+│       │   ├── routes/              # Authoritative route handlers
+│       │   └── middleware/          # Auth & session middleware
+│       ├── services/                # Core business domains (AI, payments, tickets, markets, reddit)
+│       ├── jobs/                    # Asynchronous attestation background workers
+│       ├── blockchain/              # Monad Testnet gas-sponsored relayer
+│       ├── security/                # Validation, authorization, dedup, moderation, age, rateLimit
+│       └── config/                  # Privileged admin configurations (supabaseAdmin)
 │
-├── api/                             # Thin Vercel serverless adapters delegating to server/api/routes/
+├── api/                             # Thin Vercel serverless adapters delegating to backend/api/
 ├── shared/                          # Isomorphic environment-independent code
 │   ├── contracts/                   # Smart contract ABIs (HaileyContributions.abi.js)
-│   └── crypto/                      # Deterministic Keccak-256 hashing (hashing.js)
+│   ├── crypto/                      # Deterministic Keccak-256 and SHA-256 hashing
+│   └── data/                        # Shared static datasets (culturalDatasets.js)
 ├── contracts/                       # Foundry smart contracts (HaileyContributions.sol)
 ├── supabase/                        # Database schema & migrations
 │   ├── migrations/                  # Canonical SQL migrations (0001–0005)

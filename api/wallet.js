@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/wallet.js'
+export { default } from '../backend/api/wallet.js'

@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/health.js'
+export { default } from '../backend/api/health.js'

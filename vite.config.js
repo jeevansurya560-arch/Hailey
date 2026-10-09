@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, loadEnv } from 'vite'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 // Populate process.env with local environment variables for dev serverless handlers
 const loadedEnv = loadEnv('development', process.cwd(), '')
 Object.assign(process.env, loadedEnv)
@@ -18,7 +20,10 @@ function apiDevPlugin() {
         if (!urlPath.startsWith('/api/')) return next()
 
         const endpoint = urlPath.replace('/api/', '')
-        const absPath = path.resolve(process.cwd(), 'api', `${endpoint}.js`)
+        let absPath = path.resolve(__dirname, 'backend', 'api', `${endpoint}.js`)
+        if (!fs.existsSync(absPath)) {
+          absPath = path.resolve(__dirname, 'api', `${endpoint}.js`)
+        }
         if (!fs.existsSync(absPath)) return next()
 
         try {
@@ -68,11 +73,21 @@ function apiDevPlugin() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  root: path.resolve(__dirname, 'frontend'),
+  publicDir: path.resolve(__dirname, 'frontend', 'public'),
+  build: {
+    outDir: path.resolve(__dirname, 'dist'),
+    emptyOutDir: true,
+  },
   plugins: [tailwindcss(), react(), apiDevPlugin()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@': fileURLToPath(new URL('./frontend/src', import.meta.url)),
       '@shared': fileURLToPath(new URL('./shared', import.meta.url)),
     },
+  },
+  test: {
+    root: __dirname,
+    include: ['tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
   },
 })

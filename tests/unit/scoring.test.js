@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { shouldShowRelevancePrompt } from '../../src/features/feed/lib/relevance.js'
+import { shouldShowRelevancePrompt } from '../../frontend/src/features/feed/lib/relevance.js'
 
 describe('features/feed/lib/relevance.js - Relevance Prompt Scoring Unit Tests', () => {
   it('returns false when userId or postId is falsy', () => {

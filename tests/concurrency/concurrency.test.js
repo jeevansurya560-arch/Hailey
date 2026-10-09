@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { confirmCryptoPayment } from '../../server/services/payments/paymentService.js'
-import { supabaseAdmin } from '../../server/config/supabaseAdmin.js'
+import { confirmCryptoPayment } from '../../backend/server/services/payments/paymentService.js'
+import { supabaseAdmin } from '../../backend/server/config/supabaseAdmin.js'
 
 describe('Concurrency & Race Condition Defenses (Vitest Concurrency Suite)', () => {
   beforeEach(() => {

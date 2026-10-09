@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/aiAssistant.js'
+export { default } from '../backend/api/ai.js'

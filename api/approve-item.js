@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/approveItem.js'
+export { default } from '../backend/api/approve-item.js'

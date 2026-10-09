@@ -20,20 +20,23 @@ function getFilesRecursively(dir, extensions) {
 }
 
 describe('Architectural Boundary Guard: Client / Server Isolation', () => {
-  const srcDir = path.resolve(process.cwd(), 'src')
+  const srcDir = path.resolve(process.cwd(), 'frontend', 'src')
   const clientFiles = getFilesRecursively(srcDir, ['.js', '.jsx'])
 
-  it('ensures src/ contains client files', () => {
+  it('ensures frontend/src/ contains client files', () => {
     expect(clientFiles.length).toBeGreaterThan(0)
   })
 
-  it('forbids browser src/ files from importing server/ or api/ modules', () => {
+  it('forbids browser frontend/src/ files from importing backend/, server/ or api/ modules', () => {
     const forbiddenImports = []
     const forbiddenPatterns = [
+      /from\s+['"][^'"]*\/backend(\/|['"])/,
       /from\s+['"][^'"]*\/server(\/|['"])/,
       /from\s+['"][^'"]*\/api(\/|['"])/,
+      /import\s*\(['"][^'"]*\/backend(\/|['"])/,
       /import\s*\(['"][^'"]*\/server(\/|['"])/,
       /import\s*\(['"][^'"]*\/api(\/|['"])/,
+      /require\s*\(['"][^'"]*\/backend(\/|['"])/,
       /require\s*\(['"][^'"]*\/server(\/|['"])/,
       /require\s*\(['"][^'"]*\/api(\/|['"])/,
     ]

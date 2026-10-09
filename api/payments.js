@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/payments.js'
+export { default } from '../backend/api/payments.js'
