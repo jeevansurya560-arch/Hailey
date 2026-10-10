@@ -43,7 +43,7 @@ export function AppShell() {
     { to: '/analytics', label: 'Analytics', icon: BarChart3 },
     { to: '/messages', label: 'Messages', icon: MessageSquare },
     {
-      to: user ? `/u/${user.user_metadata?.handle || user.email?.split('@')[0] || 'me'}` : '/login',
+      to: user ? '/profile' : '/login',
       label: 'Profile',
       icon: User,
     },

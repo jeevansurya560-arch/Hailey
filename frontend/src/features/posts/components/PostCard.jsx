@@ -11,7 +11,9 @@ import {
   MessageSquare,
   Share2,
   Check,
+  Mic,
 } from 'lucide-react'
+import { AuthorTalkModal } from '@/features/profile/components/AuthorTalkModal'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import {
   togglePostReaction,
@@ -35,6 +37,7 @@ export function PostCard({ post, onDelete, onHide }) {
   const [sharesCount, setSharesCount] = useState(post.reactions?.sharesCount ?? 0)
   const [showComments, setShowComments] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [isAuthorTalkOpen, setIsAuthorTalkOpen] = useState(false)
   const [isHidden, setIsHidden] = useState(post.reactions?.isHidden ?? false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -98,19 +101,37 @@ export function PostCard({ post, onDelete, onHide }) {
     }
   }
 
-  // Share post with clipboard link and recorded counter
+  // Share post with Web Share API or clipboard link fallback (SHARE-01)
   const handleShare = async () => {
     const postUrl = `${window.location.origin}/post/${post.id}`
+    const shareData = {
+      title: 'Hailey Cultural Dispatch',
+      text: post.body?.slice(0, 100) + '...',
+      url: postUrl,
+    }
+
     try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(postUrl)
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        await navigator.share(shareData)
+        setSharesCount((prev) => prev + 1)
+        await recordPostShare({ postId: post.id, userId: user?.id, platform: 'web_share' })
+      } else {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(postUrl)
+        }
+        setCopiedLink(true)
+        setTimeout(() => setCopiedLink(false), 2500)
+        setSharesCount((prev) => prev + 1)
+        await recordPostShare({ postId: post.id, userId: user?.id, platform: 'link' })
       }
-      setCopiedLink(true)
-      setTimeout(() => setCopiedLink(false), 2500)
-      setSharesCount((prev) => prev + 1)
-      await recordPostShare({ postId: post.id, userId: user?.id })
     } catch (err) {
-      console.warn('Share copy failed:', err)
+      if (err.name !== 'AbortError') {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(postUrl)
+          setCopiedLink(true)
+          setTimeout(() => setCopiedLink(false), 2500)
+        }
+      }
     }
   }
 
@@ -225,6 +246,18 @@ export function PostCard({ post, onDelete, onHide }) {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {post.author_id && (
+            <button
+              type="button"
+              onClick={() => setIsAuthorTalkOpen(true)}
+              title="Open Author Talk discovery"
+              className="flex items-center gap-1 border border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)] px-2.5 py-1 font-mono text-[11px] font-bold uppercase rounded shadow-[1px_1px_0_var(--ink)] hover:bg-[var(--paper-2)] transition-all"
+            >
+              <Mic className="h-3 w-3 text-[var(--clay)]" />
+              <span>Author Talk</span>
+            </button>
+          )}
+
           {!isAuthor && post.author_id && (
             <button
               type="button"
@@ -386,6 +419,16 @@ export function PostCard({ post, onDelete, onHide }) {
         <PostCommentsSection
           postId={post.id}
           onCommentAdded={() => setCommentsCount((c) => c + 1)}
+        />
+      )}
+
+      {/* Author Talk Discovery Modal */}
+      {post.author_id && (
+        <AuthorTalkModal
+          authorId={post.author_id}
+          author={post.author}
+          isOpen={isAuthorTalkOpen}
+          onClose={() => setIsAuthorTalkOpen(false)}
         />
       )}
     </article>

@@ -93,7 +93,7 @@ export function CreatorAnalyticsPage() {
           />
 
           {/* Author Talk Concept Section */}
-          <AuthorTalkSection />
+          <AuthorTalkSection userId={targetUserId} />
         </>
       )}
     </div>

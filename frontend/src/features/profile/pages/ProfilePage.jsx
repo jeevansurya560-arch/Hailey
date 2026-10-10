@@ -19,10 +19,13 @@ import {
   Check,
   Edit3,
   Award,
+  Bookmark,
+  User,
 } from 'lucide-react'
 import {
   fetchProfileByHandle,
-  fetchProfileById,
+  ensureUserProfile,
+  fetchUserSavedPosts,
   fetchUserInterests,
   fetchUserMemberships,
   fetchUserContributions,
@@ -41,35 +44,56 @@ import { EditProfileModal } from '../components/EditProfileModal'
 
 export function ProfilePage() {
   const { handle } = useParams()
-  const { user } = useAuth()
+  const { user, loading: isAuthLoading } = useAuth()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const [activeTab, setActiveTab] = useState('posts') // 'posts' | 'analytics' | 'threads' | 'collectives' | 'attestations'
+  const [activeTab, setActiveTab] = useState('posts') // 'posts' | 'saved' | 'analytics' | 'threads' | 'collectives' | 'attestations'
   const [viewMode, setViewMode] = useState('feed') // 'feed' | 'grid'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [copiedProfile, setCopiedProfile] = useState(false)
 
-  // 1. Fetch profile by handle (or fallback to user profile if 'me')
-  const isMeRoute = handle === 'me'
+  // 1. Fetch profile by handle or authenticated user session
+  const isOwnRoute = !handle || handle === 'me'
   const { data: profile, isLoading: isProfileLoading } = useQuery({
     queryKey: ['profile', handle, user?.id],
     queryFn: async () => {
-      if (isMeRoute && user?.id) {
-        return fetchProfileById(user.id)
+      if (isOwnRoute) {
+        if (!user) return null
+        return ensureUserProfile(user)
       }
-      return fetchProfileByHandle(handle)
+      let prof = await fetchProfileByHandle(handle)
+      if (!prof && user) {
+        const userHandle = user.user_metadata?.handle || user.email?.split('@')[0]
+        if (handle === userHandle || handle === user.id) {
+          prof = await ensureUserProfile(user)
+        }
+      }
+      return prof
     },
-    enabled: !!handle || (isMeRoute && !!user?.id),
+    enabled: (!isOwnRoute && !!handle) || (isOwnRoute && !isAuthLoading),
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   })
 
-  const isOwnProfile = user && profile && user.id === profile.id
+  const isOwnProfile = !!(user && profile && (user.id === profile.id || isOwnRoute))
 
   // 2. Fetch author's posts
   const { data: userPosts = [], isLoading: isPostsLoading } = useQuery({
     queryKey: ['profile_posts', profile?.id],
     queryFn: () => fetchUserPosts(profile.id),
     enabled: !!profile?.id,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  })
+
+  // 3. Fetch user's saved posts (only for own profile)
+  const { data: savedPosts = [], isLoading: isSavedLoading } = useQuery({
+    queryKey: ['profile_saved_posts', profile?.id],
+    queryFn: () => fetchUserSavedPosts(profile.id),
+    enabled: !!profile?.id && isOwnProfile,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   })
 
   // 3. Fetch follow statistics
@@ -78,6 +102,8 @@ export function ProfilePage() {
       queryKey: ['profile_follow_stats', profile?.id, user?.id],
       queryFn: () => fetchFollowStats(profile.id, user?.id),
       enabled: !!profile?.id,
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
     })
 
   // 4. Fetch user's exploring topics (user_interests)
@@ -106,6 +132,8 @@ export function ProfilePage() {
     queryKey: ['profile_creator_analytics', profile?.id],
     queryFn: () => fetchCreatorAnalytics(profile.id),
     enabled: !!profile?.id && activeTab === 'analytics',
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
   })
 
   // Follow / Unfollow mutation
@@ -150,7 +178,7 @@ export function ProfilePage() {
     navigate(`/messages?with=${profile.id}`)
   }
 
-  if (isProfileLoading) {
+  if (isAuthLoading || (isProfileLoading && !profile)) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-3">
         <Loader2 className="h-6 w-6 animate-spin text-[var(--clay)]" />
@@ -161,12 +189,44 @@ export function ProfilePage() {
     )
   }
 
+  if (isOwnRoute && !user) {
+    return (
+      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-12 text-center space-y-5 max-w-lg mx-auto shadow-[var(--shadow-hard)]">
+        <div className="h-14 w-14 mx-auto rounded-full border border-[var(--ink)] bg-[var(--paper)] flex items-center justify-center shadow-[2px_2px_0_var(--ink)]">
+          <User className="h-7 w-7 text-[var(--clay)]" />
+        </div>
+        <div className="space-y-1.5">
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[var(--ink)]">
+            Field Guide Passport
+          </h2>
+          <p className="text-xs font-mono text-[var(--ink-2)] leading-relaxed">
+            Sign in to view your cultural dispatches, saved archives, creator analytics, and field notes.
+          </p>
+        </div>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          <Link
+            to="/login"
+            className="w-full sm:w-auto border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] px-6 py-2.5 font-mono text-xs uppercase font-bold shadow-[2px_2px_0_var(--ink)] hover:opacity-90 transition-opacity"
+          >
+            Sign In / Register
+          </Link>
+          <Link
+            to="/explore"
+            className="w-full sm:w-auto border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] px-5 py-2.5 font-mono text-xs uppercase font-bold hover:border-[var(--ink)] transition-colors"
+          >
+            Explore Field Guide →
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
   if (!profile) {
     return (
       <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-12 text-center space-y-4 max-w-lg mx-auto shadow-[var(--shadow-hard)]">
         <h2 className="font-serif text-2xl font-bold text-[var(--ink)]">Profile Not Found</h2>
         <p className="text-xs font-mono text-[var(--ink-2)]">
-          The requested cultural contributor @{handle} does not exist or has not claimed their profile yet.
+          The requested cultural contributor @{handle || 'unknown'} does not exist or has not claimed their profile yet.
         </p>
         <Link
           to="/"
@@ -424,6 +484,21 @@ export function ProfilePage() {
             <span>Dispatches ({userPosts.length})</span>
           </button>
 
+          {isOwnProfile && (
+            <button
+              type="button"
+              onClick={() => setActiveTab('saved')}
+              className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+                activeTab === 'saved'
+                  ? 'border-[var(--clay)] text-[var(--clay)]'
+                  : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+              }`}
+            >
+              <Bookmark className="h-3.5 w-3.5" />
+              <span>Saved ({savedPosts.length})</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={() => setActiveTab('analytics')}
@@ -477,7 +552,7 @@ export function ProfilePage() {
           </button>
         </div>
 
-        {activeTab === 'posts' && userPosts.length > 0 && (
+        {((activeTab === 'posts' && userPosts.length > 0) || (activeTab === 'saved' && savedPosts.length > 0)) && (
           <div className="hidden sm:flex items-center gap-1 border border-[var(--line)] bg-[var(--paper-2)] p-0.5 rounded">
             <button
               type="button"
@@ -575,6 +650,85 @@ export function ProfilePage() {
                   post={post}
                   onDelete={() => {
                     queryClient.invalidateQueries({ queryKey: ['profile_posts', profile.id] })
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── Tab Content: Saved Posts ─────────────────────────────────── */}
+      {activeTab === 'saved' && (
+        <div className="space-y-6">
+          {isSavedLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader2 className="h-5 w-5 animate-spin text-[var(--clay)]" />
+            </div>
+          ) : savedPosts.length === 0 ? (
+            <div className="border border-dashed border-[var(--line)] bg-[var(--paper-2)] p-12 text-center space-y-3">
+              <div className="h-10 w-10 mx-auto rounded-full border border-[var(--ink-2)] flex items-center justify-center">
+                <Bookmark className="h-5 w-5 text-[var(--ink-2)]" />
+              </div>
+              <h3 className="font-serif text-lg font-bold text-[var(--ink)]">
+                No Saved Dispatches
+              </h3>
+              <p className="text-xs font-mono text-[var(--ink-2)] max-w-sm mx-auto">
+                Bookmark cultural dispatches from the Explore or Home feed to curate your private research archive.
+              </p>
+              <Link
+                to="/explore"
+                className="inline-block border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] px-4 py-2 font-mono text-xs uppercase font-bold shadow-[1.5px_1.5px_0_var(--ink)] mt-2"
+              >
+                Explore Living Archives →
+              </Link>
+            </div>
+          ) : viewMode === 'grid' ? (
+            /* Saved Grid */
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+              {savedPosts.map((post) => (
+                <Link
+                  key={post.id}
+                  to={`/post/${post.id}`}
+                  className="group relative aspect-square border border-[var(--ink)] bg-[var(--paper-2)] overflow-hidden shadow-[1.5px_1.5px_0_var(--ink)]"
+                >
+                  {post.media_url ? (
+                    <img
+                      src={post.media_url}
+                      alt="Saved Dispatch"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-full w-full p-4 flex flex-col justify-between bg-[var(--paper)]">
+                      <p className="text-xs font-serif line-clamp-4 text-[var(--ink)] leading-relaxed">
+                        {post.body}
+                      </p>
+                      <span className="font-mono text-[9px] uppercase text-[var(--clay)] font-bold">
+                        Read Dispatch →
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-mono text-xs font-bold">
+                    <span className="flex items-center gap-1">
+                      ❤️ {post.reactions?.likesCount ?? 0}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      💬 {post.reactions?.commentsCount ?? 0}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            /* Saved Feed */
+            <div className="space-y-6">
+              {savedPosts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onDelete={() => {
+                    queryClient.invalidateQueries({ queryKey: ['profile_saved_posts', profile.id] })
                   }}
                 />
               ))}

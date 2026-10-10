@@ -1,28 +1,51 @@
-import { useState } from 'react'
-import { MessageSquare, Mic, Volume2, UserCheck, Heart, Send } from 'lucide-react'
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { MessageSquare, Mic, Volume2, UserCheck, Heart, Send, ArrowRight } from 'lucide-react'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import { fetchProfileById, fetchUserPosts } from '@/features/profile/services/profileService'
 
 /**
- * Author Talk concept providing deep oral history, cultural storytelling,
- * and direct audience interaction with verified creators.
+ * AuthorTalkSection: Deep oral history, cultural storytelling,
+ * and direct audience interaction with verified culture bearers.
+ * Connects to live Supabase profile and dispatch data.
  */
-export function AuthorTalkSection({
-  authorName = 'Kenjiro Takahashi',
-  authorBio = 'Nishijin textile preservationist & living craft archivist in Kamigyo-ku, Kyoto.',
-  storyTitle = 'The Whispering Looms: Forty Years of Persimmon Dyeing in Nishijin',
-  storyContent = 'When the morning fog rolls down from Mount Hiei, the dampness in the air changes the tension of silk yarn on our wooden hand-looms. In modern synthetic manufacturing, this variation is considered an error. In Nishijin, it is the breath of the season. To dye with Kakishibu (unfermented bitter persimmon juice), one must surrender to the sunlight of mid-autumn...',
-}) {
+export function AuthorTalkSection({ userId = null }) {
+  const { user } = useAuth()
+  const activeUserId = userId || user?.id
+
+  const { data: profile } = useQuery({
+    queryKey: ['author_talk_section_profile', activeUserId],
+    queryFn: () => fetchProfileById(activeUserId),
+    enabled: !!activeUserId,
+  })
+
+  const { data: userPosts = [] } = useQuery({
+    queryKey: ['author_talk_section_posts', activeUserId],
+    queryFn: () => fetchUserPosts(activeUserId),
+    enabled: !!activeUserId,
+  })
+
+  const authorName = profile?.display_name || (profile?.handle ? `@${profile.handle}` : 'Jeevan Surya Jalli')
+  const authorBio = profile?.bio || 'Cultural field archivist & documentation lead at Hailey Living Heritage.'
+  const latestPost = userPosts[0]
+  const storyTitle = latestPost ? latestPost.body.slice(0, 60) + '...' : 'Living Heritage Field Documentation'
+  const storyContent = latestPost
+    ? latestPost.body
+    : 'Hailey connects living traditions, performing arts, and sacred architecture through decentralized dispatches recorded by local culture bearers.'
+
   const [comments, setComments] = useState([
     {
       id: 'c1',
       author: 'Amina Diallo',
-      text: 'The philosophy of allowing humidity to guide warp tension echoes West African Indigo resist-dyeing in Oshogbo.',
+      text: 'The documentation rigor preserves living nuances that synthetic digital archives frequently lose.',
       time: '2 hours ago',
       likes: 5,
     },
     {
       id: 'c2',
       author: 'Marcus Vance',
-      text: 'Does your guild still register the woodblock stencil patterns with the municipal archives?',
+      text: 'Are these recordings cross-referenced with regional municipal ethnographic guilds?',
       time: '5 hours ago',
       likes: 3,
     },
@@ -38,7 +61,7 @@ export function AuthorTalkSection({
       ...prev,
       {
         id: 'c-' + Date.now(),
-        author: 'Guest Contributor',
+        author: user?.user_metadata?.full_name || 'Guest Contributor',
         text: newComment.trim(),
         time: 'Just now',
         likes: 0,
@@ -82,7 +105,7 @@ export function AuthorTalkSection({
           {isPlayingAudio ? (
             <>
               <Volume2 className="h-3.5 w-3.5 animate-pulse" />
-              <span>Playing Audio Note (03:42)</span>
+              <span>Playing Field Note (03:42)</span>
             </>
           ) : (
             <>
@@ -107,6 +130,16 @@ export function AuthorTalkSection({
             <MessageSquare className="h-4 w-4 text-[var(--clay)]" />
             <span>Audience Exchange ({comments.length})</span>
           </h3>
+
+          {profile?.handle && (
+            <Link
+              to={`/u/${profile.handle}`}
+              className="font-mono text-xs text-[var(--clay)] hover:underline flex items-center gap-1 font-bold"
+            >
+              <span>Author Passport</span>
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          )}
         </div>
 
         {/* Comments Feed */}
