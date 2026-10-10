@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Outlet, NavLink, Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Compass, Users, User, LogOut, ShieldCheck, Ticket, TrendingUp, Calendar, BarChart3, Sparkles } from 'lucide-react'
+import { Home, Compass, Users, User, LogOut, ShieldCheck, Ticket, TrendingUp, Calendar, BarChart3, Sparkles, MessageSquare } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { fetchUserInterestsCount } from '@/features/feed/services/feedService'
@@ -41,6 +41,7 @@ export function AppShell() {
     { to: '/tickets', label: 'Passes', icon: Ticket },
     { to: '/markets', label: 'Markets', icon: TrendingUp },
     { to: '/analytics', label: 'Analytics', icon: BarChart3 },
+    { to: '/messages', label: 'Messages', icon: MessageSquare },
     {
       to: user ? `/u/${user.user_metadata?.handle || user.email?.split('@')[0] || 'me'}` : '/login',
       label: 'Profile',

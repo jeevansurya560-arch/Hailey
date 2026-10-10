@@ -15,6 +15,7 @@ import { VerifyPage } from '@/features/verification/pages/VerifyPage'
 import { PostDetailPage } from '@/features/posts/pages/PostDetailPage'
 import { OnboardingPage } from '@/features/onboarding/pages/OnboardingPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
+import { MessagesPage } from '@/features/messages/pages/MessagesPage'
 import { AuthPage } from '@/features/auth/pages/AuthPage'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
 import { TermsPage } from '@/features/auth/pages/TermsPage'
@@ -38,6 +39,7 @@ export function AppRoutes() {
         <Route path="/markets" element={<MarketsPage />} />
         <Route path="/verify/:address" element={<VerifyPage />} />
         <Route path="/post/:id" element={<PostDetailPage />} />
+        <Route path="/messages" element={<MessagesPage />} />
         <Route
           path="/onboarding"
           element={
@@ -46,6 +48,7 @@ export function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/u/:handle" element={<ProfilePage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />

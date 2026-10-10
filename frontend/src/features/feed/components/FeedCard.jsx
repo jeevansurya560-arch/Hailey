@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import {
   Heart,
   Bookmark,
@@ -8,6 +8,9 @@ import {
   ExternalLink,
   ShieldCheck,
   Lock,
+  MessageSquare,
+  Share2,
+  Check,
 } from 'lucide-react'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import {
@@ -15,6 +18,8 @@ import {
   hidePost,
   deletePost,
 } from '@/features/feed/services/feedService'
+import { recordPostShare } from '@/features/posts/services/postInteractionService'
+import { PostCommentsSection } from '@/features/posts/components/PostCommentsSection'
 import { TagSticker } from '@/components/ui/TagSticker'
 import { WhyStamp } from './WhyStamp'
 import { RelevancePrompt } from './RelevancePrompt'
@@ -24,12 +29,17 @@ import { getThreadColor } from '@/features/communities/threadColors'
 
 export function FeedCard({ post, onDelete, onHide }) {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const impressionRef = useImpression(post.id)
 
   const [isLiked, setIsLiked] = useState(post.reactions?.isLiked ?? false)
   const [likesCount, setLikesCount] = useState(post.reactions?.likesCount ?? 0)
   const [isSaved, setIsSaved] = useState(post.reactions?.isSaved ?? false)
   const [savesCount, setSavesCount] = useState(post.reactions?.savesCount ?? 0)
+  const [commentsCount, setCommentsCount] = useState(post.reactions?.commentsCount ?? 0)
+  const [sharesCount, setSharesCount] = useState(post.reactions?.sharesCount ?? 0)
+  const [showComments, setShowComments] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
   const [isHidden, setIsHidden] = useState(post.reactions?.isHidden ?? false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -93,6 +103,31 @@ export function FeedCard({ post, onDelete, onHide }) {
     }
   }
 
+  // Share post with clipboard link and recorded counter
+  const handleShare = async () => {
+    const postUrl = `${window.location.origin}/post/${post.id}`
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(postUrl)
+      }
+      setCopiedLink(true)
+      setTimeout(() => setCopiedLink(false), 2500)
+      setSharesCount((prev) => prev + 1)
+      await recordPostShare({ postId: post.id, userId: user?.id })
+    } catch (err) {
+      console.warn('Share copy failed:', err)
+    }
+  }
+
+  // Navigate to messages to discuss with author
+  const handleDiscussWithAuthor = () => {
+    if (!user) {
+      navigate('/login')
+      return
+    }
+    navigate(`/messages?with=${post.author_id}&postId=${post.id}`)
+  }
+
   // Author-only delete via feedService
   const handleDelete = async () => {
     if (!isAuthor || isDeleting) return
@@ -134,70 +169,109 @@ export function FeedCard({ post, onDelete, onHide }) {
       <article className="border border-[var(--ink)] border-t-0 bg-[var(--paper-2)] p-5 md:p-6 shadow-[var(--shadow-hard)] transition-all hover:translate-x-0.5 hover:translate-y-0.5 space-y-4">
         {/* WhyStamp badge & author header */}
         <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3">
-          <div className="space-y-1">
-            {post.why && post.why.length > 0 && (
-              <div className="mb-1.5">
-                <WhyStamp why={post.why} isExplore={post.isExplore} />
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 flex-wrap">
-              <Link
-                to={`/u/${post.author?.handle || 'member'}`}
-                className="font-mono text-xs font-bold text-[var(--ink)] hover:text-[var(--clay)] transition-colors"
-              >
-                @{post.author?.handle || 'contributor'}
-              </Link>
-
-              {post.is_editorial && (
-                <span className="inline-flex items-center gap-1 rounded bg-[var(--clay)] px-1.5 py-0.5 font-mono text-[9px] uppercase font-bold text-[var(--paper)]">
-                  <ShieldCheck className="h-3 w-3" />
-                  Editorial
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            {/* Author Avatar */}
+            <Link
+              to={`/u/${post.author?.handle || 'member'}`}
+              className="h-9 w-9 rounded-full border border-[var(--ink)] bg-[var(--paper)] shrink-0 overflow-hidden flex items-center justify-center shadow-[1px_1px_0_var(--ink)] hover:opacity-90 transition-opacity"
+            >
+              {post.author?.avatar_url ? (
+                <img
+                  src={post.author.avatar_url}
+                  alt={post.author.handle || 'Author'}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="font-mono text-xs font-bold text-[var(--clay)] uppercase">
+                  {(post.author?.handle || 'A').slice(0, 2)}
                 </span>
               )}
+            </Link>
 
-              {post.community && (
-                <>
-                  <span className="text-[var(--ink-2)] font-mono text-xs">
-                    in
-                  </span>
-                  <Link
-                    to={`/communities/${post.community.slug}`}
-                    className="font-mono text-xs text-[var(--clay)] font-semibold hover:underline"
-                  >
-                    {post.community.name}
-                  </Link>
-                </>
+            <div className="space-y-1 min-w-0 flex-1">
+              {post.why && post.why.length > 0 && (
+                <div className="mb-1">
+                  <WhyStamp why={post.why} isExplore={post.isExplore} />
+                </div>
               )}
-            </div>
 
-            <div className="flex items-center gap-2 font-mono text-[10px] text-[var(--ink-2)]">
-              <span>
-                {new Date(post.created_at).toLocaleDateString(undefined, {
-                  month: 'short',
-                  day: 'numeric',
-                  year: 'numeric',
-                })}
-              </span>
-              <span>·</span>
-              <span className="inline-flex items-center gap-0.5 text-emerald-800 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200" title="Protected under PostgreSQL Row Level Security">
-                <Lock className="h-2.5 w-2.5" />
-                RLS Verified
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link
+                  to={`/u/${post.author?.handle || 'member'}`}
+                  className="font-mono text-xs font-bold text-[var(--ink)] hover:text-[var(--clay)] transition-colors flex items-center gap-1.5"
+                >
+                  <span>{post.author?.display_name || `@${post.author?.handle || 'contributor'}`}</span>
+                  {post.author?.display_name && (
+                    <span className="text-[11px] font-normal text-[var(--ink-2)]">
+                      @{post.author?.handle}
+                    </span>
+                  )}
+                </Link>
+
+                {post.is_editorial && (
+                  <span className="inline-flex items-center gap-1 rounded bg-[var(--clay)] px-1.5 py-0.5 font-mono text-[9px] uppercase font-bold text-[var(--paper)]">
+                    <ShieldCheck className="h-3 w-3" />
+                    Editorial
+                  </span>
+                )}
+
+                {post.community && (
+                  <>
+                    <span className="text-[var(--ink-2)] font-mono text-xs">
+                      in
+                    </span>
+                    <Link
+                      to={`/communities/${post.community.slug}`}
+                      className="font-mono text-xs text-[var(--clay)] font-semibold hover:underline"
+                    >
+                      {post.community.name}
+                    </Link>
+                  </>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 font-mono text-[10px] text-[var(--ink-2)]">
+                <span>
+                  {new Date(post.created_at).toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </span>
+                <span>·</span>
+                <span className="inline-flex items-center gap-0.5 text-emerald-800 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200" title="Protected under PostgreSQL Row Level Security">
+                  <Lock className="h-2.5 w-2.5" />
+                  RLS Verified
+                </span>
+              </div>
             </div>
           </div>
 
-          {isAuthor && (
-            <button
-              type="button"
-              onClick={handleDelete}
-              disabled={isDeleting}
-              title="Delete your post"
-              className="text-[var(--ink-2)] hover:text-red-600 transition-colors p-1"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
-          )}
+          <div className="flex items-center gap-2 shrink-0">
+            {!isAuthor && post.author_id && (
+              <button
+                type="button"
+                onClick={handleDiscussWithAuthor}
+                title="Discuss this topic directly with author"
+                className="flex items-center gap-1 border border-[var(--clay)] bg-[var(--paper)] text-[var(--clay)] px-2.5 py-1 font-mono text-[11px] font-bold uppercase rounded shadow-[1px_1px_0_var(--clay)] hover:bg-[var(--clay)] hover:text-[var(--paper)] transition-all"
+              >
+                <MessageSquare className="h-3 w-3" />
+                <span>Discuss</span>
+              </button>
+            )}
+
+            {isAuthor && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={isDeleting}
+                title="Delete your post"
+                className="text-[var(--ink-2)] hover:text-red-600 transition-colors p-1"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Body (strictly plain text) */}
@@ -265,9 +339,10 @@ export function FeedCard({ post, onDelete, onHide }) {
           </div>
         )}
 
-        {/* Reactions bar */}
+        {/* Reactions & Social Interaction bar */}
         <div className="flex items-center justify-between pt-2 border-t border-[var(--line)] font-mono text-xs">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-5 flex-wrap">
+            {/* Like Button */}
             <button
               type="button"
               onClick={handleLike}
@@ -283,6 +358,34 @@ export function FeedCard({ post, onDelete, onHide }) {
               <span>{likesCount}</span>
             </button>
 
+            {/* Comment Button */}
+            <button
+              type="button"
+              onClick={() => setShowComments(!showComments)}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${
+                showComments
+                  ? 'text-[var(--clay)] font-bold'
+                  : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+              }`}
+            >
+              <MessageSquare className="h-4 w-4" />
+              <span>{commentsCount}</span>
+            </button>
+
+            {/* Share Button */}
+            <button
+              type="button"
+              onClick={handleShare}
+              className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${
+                copiedLink ? 'text-emerald-700 font-bold' : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+              }`}
+              title="Copy shareable link to clipboard"
+            >
+              {copiedLink ? <Check className="h-4 w-4 text-emerald-600" /> : <Share2 className="h-4 w-4" />}
+              <span>{copiedLink ? 'Copied!' : sharesCount}</span>
+            </button>
+
+            {/* Save / Bookmark Button */}
             <button
               type="button"
               onClick={handleSave}
@@ -307,10 +410,18 @@ export function FeedCard({ post, onDelete, onHide }) {
               className="flex items-center gap-1 text-[var(--ink-2)] hover:text-[var(--ink)] px-2 py-1 transition-colors"
             >
               <EyeOff className="h-3.5 w-3.5" />
-              <span className="text-[11px]">Not interested</span>
+              <span className="text-[11px] hidden sm:inline">Not interested</span>
             </button>
           )}
         </div>
+
+        {/* Expandable Comments & Observations Section */}
+        {showComments && (
+          <PostCommentsSection
+            postId={post.id}
+            onCommentAdded={() => setCommentsCount((c) => c + 1)}
+          />
+        )}
       </article>
     </div>
   )

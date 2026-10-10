@@ -144,3 +144,141 @@ export async function saveUserInterests({ userId, tagIds, weight = 5, source = '
   if (error) throw error
   return rows
 }
+
+/**
+ * Fetch all posts published by a user
+ */
+export async function fetchUserPosts(userId) {
+  if (!userId) return []
+
+  const { data: posts, error } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      author_id,
+      body,
+      media_url,
+      media_credit,
+      source_url,
+      is_editorial,
+      created_at,
+      profiles (
+        id,
+        handle,
+        display_name,
+        avatar_url,
+        bio
+      ),
+      communities (
+        slug,
+        name
+      ),
+      post_tags (
+        tags (id, name, slug, kind)
+      )
+    `)
+    .eq('author_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.warn('Failed to fetch user posts:', error.message)
+    return []
+  }
+
+  // Hydrate likes, comments, and shares counts
+  const postIds = (posts || []).map((p) => p.id)
+  if (postIds.length === 0) return []
+
+  const [reactionsRes, commentsRes, sharesRes] = await Promise.all([
+    supabase.from('post_reactions').select('post_id, kind').in('post_id', postIds),
+    supabase.from('post_comments').select('post_id').in('post_id', postIds),
+    supabase.from('post_shares').select('post_id').in('post_id', postIds),
+  ])
+
+  const countsMap = new Map()
+  for (const id of postIds) {
+    countsMap.set(id, { likesCount: 0, commentsCount: 0, sharesCount: 0 })
+  }
+
+  for (const r of reactionsRes.data || []) {
+    if (r.kind === 'like') {
+      const c = countsMap.get(r.post_id)
+      if (c) c.likesCount++
+    }
+  }
+
+  for (const c of commentsRes.data || []) {
+    const item = countsMap.get(c.post_id)
+    if (item) item.commentsCount++
+  }
+
+  for (const s of sharesRes.data || []) {
+    const item = countsMap.get(s.post_id)
+    if (item) item.sharesCount++
+  }
+
+  return (posts || []).map((p) => {
+    const counts = countsMap.get(p.id) || { likesCount: 0, commentsCount: 0, sharesCount: 0 }
+    return {
+      ...p,
+      author: p.profiles,
+      community: p.communities,
+      tags: (p.post_tags || []).map((pt) => pt.tags).filter(Boolean),
+      reactions: {
+        likesCount: counts.likesCount,
+        commentsCount: counts.commentsCount,
+        sharesCount: counts.sharesCount,
+      },
+    }
+  })
+}
+
+/**
+ * Fetch follow statistics for a user
+ */
+export async function fetchFollowStats(targetUserId, currentUserId = null) {
+  if (!targetUserId) return { followersCount: 0, followingCount: 0, isFollowing: false }
+
+  const [followersRes, followingRes, checkRes] = await Promise.all([
+    supabase.from('follows').select('*', { count: 'exact', head: true }).eq('following_id', targetUserId),
+    supabase.from('follows').select('*', { count: 'exact', head: true }).eq('follower_id', targetUserId),
+    currentUserId
+      ? supabase.from('follows').select('created_at').eq('follower_id', currentUserId).eq('following_id', targetUserId).maybeSingle()
+      : Promise.resolve({ data: null }),
+  ])
+
+  return {
+    followersCount: followersRes.count || 0,
+    followingCount: followingRes.count || 0,
+    isFollowing: !!checkRes?.data,
+  }
+}
+
+/**
+ * Toggle follow/unfollow for a user
+ */
+export async function toggleFollow({ currentUserId, targetUserId, isCurrentlyFollowing }) {
+  if (!currentUserId || !targetUserId) throw new Error('Both user IDs are required.')
+  if (currentUserId === targetUserId) throw new Error('Cannot follow yourself.')
+
+  if (isCurrentlyFollowing) {
+    const { error } = await supabase
+      .from('follows')
+      .delete()
+      .eq('follower_id', currentUserId)
+      .eq('following_id', targetUserId)
+
+    if (error) throw error
+    return { isFollowing: false }
+  } else {
+    const { error } = await supabase
+      .from('follows')
+      .insert({
+        follower_id: currentUserId,
+        following_id: targetUserId,
+      })
+
+    if (error) throw error
+    return { isFollowing: true }
+  }
+}

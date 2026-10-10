@@ -237,7 +237,7 @@ export async function fetchPostById({ postId, currentUserId = null }) {
       source_url,
       is_editorial,
       created_at,
-      profiles(handle, display_name),
+      profiles(id, handle, display_name, avatar_url, bio),
       communities(slug, name),
       post_tags(tags(id, name, slug, kind))
     `)
@@ -256,15 +256,16 @@ export async function fetchPostById({ postId, currentUserId = null }) {
     userReactions = reactionsData || []
   }
 
-  const { data: allReactions } = await supabase
-    .from('post_reactions')
-    .select('post_id, kind')
-    .eq('post_id', postId)
+  const [allReactionsRes, commentsCountRes, sharesCountRes] = await Promise.all([
+    supabase.from('post_reactions').select('post_id, kind').eq('post_id', postId),
+    supabase.from('post_comments').select('*', { count: 'exact', head: true }).eq('post_id', postId),
+    supabase.from('post_shares').select('*', { count: 'exact', head: true }).eq('post_id', postId),
+  ])
 
   let likesCount = 0
   let savesCount = 0
-  if (allReactions) {
-    for (const r of allReactions) {
+  if (allReactionsRes.data) {
+    for (const r of allReactionsRes.data) {
       if (r.kind === 'like') likesCount++
       if (r.kind === 'save') savesCount++
     }
@@ -287,6 +288,8 @@ export async function fetchPostById({ postId, currentUserId = null }) {
     reactions: {
       likesCount,
       savesCount,
+      commentsCount: commentsCountRes.count || 0,
+      sharesCount: sharesCountRes.count || 0,
       isLiked: userReactions.some((r) => r.kind === 'like'),
       isSaved: userReactions.some((r) => r.kind === 'save'),
       isHidden: userReactions.some((r) => r.kind === 'hide'),
@@ -367,7 +370,7 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
           source_url,
           is_editorial,
           created_at,
-          profiles(handle, display_name),
+          profiles(id, handle, display_name, avatar_url, bio),
           communities(slug, name),
           post_tags(tags(id, name, slug, kind))
         `)
@@ -376,28 +379,39 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
       if (!postErr && fullPosts) {
         const postsMap = new Map(fullPosts.map((p) => [p.id, p]))
 
-        const { data: userReactions } = await supabase
-          .from('post_reactions')
-          .select('post_id, kind')
-          .eq('user_id', user.id)
+        const [userReactionsRes, allReactionsRes, commentsRes, sharesRes] = await Promise.all([
+          supabase.from('post_reactions').select('post_id, kind').eq('user_id', user.id),
+          supabase.from('post_reactions').select('post_id, kind').in('post_id', postIds),
+          supabase.from('post_comments').select('post_id').in('post_id', postIds),
+          supabase.from('post_shares').select('post_id').in('post_id', postIds),
+        ])
 
-        const { data: allReactions } = await supabase
-          .from('post_reactions')
-          .select('post_id, kind')
-          .in('post_id', postIds)
+        const userReactions = userReactionsRes.data || []
+        const countsMap = new Map()
+        for (const id of postIds) {
+          countsMap.set(id, { likes: 0, saves: 0, comments: 0, shares: 0 })
+        }
 
-        const reactionsCountMap = new Map()
-        if (allReactions) {
-          for (const r of allReactions) {
-            const current = reactionsCountMap.get(r.post_id) || { likes: 0, saves: 0 }
-            if (r.kind === 'like') current.likes++
-            if (r.kind === 'save') current.saves++
-            reactionsCountMap.set(r.post_id, current)
+        for (const r of allReactionsRes.data || []) {
+          const item = countsMap.get(r.post_id)
+          if (item) {
+            if (r.kind === 'like') item.likes++
+            if (r.kind === 'save') item.saves++
           }
         }
 
+        for (const c of commentsRes.data || []) {
+          const item = countsMap.get(c.post_id)
+          if (item) item.comments++
+        }
+
+        for (const s of sharesRes.data || []) {
+          const item = countsMap.get(s.post_id)
+          if (item) item.shares++
+        }
+
         const hiddenPostIds = new Set(
-          (userReactions || []).filter((r) => r.kind === 'hide').map((r) => r.post_id)
+          userReactions.filter((r) => r.kind === 'hide').map((r) => r.post_id)
         )
 
         const resultList = []
@@ -406,8 +420,8 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
           const p = postsMap.get(feedItem.post_id)
           if (!p) continue
 
-          const pReactions = (userReactions || []).filter((r) => r.post_id === p.id)
-          const counts = reactionsCountMap.get(p.id) || { likes: 0, saves: 0 }
+          const pReactions = userReactions.filter((r) => r.post_id === p.id)
+          const counts = countsMap.get(p.id) || { likes: 0, saves: 0, comments: 0, shares: 0 }
           const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
 
           resultList.push({
@@ -428,6 +442,8 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
             reactions: {
               likesCount: counts.likes,
               savesCount: counts.saves,
+              commentsCount: counts.comments,
+              sharesCount: counts.shares,
               isLiked: pReactions.some((r) => r.kind === 'like'),
               isSaved: pReactions.some((r) => r.kind === 'save'),
               isHidden: false,
@@ -452,15 +468,67 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
       source_url,
       is_editorial,
       created_at,
-      profiles(handle, display_name),
+      profiles(id, handle, display_name, avatar_url, bio),
       communities(slug, name),
       post_tags(tags(id, name, slug, kind))
     `)
     .order('created_at', { ascending: false })
     .limit(limit)
 
+  const fallbackPostIds = (postsData || []).map((p) => p.id)
+  let fallbackUserReactions = []
+  let fallbackAllReactions = []
+  let fallbackComments = []
+  let fallbackShares = []
+
+  if (fallbackPostIds.length > 0) {
+    const promises = [
+      supabase.from('post_reactions').select('post_id, kind').in('post_id', fallbackPostIds),
+      supabase.from('post_comments').select('post_id').in('post_id', fallbackPostIds),
+      supabase.from('post_shares').select('post_id').in('post_id', fallbackPostIds),
+    ]
+
+    if (user?.id) {
+      promises.push(
+        supabase.from('post_reactions').select('post_id, kind').eq('user_id', user.id).in('post_id', fallbackPostIds)
+      )
+    }
+
+    const [allR, allC, allS, userR] = await Promise.all(promises)
+    fallbackAllReactions = allR.data || []
+    fallbackComments = allC.data || []
+    fallbackShares = allS.data || []
+    fallbackUserReactions = userR?.data || []
+  }
+
+  const fallbackCountsMap = new Map()
+  for (const id of fallbackPostIds) {
+    fallbackCountsMap.set(id, { likes: 0, saves: 0, comments: 0, shares: 0 })
+  }
+
+  for (const r of fallbackAllReactions) {
+    const item = fallbackCountsMap.get(r.post_id)
+    if (item) {
+      if (r.kind === 'like') item.likes++
+      if (r.kind === 'save') item.saves++
+    }
+  }
+
+  for (const c of fallbackComments) {
+    const item = fallbackCountsMap.get(c.post_id)
+    if (item) item.comments++
+  }
+
+  for (const s of fallbackShares) {
+    const item = fallbackCountsMap.get(s.post_id)
+    if (item) item.shares++
+  }
+
   const fallbackList = (postsData || []).map((p) => {
     const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
+    const counts = fallbackCountsMap.get(p.id) || { likes: 0, saves: 0, comments: 0, shares: 0 }
+    const pReactions = fallbackUserReactions.filter((r) => r.post_id === p.id)
+
     return {
       id: p.id,
       author_id: p.author_id,
@@ -476,10 +544,12 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
       why: tags.length > 0 ? [tags[0].name] : ['Culture'],
       isExplore: false,
       reactions: {
-        likesCount: 0,
-        savesCount: 0,
-        isLiked: false,
-        isSaved: false,
+        likesCount: counts.likes,
+        savesCount: counts.saves,
+        commentsCount: counts.comments,
+        sharesCount: counts.shares,
+        isLiked: pReactions.some((r) => r.kind === 'like'),
+        isSaved: pReactions.some((r) => r.kind === 'save'),
         isHidden: false,
       },
     }
