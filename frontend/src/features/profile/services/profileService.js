@@ -162,7 +162,7 @@ export async function fetchUserPosts(userId) {
       source_url,
       is_editorial,
       created_at,
-      profiles (
+      profiles!author_id (
         id,
         handle,
         display_name,
@@ -282,3 +282,138 @@ export async function toggleFollow({ currentUserId, targetUserId, isCurrentlyFol
     return { isFollowing: true }
   }
 }
+
+/**
+ * Ensure a user profile exists, auto-upserting if not present
+ */
+export async function ensureUserProfile(user) {
+  if (!user?.id) return null
+
+  let profile = await fetchProfileById(user.id)
+  if (!profile) {
+    const rawHandle =
+      user.user_metadata?.handle ||
+      user.user_metadata?.user_name ||
+      user.email?.split('@')[0]?.replace(/[^a-zA-Z0-9_]/g, '_') ||
+      `user_${user.id.slice(0, 8)}`
+    const displayName =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      rawHandle
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .upsert(
+        {
+          id: user.id,
+          handle: rawHandle,
+          display_name: displayName,
+          avatar_url: user.user_metadata?.avatar_url || null,
+        },
+        { onConflict: 'id' }
+      )
+      .select()
+      .maybeSingle()
+
+    if (!error && data) {
+      profile = data
+    }
+  }
+
+  return profile
+}
+
+/**
+ * Fetch all posts saved (bookmarked) by a user
+ */
+export async function fetchUserSavedPosts(userId) {
+  if (!userId) return []
+
+  const { data: saves, error } = await supabase
+    .from('post_reactions')
+    .select(`
+      post_id,
+      created_at,
+      posts (
+        id,
+        author_id,
+        body,
+        media_url,
+        media_credit,
+        source_url,
+        is_editorial,
+        created_at,
+        profiles!author_id (
+          id,
+          handle,
+          display_name,
+          avatar_url,
+          bio
+        ),
+        communities (
+          slug,
+          name
+        ),
+        post_tags (
+          tags (id, name, slug, kind)
+        )
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('kind', 'save')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.warn('Failed to fetch user saved posts:', error.message)
+    return []
+  }
+
+  const posts = (saves || []).map((s) => s.posts).filter(Boolean)
+  const postIds = posts.map((p) => p.id)
+  if (postIds.length === 0) return []
+
+  const [reactionsRes, commentsRes, sharesRes] = await Promise.all([
+    supabase.from('post_reactions').select('post_id, kind').in('post_id', postIds),
+    supabase.from('post_comments').select('post_id').in('post_id', postIds),
+    supabase.from('post_shares').select('post_id').in('post_id', postIds),
+  ])
+
+  const countsMap = new Map()
+  for (const id of postIds) {
+    countsMap.set(id, { likesCount: 0, commentsCount: 0, sharesCount: 0 })
+  }
+
+  for (const r of reactionsRes.data || []) {
+    if (r.kind === 'like') {
+      const c = countsMap.get(r.post_id)
+      if (c) c.likesCount++
+    }
+  }
+
+  for (const c of commentsRes.data || []) {
+    const item = countsMap.get(c.post_id)
+    if (item) item.commentsCount++
+  }
+
+  for (const s of sharesRes.data || []) {
+    const item = countsMap.get(s.post_id)
+    if (item) item.sharesCount++
+  }
+
+  return posts.map((p) => {
+    const counts = countsMap.get(p.id) || { likesCount: 0, commentsCount: 0, sharesCount: 0 }
+    return {
+      ...p,
+      author: p.profiles,
+      community: p.communities,
+      tags: (p.post_tags || []).map((pt) => pt.tags).filter(Boolean),
+      reactions: {
+        likesCount: counts.likesCount,
+        commentsCount: counts.commentsCount,
+        sharesCount: counts.sharesCount,
+        isSaved: true,
+      },
+    }
+  })
+}
+

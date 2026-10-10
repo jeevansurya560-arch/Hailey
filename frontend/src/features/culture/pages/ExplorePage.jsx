@@ -1,17 +1,18 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Search, Loader2, Compass, Database, Layers } from 'lucide-react'
+import { Search, Loader2, Compass, Database, Layers, Radio } from 'lucide-react'
 import { fetchCultureTags } from '@/features/communities/services/communityService'
 import { TagSticker } from '@/components/ui/TagSticker'
 import { getThreadColor } from '@/features/communities/threadColors'
 import { CultureMasterExplorer } from '../components/CultureMasterExplorer'
+import { ExploreDispatchesFeed } from '../components/ExploreDispatchesFeed'
 
 export function ExplorePage() {
-  const [activeTab, setActiveTab] = useState('master_1m') // 'master_1m' | 'taxonomy'
+  const [activeTab, setActiveTab] = useState('dispatches') // 'dispatches' | 'master_1m' | 'taxonomy'
   const [filter, setFilter] = useState('')
   const [selectedKind, setSelectedKind] = useState(null)
 
-  // Fetch real taxonomy tags via communityService
+  // Fetch real taxonomy tags via communityService only when taxonomy tab is active
   const {
     data: tags = [],
     isLoading,
@@ -19,6 +20,7 @@ export function ExplorePage() {
   } = useQuery({
     queryKey: ['tags'],
     queryFn: fetchCultureTags,
+    enabled: activeTab === 'taxonomy',
   })
 
   // Extract distinct kinds for filter pills
@@ -58,11 +60,24 @@ export function ExplorePage() {
   return (
     <div className="space-y-6">
       {/* View Switcher Bar */}
-      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-3">
+      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-3 overflow-x-auto">
+        <button
+          type="button"
+          onClick={() => setActiveTab('dispatches')}
+          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all whitespace-nowrap ${
+            activeTab === 'dispatches'
+              ? 'bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
+              : 'text-[var(--ink-2)] hover:text-[var(--clay)]'
+          }`}
+        >
+          <Radio className="h-3.5 w-3.5" />
+          <span>Live Dispatches Feed</span>
+        </button>
+
         <button
           type="button"
           onClick={() => setActiveTab('master_1m')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all whitespace-nowrap ${
             activeTab === 'master_1m'
               ? 'bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
               : 'text-[var(--ink-2)] hover:text-[var(--clay)]'
@@ -75,7 +90,7 @@ export function ExplorePage() {
         <button
           type="button"
           onClick={() => setActiveTab('taxonomy')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all whitespace-nowrap ${
             activeTab === 'taxonomy'
               ? 'bg-[var(--ink)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
               : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
@@ -86,7 +101,9 @@ export function ExplorePage() {
         </button>
       </div>
 
-      {activeTab === 'master_1m' ? (
+      {activeTab === 'dispatches' ? (
+        <ExploreDispatchesFeed />
+      ) : activeTab === 'master_1m' ? (
         <CultureMasterExplorer />
       ) : (
         <div className="space-y-6">

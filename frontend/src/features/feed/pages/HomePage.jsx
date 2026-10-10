@@ -11,6 +11,27 @@ import { PostComposer } from '@/features/posts/components/PostComposer'
 import { FeedCard } from '@/features/feed/components/FeedCard'
 
 const PAGE_SIZE = 15
+const HOME_FEED_CACHE_KEY = 'hailey_home_feed_cache_v2'
+
+function getLocalHomeFeedCache() {
+  try {
+    const raw = localStorage.getItem(HOME_FEED_CACHE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    if (Date.now() - parsed.timestamp < 1000 * 60 * 120 && Array.isArray(parsed.data?.items) && parsed.data.items.length > 0) {
+      return parsed.data
+    }
+  } catch {}
+  return null
+}
+
+function saveLocalHomeFeedCache(data) {
+  try {
+    if (data?.items?.length > 0) {
+      localStorage.setItem(HOME_FEED_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }))
+    }
+  } catch {}
+}
 
 export function HomePage() {
   const { user } = useAuth()
@@ -22,18 +43,30 @@ export function HomePage() {
     queryKey: ['user_interests_count', user?.id],
     queryFn: () => fetchUserInterestsCount(user?.id),
     enabled: !!user,
+    staleTime: 1000 * 60 * 5,
   })
 
-  // 2. Fetch personalized or fallback feed stream via feedService
+  const cachedHomeFeed = page === 0 ? getLocalHomeFeedCache() : null
+
+  // 2. Fetch personalized or fallback feed stream via feedService with instant local cache
   const { data: feedData, isLoading: isFeedLoading } = useQuery({
     queryKey: ['feed', user?.id, page, userInterestsCount],
-    queryFn: () =>
-      fetchFeedStream({
+    queryFn: async () => {
+      const res = await fetchFeedStream({
         user,
         userInterestsCount,
         page,
         pageSize: PAGE_SIZE,
-      }),
+      })
+      if (page === 0 && res?.items?.length > 0) {
+        saveLocalHomeFeedCache(res)
+      }
+      return res
+    },
+    initialData: cachedHomeFeed || undefined,
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 30,
+    refetchOnWindowFocus: false,
   })
 
   const posts = feedData?.items || []

@@ -80,6 +80,19 @@ export default defineConfig({
     emptyOutDir: true,
   },
   plugins: [tailwindcss(), react(), apiDevPlugin()],
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@tanstack/react-query',
+      '@supabase/supabase-js',
+      'lucide-react',
+      'wagmi',
+      'viem',
+      '@rainbow-me/rainbowkit',
+    ],
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./frontend/src', import.meta.url)),

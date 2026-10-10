@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import {
   Search,
   Database,
@@ -47,7 +47,8 @@ export function CultureMasterExplorer() {
         page,
         limit: 12,
       }),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5,
   })
 
   const nodes = data?.nodes || []

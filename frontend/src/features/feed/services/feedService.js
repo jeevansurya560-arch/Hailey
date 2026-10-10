@@ -237,7 +237,7 @@ export async function fetchPostById({ postId, currentUserId = null }) {
       source_url,
       is_editorial,
       created_at,
-      profiles(id, handle, display_name, avatar_url, bio),
+      profiles!author_id(id, handle, display_name, avatar_url, bio),
       communities(slug, name),
       post_tags(tags(id, name, slug, kind))
     `)
@@ -370,7 +370,7 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
           source_url,
           is_editorial,
           created_at,
-          profiles(id, handle, display_name, avatar_url, bio),
+          profiles!author_id(id, handle, display_name, avatar_url, bio),
           communities(slug, name),
           post_tags(tags(id, name, slug, kind))
         `)
@@ -468,7 +468,7 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
       source_url,
       is_editorial,
       created_at,
-      profiles(id, handle, display_name, avatar_url, bio),
+      profiles!author_id(id, handle, display_name, avatar_url, bio),
       communities(slug, name),
       post_tags(tags(id, name, slug, kind))
     `)
@@ -556,5 +556,160 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
   })
 
   return { items: fallbackList, hasPersonalization: false, hasMore: (postsData || []).length >= limit }
+}
+
+/**
+ * Fetch live explore dispatches with filtering, sorting, pagination, and reaction hydration
+ */
+export async function fetchExploreDispatches({
+  query = '',
+  communitySlug = '',
+  orderBy = 'newest',
+  page = 0,
+  pageSize = 36,
+  userId = null,
+} = {}) {
+  const communityEmbedding = communitySlug
+    ? 'communities!inner(slug, name)'
+    : 'communities(slug, name)'
+
+  let req = supabase
+    .from('posts')
+    .select(
+      `
+      id,
+      author_id,
+      body,
+      media_url,
+      media_credit,
+      source_url,
+      is_editorial,
+      created_at,
+      status,
+      profiles!author_id (
+        id,
+        handle,
+        display_name,
+        avatar_url,
+        bio
+      ),
+      ${communityEmbedding},
+      post_tags (
+        tags (id, name, slug, kind)
+      )
+    `,
+      { count: 'exact' }
+    )
+    .eq('status', 'published')
+
+  if (communitySlug) {
+    req = req.eq('communities.slug', communitySlug)
+  }
+
+  if (query && query.trim()) {
+    req = req.ilike('body', `%${query.trim()}%`)
+  }
+
+  if (orderBy === 'oldest') {
+    req = req.order('created_at', { ascending: true })
+  } else {
+    req = req.order('created_at', { ascending: false })
+  }
+
+  const from = page * pageSize
+  const to = from + pageSize - 1
+  req = req.range(from, to)
+
+  const { data: postsData, error, count } = await req
+
+  if (error) {
+    throw new Error(`Failed to fetch explore dispatches: ${error.message}`)
+  }
+
+  const rawPosts = postsData || []
+  const postIds = rawPosts.map((p) => p.id)
+
+  if (postIds.length === 0) {
+    return { posts: [], total: count || 0, hasMore: false }
+  }
+
+  const [reactionsRes, commentsRes, sharesRes, userReactionsRes] = await Promise.all([
+    supabase.from('post_reactions').select('post_id, kind').in('post_id', postIds),
+    supabase.from('post_comments').select('post_id').in('post_id', postIds),
+    supabase.from('post_shares').select('post_id').in('post_id', postIds),
+    userId
+      ? supabase
+          .from('post_reactions')
+          .select('post_id, kind')
+          .eq('user_id', userId)
+          .in('post_id', postIds)
+      : Promise.resolve({ data: [] }),
+  ])
+
+  const countsMap = new Map()
+  for (const id of postIds) {
+    countsMap.set(id, { likes: 0, saves: 0, comments: 0, shares: 0 })
+  }
+
+  for (const r of reactionsRes.data || []) {
+    const item = countsMap.get(r.post_id)
+    if (item) {
+      if (r.kind === 'like') item.likes++
+      if (r.kind === 'save') item.saves++
+    }
+  }
+
+  for (const c of commentsRes.data || []) {
+    const item = countsMap.get(c.post_id)
+    if (item) item.comments++
+  }
+
+  for (const s of sharesRes.data || []) {
+    const item = countsMap.get(s.post_id)
+    if (item) item.shares++
+  }
+
+  const userReactions = userReactionsRes.data || []
+
+  let posts = rawPosts.map((p) => {
+    const counts = countsMap.get(p.id) || { likes: 0, saves: 0, comments: 0, shares: 0 }
+    const pReactions = userReactions.filter((r) => r.post_id === p.id)
+    const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
+
+    return {
+      id: p.id,
+      author_id: p.author_id,
+      author: p.profiles,
+      community: p.communities,
+      body: p.body,
+      media_url: p.media_url,
+      media_credit: p.media_credit,
+      source_url: p.source_url,
+      is_editorial: p.is_editorial,
+      created_at: p.created_at,
+      tags,
+      reactions: {
+        likesCount: counts.likes,
+        savesCount: counts.saves,
+        commentsCount: counts.comments,
+        sharesCount: counts.shares,
+        isLiked: pReactions.some((r) => r.kind === 'like'),
+        isSaved: pReactions.some((r) => r.kind === 'save'),
+        isHidden: false,
+      },
+    }
+  })
+
+  if (orderBy === 'most_liked') {
+    posts.sort((a, b) => b.reactions.likesCount - a.reactions.likesCount)
+  } else if (orderBy === 'most_discussed') {
+    posts.sort((a, b) => b.reactions.commentsCount - a.reactions.commentsCount)
+  }
+
+  return {
+    posts,
+    total: count || 0,
+    hasMore: to < (count || 0) - 1,
+  }
 }
 
