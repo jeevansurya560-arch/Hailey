@@ -19,14 +19,15 @@ export function AppShell() {
     enabled: !!user,
   })
 
-  // Redirect signed-in users with 0 interests to /onboarding
+  // Suggest onboarding for signed-in users with 0 interests on initial home visit, without hijacking deliberate navigation
   useEffect(() => {
+    const hasDismissed = user?.id ? sessionStorage.getItem(`onboarding_dismissed_${user.id}`) : null
     if (
       user &&
       !checkingInterests &&
       interestsCount === 0 &&
-      location.pathname !== '/onboarding' &&
-      location.pathname !== '/login'
+      !hasDismissed &&
+      location.pathname === '/'
     ) {
       navigate('/onboarding', { replace: true })
     }

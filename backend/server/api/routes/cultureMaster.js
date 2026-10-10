@@ -5,7 +5,7 @@
  * 1,000,000 Culture Master Dataset (culture_master_dataset table).
  */
 
-import { supabaseAdmin } from '../lib/supabaseAdmin.js'
+import { supabaseAdmin } from '../../config/supabaseAdmin.js'
 
 // Curated fallback nodes mirroring 0007_culture_master_dataset.sql
 export const FALLBACK_MASTER_NODES = [

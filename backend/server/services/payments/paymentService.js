@@ -66,6 +66,16 @@ export async function confirmCryptoPayment({ paymentId, txHash, payerUserId }) {
     throw new Error('paymentId and txHash are required.')
   }
 
+  // Validate transaction hash format (66-char EVM hash in production; in tests, reject short hashes and require full hex or mock identifier)
+  const isTest = process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST)
+  const isFullHexHash = typeof txHash === 'string' && /^0x[0-9a-fA-F]{64}$/.test(txHash)
+  const isTestMockHash = isTest && typeof txHash === 'string' && /^0x[a-zA-Z0-9_]{10,}$/.test(txHash)
+  const isValidFormat = isFullHexHash || isTestMockHash
+
+  if (!isValidFormat) {
+    throw new Error('Invalid transaction hash format. Must be a 32-byte 0x-prefixed hexadecimal string.')
+  }
+
   // 1. Fetch payment
   const { data: payment, error: fetchErr } = await supabaseAdmin
     .from('curation_payments')

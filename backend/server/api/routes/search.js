@@ -12,7 +12,9 @@ export default async function searchRoute(req, res) {
 
   const host = req.headers?.host || 'localhost'
   const parsedUrl = new URL(req.url, `http://${host}`)
-  const query = (parsedUrl.searchParams.get('q') || '').trim().toLowerCase()
+  const rawQuery = (parsedUrl.searchParams.get('q') || '').trim().toLowerCase()
+  // Sanitize query to prevent PostgREST operator injection (strip commas, parens, colons, quotes)
+  const query = rawQuery.replace(/[,():".%]/g, ' ').replace(/\s+/g, ' ').trim()
 
   if (!query || query.length < 2) {
     return res.status(200).json({
@@ -89,24 +91,31 @@ export default async function searchRoute(req, res) {
       results.communities = communities
     }
 
-    // 4. Search Posts
+    // 4. Search Posts (Enforce published status and GENERAL audience only)
     const { data: posts } = await supabaseAdmin
       .from('posts')
-      .select('id, body, created_at, author_id')
+      .select('id, body, created_at, author_id, status, age_classification')
+      .eq('status', 'published')
+      .eq('age_classification', 'GENERAL')
       .ilike('body', `%${query}%`)
       .limit(8)
 
     if (posts) {
-      results.posts = posts
+      results.posts = posts.map((p) => ({
+        id: p.id,
+        body: p.body,
+        created_at: p.created_at,
+        author_id: p.author_id,
+      }))
     }
 
     return res.status(200).json({
       query,
       results,
     })
-  } catch (err) {
+  } catch {
     return res.status(500).json({
-      error: 'Search operation failed: ' + (err instanceof Error ? err.message : String(err)),
+      error: 'Search operation failed.',
     })
   }
 }

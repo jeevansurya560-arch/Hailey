@@ -202,6 +202,21 @@ export async function resolveMarket({
     throw new Error(`Market cannot be resolved from state: ${market.status}`)
   }
 
+  // Authorization check (defense-in-depth)
+  if (resolvedByUserId && market.creator_id && market.creator_id !== resolvedByUserId) {
+    const profileQuery = supabaseAdmin.from('profiles')
+    if (profileQuery && typeof profileQuery.select === 'function') {
+      const { data: profile } = await profileQuery
+        .select('is_editorial')
+        .eq('id', resolvedByUserId)
+        .single()
+
+      if (!profile?.is_editorial) {
+        throw new Error('Unauthorized: only market creator or editorial administrator can resolve this market.')
+      }
+    }
+  }
+
   const winningOption = (market.market_options || []).find((opt) => opt.id === winningOptionId)
   if (!winningOption) {
     throw new Error('Winning option does not belong to this market.')

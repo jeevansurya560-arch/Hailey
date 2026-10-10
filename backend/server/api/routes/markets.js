@@ -104,6 +104,26 @@ export default async function marketsRoute(req, res) {
 
     if (action === 'resolve') {
       const { marketId, winningOptionId, evidenceUrl, sourceDescription } = req.body || {}
+      if (!marketId) {
+        return res.status(400).json({ error: 'marketId is required.' })
+      }
+
+      // Authorization check: Caller must be market creator or editorial admin
+      const market = await getMarket(marketId)
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('is_editorial')
+        .eq('id', user.id)
+        .single()
+
+      const isCreator = market.creator_id === user.id
+      const isEditorial = Boolean(profile?.is_editorial)
+
+      if (!isCreator && !isEditorial) {
+        return res.status(403).json({
+          error: 'Forbidden. Only the market creator or an editorial administrator can resolve this market.',
+        })
+      }
 
       const result = await resolveMarket({
         marketId,

@@ -119,24 +119,52 @@ export default async function ticketsRoute(req, res) {
       return res.status(200).json({ ok: true, tickets })
     }
 
-    if (action === 'consume') {
+    if (action === 'consume' || action === 'revoke') {
       const { ticketId } = req.body || {}
       if (!ticketId) {
         return res.status(400).json({ error: 'ticketId is required' })
       }
 
-      const consumed = await consumeTicket(ticketId)
-      return res.status(200).json({ ok: true, ticket: consumed })
-    }
+      // Fetch ticket to check ownership / authorization
+      const { data: ticket, error: ticketErr } = await supabaseAdmin
+        .from('tickets')
+        .select('*')
+        .eq('id', ticketId)
+        .single()
 
-    if (action === 'revoke') {
-      const { ticketId } = req.body || {}
-      if (!ticketId) {
-        return res.status(400).json({ error: 'ticketId is required' })
+      if (ticketErr || !ticket) {
+        return res.status(404).json({ error: 'Ticket not found.' })
       }
 
-      const revoked = await revokeTicket(ticketId)
-      return res.status(200).json({ ok: true, ticket: revoked })
+      // Check caller's profile for editorial status or linked wallet
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('is_editorial, wallet_address')
+        .eq('id', user.id)
+        .single()
+
+      const isOwner =
+        ticket.owner_user_id === user.id ||
+        (profile?.wallet_address &&
+          ticket.owner_wallet_address &&
+          profile.wallet_address.toLowerCase() === ticket.owner_wallet_address.toLowerCase())
+      const isEditorial = Boolean(profile?.is_editorial)
+
+      if (!isOwner && !isEditorial) {
+        return res.status(403).json({
+          error: 'Forbidden. You are not the owner or authorized organizer of this ticket.',
+        })
+      }
+
+      if (action === 'consume') {
+        const consumed = await consumeTicket(ticketId)
+        return res.status(200).json({ ok: true, ticket: consumed })
+      }
+
+      if (action === 'revoke') {
+        const revoked = await revokeTicket(ticketId)
+        return res.status(200).json({ ok: true, ticket: revoked })
+      }
     }
 
     return res.status(400).json({

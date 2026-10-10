@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { PenSquare, Send, Image, Link2, AlertCircle, Loader2, X } from 'lucide-react'
+import { PenSquare, Send, Image, Link2, AlertCircle, Loader2, X, Upload } from 'lucide-react'
+import { supabase } from '@/lib/supabase/client'
 import { createPost } from '@/features/feed/services/feedService'
 import {
   fetchCultureTags,
@@ -12,6 +13,7 @@ import { TagSticker } from '@/components/ui/TagSticker'
 export function PostComposer({ defaultCommunityId, onPostCreated }) {
   const { user } = useAuth()
   const queryClient = useQueryClient()
+  const fileInputRef = useRef(null)
 
   const [body, setBody] = useState('')
   const [mediaUrl, setMediaUrl] = useState('')
@@ -22,6 +24,7 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
   const [tagSearch, setTagSearch] = useState('')
   const [showExtras, setShowExtras] = useState(false)
   const [errorMsg, setErrorMsg] = useState(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   // Fetch available tags via communityService
   const { data: tags = [] } = useQuery({
@@ -45,6 +48,61 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
         return
       }
       setSelectedTagIds([...selectedTagIds, tagId])
+    }
+  }
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setErrorMsg(null)
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(file.type)) {
+      setErrorMsg('Only JPEG, PNG, and WebP images are permitted.')
+      return
+    }
+
+    const maxSize = 5 * 1024 * 1024 // 5 MB
+    if (file.size > maxSize) {
+      setErrorMsg('Image size exceeds 5MB limit.')
+      return
+    }
+
+    if (!user) {
+      setErrorMsg('Please sign in to upload media.')
+      return
+    }
+
+    try {
+      setUploadingImage(true)
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      const filePath = `${user.id}/${Date.now()}_${cleanFileName}`
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('cultural-media')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+        })
+
+      if (uploadError) {
+        throw new Error(uploadError.message || 'Image upload failed.')
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('cultural-media')
+        .getPublicUrl(data.path)
+
+      if (publicUrlData?.publicUrl) {
+        setMediaUrl(publicUrlData.publicUrl)
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Upload failed.')
+    } finally {
+      setUploadingImage(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
     }
   }
 
@@ -223,18 +281,70 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
 
       {showExtras && (
         <div className="space-y-3 border-t border-[var(--line)] pt-3">
-          <div className="space-y-1">
-            <label className="flex items-center gap-1 font-mono text-xs text-[var(--ink)]">
-              <Image className="h-3.5 w-3.5 text-[var(--ink-2)]" />
-              <span>Image URL (https:// only):</span>
-            </label>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-1 font-mono text-xs text-[var(--ink)]">
+                <Image className="h-3.5 w-3.5 text-[var(--ink-2)]" />
+                <span>Media & Artifact Visual:</span>
+              </label>
+              {mediaUrl && (
+                <button
+                  type="button"
+                  onClick={() => setMediaUrl('')}
+                  className="font-mono text-[11px] text-[var(--clay)] hover:underline flex items-center gap-0.5"
+                >
+                  <X className="h-3 w-3" />
+                  <span>Clear</span>
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="media-file-input"
+              />
+              <label
+                htmlFor="media-file-input"
+                className="cursor-pointer inline-flex items-center gap-1.5 border border-[var(--ink)] bg-[var(--paper)] px-3 py-1 font-mono text-xs uppercase tracking-wider text-[var(--ink)] shadow-[1px_1px_0_var(--ink)] hover:bg-[var(--paper-2)] transition-all"
+              >
+                {uploadingImage ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <span>Uploading...</span>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-3.5 w-3.5" />
+                    <span>Upload Image (Max 5MB)</span>
+                  </>
+                )}
+              </label>
+              <span className="font-mono text-[10px] text-[var(--ink-2)]">or enter URL below</span>
+            </div>
+
             <input
               type="url"
               value={mediaUrl}
               onChange={(e) => setMediaUrl(e.target.value)}
-              placeholder="https://upload.wikimedia.org/..."
+              placeholder="https://..."
               className="w-full border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
             />
+
+            {mediaUrl && (
+              <div className="mt-2 border border-[var(--line)] p-2 max-w-[200px] bg-[var(--paper-2)]">
+                <img
+                  src={mediaUrl}
+                  alt="Post visual attachment preview"
+                  className="w-full h-24 object-cover border border-[var(--line)]"
+                  onError={() => setErrorMsg('Failed to preview image from URL.')}
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-1">

@@ -101,8 +101,14 @@ export function OnboardingPage() {
         source: 'onboarding',
       })
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user_interests', user?.id] })
+    onSuccess: (_, tagIds) => {
+      if (user?.id) {
+        queryClient.setQueryData(['user_interests_count', user.id], tagIds.length)
+        queryClient.invalidateQueries({ queryKey: ['user_interests_count', user.id] })
+        queryClient.invalidateQueries({ queryKey: ['user_interests', user.id] })
+        queryClient.invalidateQueries({ queryKey: ['feed'] })
+        sessionStorage.setItem(`onboarding_dismissed_${user.id}`, 'true')
+      }
       navigate('/', { replace: true })
     },
     onError: (err) => {
