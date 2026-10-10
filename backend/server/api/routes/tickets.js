@@ -6,7 +6,7 @@ import {
   consumeTicket,
 } from '../../services/tickets/ticketService.js'
 import { supabaseAdmin } from '../../config/supabaseAdmin.js'
-import { rateLimiter } from '../../security/rateLimit.js'
+import { rateLimiter, resolveTrustedIp } from '../../security/rateLimit.js'
 import { logAuditEvent } from '../../observability/auditLogger.js'
 
 export default async function ticketsRoute(req, res) {
@@ -14,16 +14,23 @@ export default async function ticketsRoute(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
   }
 
-  const ip =
-    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-    req.socket?.remoteAddress ||
-    '127.0.0.1'
+  const ip = resolveTrustedIp(req)
+  const limit = await rateLimiter.check(`tickets:${ip}`, 40, 60000)
 
-  const limit = rateLimiter.check(`tickets:${ip}`, 40, 60000)
+  if (limit.isServiceUnavailable) {
+    res.setHeader('Retry-After', '30')
+    return res.status(503).json({
+      error: 'Rate limit service unavailable. Please retry shortly.',
+      retryAfterSeconds: 30,
+    })
+  }
+
   if (!limit.allowed) {
+    const retrySec = Math.ceil(limit.resetMs / 1000)
+    res.setHeader('Retry-After', retrySec.toString())
     return res.status(429).json({
       error: 'Ticket operation rate limit exceeded. Please wait a moment.',
-      retryAfterSeconds: Math.ceil(limit.resetMs / 1000),
+      retryAfterSeconds: retrySec,
     })
   }
 

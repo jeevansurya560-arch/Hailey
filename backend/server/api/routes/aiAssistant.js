@@ -1,5 +1,5 @@
 import { aiAssistantService } from '../../services/ai/aiProviderService.js'
-import { rateLimiter } from '../../security/rateLimit.js'
+import { rateLimiter, resolveTrustedIp } from '../../security/rateLimit.js'
 import { logAuditEvent } from '../../observability/auditLogger.js'
 
 /**
@@ -10,17 +10,24 @@ export default async function aiAssistantRoute(req, res) {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' })
   }
 
-  // Rate Limiting (30 requests per minute per IP)
-  const ip =
-    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-    req.socket?.remoteAddress ||
-    '127.0.0.1'
+  // Rate Limiting (30 requests per minute per trusted IP)
+  const ip = resolveTrustedIp(req)
+  const limitResult = await rateLimiter.check(`ai:${ip}`, 30, 60000)
 
-  const limitResult = rateLimiter.check(`ai:${ip}`, 30, 60000)
+  if (limitResult.isServiceUnavailable) {
+    res.setHeader('Retry-After', '30')
+    return res.status(503).json({
+      error: 'Rate limit service unavailable. Please retry shortly.',
+      retryAfterSeconds: 30,
+    })
+  }
+
   if (!limitResult.allowed) {
+    const retrySec = Math.ceil(limitResult.resetMs / 1000)
+    res.setHeader('Retry-After', retrySec.toString())
     return res.status(429).json({
       error: 'AI query rate limit exceeded. Please wait a moment before trying again.',
-      retryAfterSeconds: Math.ceil(limitResult.resetMs / 1000),
+      retryAfterSeconds: retrySec,
     })
   }
 

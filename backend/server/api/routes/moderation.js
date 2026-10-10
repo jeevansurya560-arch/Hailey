@@ -1,6 +1,6 @@
 import { supabaseAdmin } from '../../config/supabaseAdmin.js'
 import { logAuditEvent } from '../../observability/auditLogger.js'
-import { rateLimiter } from '../../security/rateLimit.js'
+import { rateLimiter, resolveTrustedIp } from '../../security/rateLimit.js'
 import { verifyAuth } from '../../security/authorization/auth.js'
 
 /**
@@ -32,16 +32,27 @@ async function requireEditorialAuth(req) {
  * PATCH /api/moderation/review: Update report status (strictly editorial/moderators only)
  */
 export default async function moderationRoute(req, res) {
-  const ip =
-    req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-    req.socket?.remoteAddress ||
-    '127.0.0.1'
+  const ip = resolveTrustedIp(req)
 
   // 1. Submit Report (POST)
   if (req.method === 'POST') {
-    const limit = rateLimiter.check(`report:${ip}`, 10, 60000)
+    const limit = await rateLimiter.check(`report:${ip}`, 10, 60000)
+
+    if (limit.isServiceUnavailable) {
+      res.setHeader('Retry-After', '30')
+      return res.status(503).json({
+        error: 'Rate limit service unavailable. Please retry shortly.',
+        retryAfterSeconds: 30,
+      })
+    }
+
     if (!limit.allowed) {
-      return res.status(429).json({ error: 'Report submission rate limit exceeded.' })
+      const retrySec = Math.ceil(limit.resetMs / 1000)
+      res.setHeader('Retry-After', retrySec.toString())
+      return res.status(429).json({
+        error: 'Report submission rate limit exceeded.',
+        retryAfterSeconds: retrySec,
+      })
     }
 
     const { targetType, targetId, reason } = req.body || {}
