@@ -10,52 +10,52 @@ export function TicketPassCard({ ticket }) {
 
   const getStatusBadge = () => {
     if (isRevoked) {
-      return <span className="px-2 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs rounded-full font-medium">Revoked</span>
+      return <span className="px-2.5 py-0.5 bg-rose-50 text-rose-800 border border-rose-200 text-xs rounded-full font-medium">Revoked</span>
     }
     if (isExpired) {
-      return <span className="px-2 py-0.5 bg-zinc-800 text-zinc-400 border border-zinc-700 text-xs rounded-full font-medium">Expired</span>
+      return <span className="px-2.5 py-0.5 bg-[#F0E7DA] text-[#34252A]/60 border border-[#E0D4C5] text-xs rounded-full font-medium">Expired</span>
     }
     if (isUsed) {
-      return <span className="px-2 py-0.5 bg-zinc-800 text-zinc-300 border border-zinc-700 text-xs rounded-full font-medium">Used</span>
+      return <span className="px-2.5 py-0.5 bg-[#F0E7DA] text-[#34252A]/70 border border-[#E0D4C5] text-xs rounded-full font-medium">Used</span>
     }
-    return <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs rounded-full font-medium">Active Entitlement</span>
+    return <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs rounded-full font-medium">Active Entitlement</span>
   }
 
   return (
-    <div className="relative overflow-hidden p-5 bg-gradient-to-br from-zinc-900 to-zinc-950 border border-zinc-800 rounded-2xl shadow-xl space-y-4">
+    <div className="relative overflow-hidden p-5 neu-card bg-[#FAF6EF] border border-[#E0D4C5] rounded-2xl space-y-4 text-[#34252A]">
       {/* Decorative pass cutout notches */}
-      <div className="absolute -left-3 top-1/2 w-6 h-6 bg-black rounded-full" />
-      <div className="absolute -right-3 top-1/2 w-6 h-6 bg-black rounded-full" />
+      <div className="absolute -left-3 top-1/2 w-6 h-6 bg-[#FAF6EF] border border-[#E0D4C5] rounded-full shadow-inner" />
+      <div className="absolute -right-3 top-1/2 w-6 h-6 bg-[#FAF6EF] border border-[#E0D4C5] rounded-full shadow-inner" />
 
       <div className="flex items-start justify-between">
         <div>
-          <span className="text-[10px] uppercase font-bold tracking-wider text-purple-400">
+          <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[#B08A50]">
             Wallet-Native Access Pass
           </span>
-          <h3 className="text-lg font-bold text-white mt-0.5">{ticket.event_title}</h3>
-          <span className="text-xs text-zinc-400 block mt-0.5">Event ID: {ticket.event_id}</span>
+          <h3 className="text-lg font-serif font-bold text-[#34252A] mt-0.5">{ticket.event_title}</h3>
+          <span className="text-xs text-[#34252A]/60 block mt-0.5 font-mono">Event ID: {ticket.event_id}</span>
         </div>
         {getStatusBadge()}
       </div>
 
-      <div className="p-3 bg-zinc-850 bg-zinc-900/80 rounded-xl border border-zinc-800 text-xs space-y-1.5 font-mono">
+      <div className="p-3.5 neu-card bg-[#F0E7DA]/50 rounded-xl border border-[#E0D4C5] text-xs space-y-1.5 font-mono">
         <div className="flex justify-between">
-          <span className="text-zinc-500">Tier:</span>
-          <span className="text-zinc-200 uppercase">{ticket.ticket_type}</span>
+          <span className="text-[#34252A]/60">Tier:</span>
+          <span className="text-[#34252A] font-semibold uppercase">{ticket.ticket_type}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-zinc-500">Wallet Entitlement:</span>
-          <span className="text-purple-300 truncate max-w-[160px]">{ticket.owner_wallet_address}</span>
+          <span className="text-[#34252A]/60">Wallet Entitlement:</span>
+          <span className="text-[#6A1F35] font-semibold truncate max-w-[160px]">{ticket.owner_wallet_address}</span>
         </div>
         <div className="flex justify-between">
-          <span className="text-zinc-500">Pass Hash:</span>
-          <span className="text-zinc-400 truncate max-w-[160px]">{ticket.id}</span>
+          <span className="text-[#34252A]/60">Pass Hash:</span>
+          <span className="text-[#34252A]/70 truncate max-w-[160px]">{ticket.id}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-2 border-t border-zinc-800/80">
+      <div className="flex items-center justify-between text-[11px] font-mono text-[#34252A]/60 pt-2 border-t border-[#E0D4C5]">
         <span>Issued: {new Date(ticket.issued_at).toLocaleDateString()}</span>
-        <span>Cryptographically Linked</span>
+        <span className="text-[#B08A50]">Cryptographically Linked</span>
       </div>
     </div>
   )

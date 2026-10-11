@@ -50,10 +50,10 @@ export function AuthProvider({ children }) {
    * }} [optionsOrHandle]
    * @returns {Promise<{ data?: any, error: any }>}
    */
-  const signUp = async (email, password, optionsOrHandle = {}) => {
+  const signUp = async (email, password, optionsOrHandle = {}, legacyName) => {
     let metadata = {}
     if (typeof optionsOrHandle === 'string') {
-      metadata = { handle: optionsOrHandle }
+      metadata = { handle: optionsOrHandle, fullName: legacyName }
     } else if (optionsOrHandle && typeof optionsOrHandle === 'object') {
       metadata = optionsOrHandle
     }
@@ -61,7 +61,8 @@ export function AuthProvider({ children }) {
     const trimmedEmail = typeof email === 'string' ? email.trim() : email
     const fallbackHandle = trimmedEmail?.split('@')[0] || 'user'
     const handle = metadata.handle ? metadata.handle.toLowerCase().trim() : fallbackHandle
-    const fullName = metadata.fullName ? metadata.fullName.trim() : undefined
+    const rawName = metadata.fullName || metadata.name || legacyName
+    const fullName = rawName ? String(rawName).trim() : undefined
     const emailRedirectTo =
       metadata.emailRedirectTo ||
       metadata.redirectTo ||
@@ -76,6 +77,7 @@ export function AuthProvider({ children }) {
           handle,
           full_name: fullName,
           name: fullName,
+          display_name: fullName,
           terms_accepted_at: metadata.termsAcceptedAt || new Date().toISOString(),
           terms_version: metadata.termsVersion || 'v1.0',
           is_minor: typeof metadata.isMinor === 'boolean' ? metadata.isMinor : false,

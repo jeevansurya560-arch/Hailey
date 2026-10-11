@@ -20,8 +20,8 @@ export function PostDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-3">
-        <Loader2 className="h-6 w-6 animate-spin text-[var(--clay)]" />
-        <p className="font-mono text-xs uppercase tracking-widest text-[var(--ink-2)]">
+        <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
+        <p className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-semibold">
           Loading dispatch...
         </p>
       </div>
@@ -30,9 +30,9 @@ export function PostDetailPage() {
 
   if (isError || !post) {
     return (
-      <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-8 text-center space-y-3">
-        <h2 className="font-serif text-2xl font-bold text-[var(--ink)]">Dispatch Not Found</h2>
-        <Link to="/" className="font-mono text-xs text-[var(--clay)] underline">
+      <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-8 text-center space-y-3">
+        <h2 className="font-serif text-2xl font-bold text-[#34252A]">Dispatch Not Found</h2>
+        <Link to="/" className="font-mono text-xs text-[#6A1F35] underline font-semibold">
           ← Return to Home
         </Link>
       </div>
@@ -44,7 +44,7 @@ export function PostDetailPage() {
       <button
         type="button"
         onClick={() => navigate(-1)}
-        className="flex items-center gap-1.5 font-mono text-xs text-[var(--ink-2)] hover:text-[var(--ink)]"
+        className="neu-pill inline-flex items-center gap-1.5 font-mono text-xs text-[#34252A] hover:text-[#6A1F35] bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-1.5 rounded-full cursor-pointer transition-all"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>Back</span>

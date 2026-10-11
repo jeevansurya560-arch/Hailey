@@ -33,9 +33,9 @@ export function WalletConnectButton() {
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="flex items-center gap-2 border border-[var(--ink)] bg-[var(--paper)] px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-[var(--ink)] shadow-[2px_2px_0_var(--ink)] hover:bg-[var(--paper-2)] transition-all"
+                    className="flex items-center gap-2 neu-burgundy-pill rounded-full px-4 py-2 font-mono text-xs uppercase tracking-wider text-[#FAF6EF] hover:bg-[#511528] transition-all font-semibold"
                   >
-                    <Wallet className="h-3.5 w-3.5 text-[var(--clay)]" />
+                    <Wallet className="h-3.5 w-3.5 text-[#B08A50]" />
                     <span>Connect Wallet</span>
                   </button>
                 )
@@ -46,9 +46,9 @@ export function WalletConnectButton() {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="flex items-center gap-1.5 border border-[var(--clay)] bg-[var(--paper)] px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-[var(--clay)] shadow-[2px_2px_0_var(--clay)] hover:bg-red-50 transition-all"
+                    className="flex items-center gap-1.5 neu-pill rounded-full border border-rose-300 bg-rose-50 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider text-rose-800 transition-all font-semibold"
                   >
-                    <AlertCircle className="h-3.5 w-3.5" />
+                    <AlertCircle className="h-3.5 w-3.5 text-rose-700" />
                     <span>Switch to Monad</span>
                   </button>
                 )
@@ -59,7 +59,7 @@ export function WalletConnectButton() {
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="flex items-center gap-1 border border-[var(--line)] bg-[var(--paper)] px-2.5 py-1 font-mono text-xs text-[var(--ink)] hover:border-[var(--ink)] transition-colors"
+                    className="flex items-center gap-1 neu-pill rounded-full border border-[#E0D4C5] bg-[#FAF6EF] px-3 py-1 font-mono text-xs text-[#34252A] hover:bg-[#F0E7DA] transition-all"
                   >
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
                     <span>{chain.name}</span>
@@ -68,9 +68,9 @@ export function WalletConnectButton() {
                   <button
                     onClick={openAccountModal}
                     type="button"
-                    className="flex items-center gap-1.5 border border-[var(--ink)] bg-[var(--paper)] px-3 py-1 font-mono text-xs text-[var(--ink)] shadow-[2px_2px_0_var(--ink)] hover:bg-[var(--paper-2)] transition-colors"
+                    className="flex items-center gap-1.5 neu-pill rounded-full border border-[#E0D4C5] bg-[#FAF6EF] px-3 py-1 font-mono text-xs text-[#34252A] hover:bg-[#F0E7DA] transition-all font-semibold"
                   >
-                    <Wallet className="h-3.5 w-3.5 text-[var(--onchain)]" />
+                    <Wallet className="h-3.5 w-3.5 text-[#6A1F35]" />
                     <span>{account.displayName}</span>
                   </button>
                 </div>

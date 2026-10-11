@@ -58,19 +58,19 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-      <div className="border border-[var(--ink)] bg-[var(--paper)] max-w-xl w-full p-6 shadow-[var(--shadow-hard)] space-y-5">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-sm">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] max-w-xl w-full p-6 md:p-8 space-y-5 text-[#34252A]">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded bg-[var(--clay)] text-[var(--paper)]">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-4">
+          <div className="flex items-center gap-3">
+            <span className="neu-circle h-9 w-9 rounded-full bg-[#6A1F35] text-[#FAF6EF] flex items-center justify-center">
               <Sparkles className="h-4 w-4" />
             </span>
             <div>
-              <h2 className="font-serif text-lg font-bold text-[var(--ink)]">
+              <h2 className="font-serif text-xl font-bold text-[#34252A]">
                 AI Cultural Field Assistant
               </h2>
-              <span className="font-mono text-[10px] text-[var(--ink-2)] uppercase">
+              <span className="font-mono text-[10px] text-[#B08A50] uppercase tracking-wider font-semibold">
                 Grounded Knowledge · Academic Provenance
               </span>
             </div>
@@ -81,15 +81,16 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
               stopSpeaking()
               onClose()
             }}
-            className="font-mono text-xs border border-[var(--line)] px-2 py-0.5 hover:border-[var(--ink)]"
+            className="neu-circle h-8 w-8 rounded-full border border-[#E0D4C5] bg-[#F0E7DA] hover:bg-[#FAF6EF] text-[#34252A] flex items-center justify-center cursor-pointer transition-all"
+            aria-label="Close modal"
           >
             ✕
           </button>
         </div>
 
         {/* Suggested Queries */}
-        <div className="flex flex-wrap gap-1.5">
-          <span className="font-mono text-[10px] text-[var(--ink-2)] uppercase self-center mr-1">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="font-mono text-[10px] text-[#34252A]/60 uppercase self-center mr-1 font-semibold">
             Explore:
           </span>
           {['Kyoto Machiya', 'Flamenco Duende', 'Diwali Lights', 'Eid al-Fitr'].map((pill) => (
@@ -100,7 +101,7 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
                 setQuery(pill)
                 handleSend(pill)
               }}
-              className="border border-[var(--line)] bg-[var(--paper-2)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-2)] hover:border-[var(--clay)] hover:text-[var(--clay)] transition-all"
+              className="neu-pill rounded-full border border-[#E0D4C5] bg-[#F0E7DA] px-3 py-1 font-mono text-[11px] text-[#34252A] hover:border-[#6A1F35]/40 hover:text-[#6A1F35] cursor-pointer transition-all"
             >
               {pill}
             </button>
@@ -108,43 +109,43 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
         </div>
 
         {/* Dialogue / Response Area */}
-        <div className="min-h-[160px] max-h-[280px] overflow-y-auto border border-[var(--line)] bg-[var(--paper-2)] p-4 rounded space-y-3">
+        <div className="min-h-[160px] max-h-[290px] overflow-y-auto neu-inset rounded-2xl bg-[#F0E7DA]/50 border border-[#E0D4C5] p-5 space-y-3">
           {isLoading && (
             <div className="flex items-center justify-center py-8 space-y-2">
-              <Loader2 className="h-5 w-5 animate-spin text-[var(--clay)]" />
-              <span className="font-mono text-xs text-[var(--ink-2)] ml-2">
+              <Loader2 className="h-5 w-5 animate-spin text-[#6A1F35]" />
+              <span className="font-mono text-xs text-[#B08A50] font-semibold ml-2">
                 Retrieving verified cultural sources...
               </span>
             </div>
           )}
 
           {error && (
-            <div className="border border-red-800/40 bg-red-950/10 p-3 rounded text-xs text-red-700 flex items-start gap-2">
+            <div className="border border-red-200 bg-red-50 p-3.5 rounded-xl text-xs text-[#6A1F35] flex items-start gap-2">
               <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {!isLoading && !response && !error && (
-            <p className="text-xs text-[var(--ink-2)] italic text-center py-8">
+            <p className="text-xs text-[#34252A]/60 italic text-center py-8 leading-relaxed">
               Ask any question regarding living traditions, sacred celebrations, folk craft genealogies, or historical diaspora routes.
             </p>
           )}
 
           {!isLoading && response && (
             <div className="space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-xs leading-relaxed text-[var(--ink)]">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-xs leading-relaxed text-[#34252A]">
                   {response.answer}
                 </p>
                 <button
                   type="button"
                   onClick={() => (isSpeaking ? stopSpeaking() : speakText(response.answer))}
                   title={isSpeaking ? 'Stop playback' : 'Read aloud'}
-                  className="p-1 rounded border border-[var(--line)] text-[var(--ink-2)] hover:text-[var(--ink)] shrink-0"
+                  className="neu-circle h-7 w-7 rounded-full border border-[#E0D4C5] bg-[#FAF6EF] flex items-center justify-center text-[#6A1F35] hover:bg-[#F0E7DA] shrink-0 cursor-pointer transition-all"
                 >
                   {isSpeaking ? (
-                    <VolumeX className="h-3.5 w-3.5 text-[var(--clay)]" />
+                    <VolumeX className="h-3.5 w-3.5 text-[#6A1F35]" />
                   ) : (
                     <Volume2 className="h-3.5 w-3.5" />
                   )}
@@ -152,12 +153,12 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
               </div>
 
               {response.sources?.length > 0 && (
-                <div className="border-t border-[var(--line)] pt-2 space-y-1">
-                  <span className="font-mono text-[10px] uppercase font-bold text-[var(--clay)] flex items-center gap-1">
+                <div className="border-t border-[#E0D4C5] pt-3 space-y-1.5">
+                  <span className="font-mono text-[10px] uppercase font-bold text-[#B08A50] flex items-center gap-1">
                     <BookOpen className="h-3 w-3" /> Cited Scholarly References:
                   </span>
                   {response.sources.map((src, i) => (
-                    <p key={i} className="font-mono text-[10px] text-[var(--ink-2)] pl-2 border-l border-[var(--clay)]">
+                    <p key={i} className="font-mono text-[10px] text-[#34252A]/80 pl-2.5 border-l-2 border-[#B08A50]">
                       "{src.title}" — {src.author || 'Archive'} ({src.publisher || 'Hailey Protocol'})
                     </p>
                   ))}
@@ -169,7 +170,7 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
 
         {/* Voice Error notice */}
         {voiceError && (
-          <p className="text-[10px] font-mono text-amber-700">{voiceError}</p>
+          <p className="text-[10px] font-mono text-amber-800">{voiceError}</p>
         )}
 
         {/* Query Input Box */}
@@ -185,17 +186,17 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Inquire about cultural roots, festivals, or traditions..."
-            className="flex-1 border border-[var(--ink)] bg-[var(--paper-2)] px-3 py-2 text-xs text-[var(--ink)] placeholder:text-[var(--ink-2)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)]"
+            className="flex-1 neu-inset-input rounded-full bg-[#F0E7DA] border border-[#E0D4C5] px-4 py-2.5 text-xs text-[#34252A] placeholder:text-[#34252A]/50 focus:outline-none focus:border-[#6A1F35] transition-all"
           />
 
           {isVoiceSupported && (
             <button
               type="button"
               onClick={isListening ? stopListening : startListening}
-              className={`p-2 rounded border border-[var(--ink)] transition-all ${
+              className={`p-2.5 rounded-full border transition-all cursor-pointer ${
                 isListening
-                  ? 'bg-[var(--clay)] text-[var(--paper)] animate-pulse'
-                  : 'bg-[var(--paper-2)] text-[var(--ink)] hover:bg-[var(--paper)]'
+                  ? 'bg-[#6A1F35] text-[#FAF6EF] border-[#511528] animate-pulse shadow-[0_2px_8px_rgba(106,31,53,0.3)]'
+                  : 'neu-circle bg-[#F0E7DA] text-[#6A1F35] border-[#E0D4C5] hover:bg-[#FAF6EF]'
               }`}
               title={isListening ? 'Stop recording voice' : 'Speak inquiry'}
             >
@@ -206,7 +207,7 @@ export function CulturalAssistantModal({ isOpen, onClose }) {
           <button
             type="submit"
             disabled={isLoading || !query.trim()}
-            className="border border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] px-3.5 py-2 font-mono text-xs uppercase font-bold shadow-[2px_2px_0_var(--ink)] hover:bg-[var(--clay)] transition-colors disabled:opacity-50"
+            className="neu-burgundy-pill rounded-full px-4 py-2.5 font-mono text-xs uppercase font-bold text-[#FAF6EF] disabled:opacity-40 disabled:pointer-events-none cursor-pointer transition-all"
           >
             <Send className="h-3.5 w-3.5" />
           </button>

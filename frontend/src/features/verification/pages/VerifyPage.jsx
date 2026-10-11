@@ -38,35 +38,35 @@ export function VerifyPage() {
       <div>
         <Link
           to="/"
-          className="inline-flex items-center gap-1.5 font-mono text-xs text-[var(--ink-2)] hover:text-[var(--ink)] mb-4"
+          className="neu-pill inline-flex items-center gap-1.5 font-mono text-xs text-[#34252A] hover:text-[#6A1F35] bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-1.5 rounded-full cursor-pointer mb-4 transition-all"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           <span>Back to Home</span>
         </Link>
 
         {/* Header Card */}
-        <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 md:p-8 shadow-[var(--shadow-hard)] space-y-4">
+        <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 md:p-8 space-y-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-6 w-6 text-[var(--onchain)]" />
-            <span className="font-mono text-xs uppercase tracking-widest text-[var(--onchain)] font-bold">
+            <ShieldCheck className="h-6 w-6 text-[#6A1F35]" />
+            <span className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-bold">
               Monad Onchain Ledger Verification
             </span>
           </div>
 
-          <h1 className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-[var(--ink)] break-all">
+          <h1 className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-[#34252A] break-all">
             {address}
           </h1>
 
-          <p className="text-xs md:text-sm text-[var(--ink-2)] leading-relaxed font-mono">
+          <p className="text-xs md:text-sm text-[#34252A]/80 leading-relaxed font-mono">
             This verification view reads directly from the deployed Hailey smart contract on Monad Testnet (Chain ID 10143).
           </p>
 
-          <div className="flex flex-wrap items-center gap-4 pt-2 border-t border-[var(--line)] font-mono text-xs">
-            <div className="flex items-center gap-1.5 text-[var(--ink)]">
+          <div className="flex flex-wrap items-center gap-4 pt-3 border-t border-[#E0D4C5] font-mono text-xs">
+            <div className="flex items-center gap-2 text-[#34252A]">
               <span>Total Attestations:</span>
-              <strong className="text-[var(--onchain)] text-sm">{totalVerifiedCount}</strong>
+              <strong className="text-[#6A1F35] text-base font-bold">{totalVerifiedCount}</strong>
               {hasAnyUnavailable && (
-                <span className="text-amber-600 text-[10px] flex items-center gap-1">
+                <span className="text-amber-700 text-[10px] flex items-center gap-1">
                   <AlertCircle className="h-3 w-3" /> (some queries unavailable)
                 </span>
               )}
@@ -76,7 +76,7 @@ export function VerifyPage() {
               href={`${explorerBaseUrl}/address/${normalizedAddress}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[var(--clay)] hover:underline ml-auto"
+              className="inline-flex items-center gap-1 text-[#6A1F35] font-semibold hover:underline ml-auto"
             >
               <span>View on Monad Explorer</span>
               <ExternalLink className="h-3 w-3" />
@@ -86,64 +86,64 @@ export function VerifyPage() {
       </div>
 
       {/* Per-Community Breakdown */}
-      <div className="border border-[var(--line)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)] space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 md:p-8 space-y-4">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-3.5">
           <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-[var(--clay)]" />
-            <h2 className="font-serif text-lg font-bold text-[var(--ink)]">
+            <Building2 className="h-4 w-4 text-[#6A1F35]" />
+            <h2 className="font-serif text-lg font-bold text-[#34252A]">
               Collective Attestation Breakdown
             </h2>
           </div>
-          <span className="font-mono text-[10px] text-[var(--ink-2)]">
+          <span className="font-mono text-[10px] text-[#34252A]/60">
             Contract: {contractAddress.slice(0, 8)}...
           </span>
         </div>
 
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-12 space-y-3">
-            <Loader2 className="h-6 w-6 animate-spin text-[var(--onchain)]" />
-            <p className="font-mono text-xs uppercase tracking-widest text-[var(--ink-2)]">
+            <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
+            <p className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-semibold">
               Querying Monad smart contract...
             </p>
           </div>
         )}
 
         {isError && (
-          <div className="text-xs text-[var(--clay)] p-4 border border-red-200 bg-red-50 font-mono">
+          <div className="text-xs text-[#6A1F35] p-4 border border-red-200 bg-red-50 rounded-xl font-mono">
             Unable to query Monad testnet RPC. Please verify network connectivity.
           </div>
         )}
 
         {!isLoading && onchainCounts.length > 0 && (
-          <div className="divide-y divide-[var(--line)]">
+          <div className="divide-y divide-[#E0D4C5]">
             {onchainCounts.map(({ community, count, status, errorMessage }) => (
               <div
                 key={community.id}
-                className="py-3 flex items-center justify-between font-mono text-xs"
+                className="py-3.5 flex items-center justify-between font-mono text-xs"
               >
                 <div>
                   <Link
                     to={`/communities/${community.slug}`}
-                    className="font-bold text-[var(--ink)] hover:text-[var(--clay)] transition-colors"
+                    className="font-bold text-[#34252A] hover:text-[#6A1F35] transition-colors"
                   >
                     {community.name}
                   </Link>
-                  <div className="text-[10px] text-[var(--ink-2)]">
+                  <div className="text-[10px] text-[#34252A]/60">
                     Slug: {community.slug}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
                   {status === 'unavailable' ? (
-                    <span className="px-2.5 py-1 rounded font-bold bg-amber-50 text-amber-700 border border-amber-200" title={errorMessage}>
+                    <span className="px-3 py-1 rounded-full font-bold bg-amber-50 text-amber-800 border border-amber-200" title={errorMessage}>
                       Verification unavailable
                     </span>
                   ) : (
                     <span
-                      className={`px-2.5 py-1 rounded font-bold ${
+                      className={`neu-pill px-3 py-1 rounded-full font-bold transition-all ${
                         count > 0
-                          ? 'bg-[var(--onchain)]/20 text-[var(--onchain)] border border-[var(--onchain)]/30'
-                          : 'bg-gray-100 text-[var(--ink-2)]'
+                          ? 'bg-[#6A1F35]/10 text-[#6A1F35] border-[#6A1F35]/30'
+                          : 'bg-[#F0E7DA] text-[#34252A]/60 border-[#E0D4C5]'
                       }`}
                     >
                       {count} {count === 1 ? 'Attestation' : 'Attestations'}

@@ -153,7 +153,7 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
 
   if (!user) {
     return (
-      <div className="border border-[var(--line)] bg-[var(--paper-2)] p-4 text-center font-mono text-xs text-[var(--ink-2)]">
+      <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-5 text-center font-mono text-xs text-[#34252A]/70">
         Sign in to post cultural dispatches and archival findings.
       </div>
     )
@@ -165,10 +165,10 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
   ).slice(0, 8)
 
   return (
-    <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-5 shadow-[var(--shadow-hard)] space-y-4">
-      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-3">
-        <PenSquare className="h-4 w-4 text-[var(--clay)]" />
-        <span className="font-mono text-xs uppercase tracking-widest text-[var(--clay)] font-bold">
+    <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 space-y-4">
+      <div className="flex items-center gap-2 border-b border-[#E0D4C5] pb-3">
+        <PenSquare className="h-4 w-4 text-[#6A1F35]" />
+        <span className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-bold">
           Dispatch Composer
         </span>
       </div>
@@ -181,22 +181,22 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
           onChange={(e) => setBody(e.target.value)}
           placeholder="Document a cultural movement, aesthetic history, or subcultural tradition..."
           maxLength={2000}
-          className="w-full border border-[var(--ink)] bg-[var(--paper)] p-3 text-sm text-[var(--ink)] placeholder:text-[var(--ink-2)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)]"
+          className="w-full neu-inset-input rounded-2xl bg-[#F0E7DA] border border-[#E0D4C5] p-4 text-sm text-[#34252A] placeholder:text-[#34252A]/50 focus:outline-none focus:border-[#6A1F35] transition-all resize-y"
         />
-        <div className="flex justify-end font-mono text-[10px] text-[var(--ink-2)]">
+        <div className="flex justify-end font-mono text-[10px] text-[#34252A]/60 pr-1">
           <span>{charCount} / 2000</span>
         </div>
       </div>
 
       {/* Tag Selector (1-5 tags) */}
       <div className="space-y-2">
-        <label className="block font-mono text-xs text-[var(--ink)]">
+        <label className="block font-mono text-xs text-[#34252A] font-semibold">
           Select Cultural Threads ({selectedTagIds.length}/5 selected, min 1):
         </label>
 
         {/* Selected Tags Pill Display */}
         {selectedTagIds.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-2">
             {selectedTagIds.map((id) => {
               const tag = tags.find((t) => t.id === id)
               if (!tag) return null
@@ -213,7 +213,7 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
                   <button
                     type="button"
                     onClick={() => toggleTag(tag.id)}
-                    className="text-[var(--ink-2)] hover:text-red-600 p-0.5"
+                    className="text-[#34252A]/60 hover:text-red-700 p-0.5 cursor-pointer"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -229,11 +229,11 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
           value={tagSearch}
           onChange={(e) => setTagSearch(e.target.value)}
           placeholder="Filter tags to add (e.g. Hip-Hop, Streetwear, Fermentation)..."
-          className="w-full border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+          className="w-full neu-inset-input rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs text-[#34252A] placeholder:text-[#34252A]/50 focus:border-[#6A1F35] focus:outline-none transition-all"
         />
 
         {tagSearch.trim() && (
-          <div className="flex flex-wrap gap-1.5 pt-1 max-h-32 overflow-y-auto">
+          <div className="flex flex-wrap gap-2 pt-1 max-h-32 overflow-y-auto">
             {filteredTagSuggestions.map((t) => (
               <TagSticker
                 key={t.id}
@@ -250,14 +250,14 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
       </div>
 
       {/* Optional Community Selector */}
-      <div className="space-y-1">
-        <label className="block font-mono text-xs text-[var(--ink)]">
+      <div className="space-y-1.5">
+        <label className="block font-mono text-xs text-[#34252A] font-semibold">
           Target Community (optional):
         </label>
         <select
           value={selectedCommunityId}
           onChange={(e) => setSelectedCommunityId(e.target.value)}
-          className="w-full border border-[var(--line)] bg-[var(--paper)] px-3 py-2 text-xs font-mono text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+          className="w-full neu-inset rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs font-mono text-[#34252A] focus:border-[#6A1F35] focus:outline-none transition-all cursor-pointer"
         >
           <option value="">None (Personal Global Feed)</option>
           {communities.map((c) => (
@@ -273,25 +273,25 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
         <button
           type="button"
           onClick={() => setShowExtras(!showExtras)}
-          className="font-mono text-xs text-[var(--clay)] hover:underline flex items-center gap-1"
+          className="font-mono text-xs text-[#6A1F35] hover:underline flex items-center gap-1 cursor-pointer font-medium"
         >
           <span>{showExtras ? '− Hide image & source links' : '+ Add image & source citation'}</span>
         </button>
       </div>
 
       {showExtras && (
-        <div className="space-y-3 border-t border-[var(--line)] pt-3">
+        <div className="space-y-3.5 border-t border-[#E0D4C5] pt-3.5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-1 font-mono text-xs text-[var(--ink)]">
-                <Image className="h-3.5 w-3.5 text-[var(--ink-2)]" />
+              <label className="flex items-center gap-1.5 font-mono text-xs text-[#34252A]">
+                <Image className="h-3.5 w-3.5 text-[#B08A50]" />
                 <span>Media & Artifact Visual:</span>
               </label>
               {mediaUrl && (
                 <button
                   type="button"
                   onClick={() => setMediaUrl('')}
-                  className="font-mono text-[11px] text-[var(--clay)] hover:underline flex items-center gap-0.5"
+                  className="font-mono text-[11px] text-[#6A1F35] hover:underline flex items-center gap-0.5 cursor-pointer"
                 >
                   <X className="h-3 w-3" />
                   <span>Clear</span>
@@ -310,29 +310,29 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
               />
               <label
                 htmlFor="media-file-input"
-                className="cursor-pointer inline-flex items-center gap-1.5 border border-[var(--ink)] bg-[var(--paper)] px-3 py-1 font-mono text-xs uppercase tracking-wider text-[var(--ink)] shadow-[1px_1px_0_var(--ink)] hover:bg-[var(--paper-2)] transition-all"
+                className="cursor-pointer inline-flex items-center gap-1.5 border border-[#E0D4C5] bg-[#FAF6EF] px-3.5 py-1.5 rounded-xl font-mono text-xs uppercase tracking-wider text-[#34252A] neu-pill hover:bg-[#F0E7DA] transition-all"
               >
                 {uploadingImage ? (
                   <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#6A1F35]" />
                     <span>Uploading...</span>
                   </>
                 ) : (
                   <>
-                    <Upload className="h-3.5 w-3.5" />
+                    <Upload className="h-3.5 w-3.5 text-[#6A1F35]" />
                     <span>Upload Image (Max 5MB)</span>
                   </>
                 )}
               </label>
-              <span className="font-mono text-[10px] text-[var(--ink-2)]">or enter URL below</span>
+              <span className="font-mono text-[10px] text-[#34252A]/60">or enter image URL below</span>
             </div>
 
             <input
               type="url"
               value={mediaUrl}
               onChange={(e) => setMediaUrl(e.target.value)}
-              placeholder="https://..."
-              className="w-full border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+              placeholder="https://upload.wikimedia.org/... or https://..."
+              className="w-full neu-inset-input rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs text-[#34252A] focus:border-[#6A1F35] focus:outline-none transition-all"
             />
 
             {mediaUrl && (
@@ -348,7 +348,7 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
           </div>
 
           <div className="space-y-1">
-            <label className="block font-mono text-xs text-[var(--ink)]">
+            <label className="block font-mono text-xs text-[#34252A]">
               Media Credit / Attribution:
             </label>
             <input
@@ -356,13 +356,13 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
               value={mediaCredit}
               onChange={(e) => setMediaCredit(e.target.value)}
               placeholder="Wikimedia Commons / Photographer Name (CC BY-SA 4.0)"
-              className="w-full border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+              className="w-full neu-inset-input rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs text-[#34252A] focus:border-[#6A1F35] focus:outline-none transition-all"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="flex items-center gap-1 font-mono text-xs text-[var(--ink)]">
-              <Link2 className="h-3.5 w-3.5 text-[var(--ink-2)]" />
+            <label className="flex items-center gap-1.5 font-mono text-xs text-[#34252A]">
+              <Link2 className="h-3.5 w-3.5 text-[#B08A50]" />
               <span>Source URL / Citation:</span>
             </label>
             <input
@@ -370,14 +370,14 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
               value={sourceUrl}
               onChange={(e) => setSourceUrl(e.target.value)}
               placeholder="https://..."
-              className="w-full border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+              className="w-full neu-inset-input rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs text-[#34252A] focus:border-[#6A1F35] focus:outline-none transition-all"
             />
           </div>
         </div>
       )}
 
       {errorMsg && (
-        <div className="flex items-center gap-2 text-xs text-[var(--clay)] bg-red-50 p-2.5 border border-red-200">
+        <div className="flex items-center gap-2 text-xs text-[#6A1F35] bg-red-50 p-3 rounded-xl border border-red-200">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{errorMsg}</span>
         </div>
@@ -388,16 +388,16 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
           type="button"
           onClick={() => createPostMutation.mutate()}
           disabled={createPostMutation.isPending || body.trim().length === 0 || selectedTagIds.length === 0}
-          className="flex items-center gap-2 border border-[var(--ink)] bg-[var(--clay)] px-5 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all"
+          className="neu-burgundy-pill flex items-center gap-2 rounded-full px-6 py-2.5 font-mono text-xs uppercase tracking-wider text-[#FAF6EF] disabled:opacity-40 disabled:pointer-events-none cursor-pointer transition-all"
         >
           {createPostMutation.isPending ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin text-[#FAF6EF]" />
               <span>Publishing...</span>
             </>
           ) : (
             <>
-              <Send className="h-3.5 w-3.5" />
+              <Send className="h-3.5 w-3.5 text-[#FAF6EF]" />
               <span>Publish Dispatch</span>
             </>
           )}

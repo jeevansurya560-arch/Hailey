@@ -11,6 +11,7 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
   const [kind, setKind] = useState('link')
   const [postId, setPostId] = useState('')
   const [url, setUrl] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [note, setNote] = useState('')
   const [errorMsg, setErrorMsg] = useState(null)
 
@@ -44,13 +45,14 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
         addedBy: user.id,
         kind,
         postId: kind === 'post' ? postId : null,
-        url: kind === 'link' ? url.trim() : null,
+        url: kind === 'link' ? url.trim() : imageUrl.trim() || null,
         note: note.trim() || null,
         status: initialStatus,
       })
     },
     onSuccess: () => {
       setUrl('')
+      setImageUrl('')
       setNote('')
       setPostId('')
       setErrorMsg(null)
@@ -65,19 +67,19 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] max-w-lg w-full p-6 shadow-[var(--shadow-hard)] space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#34252A]/40 backdrop-blur-xs">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] max-w-lg w-full p-6 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-3">
           <div className="flex items-center gap-2">
-            <PlusCircle className="h-4 w-4 text-[var(--clay)]" />
-            <h2 className="font-serif text-lg font-bold text-[var(--ink)]">
+            <PlusCircle className="h-4 w-4 text-[#6A1F35]" />
+            <h2 className="font-serif text-lg font-bold text-[#34252A]">
               {isPersonal ? 'Add Item to Collection' : 'Propose Archival Item'}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[var(--ink-2)] hover:text-[var(--ink)] p-1"
+            className="text-[#34252A]/50 hover:text-[#34252A] p-1.5 rounded-full hover:bg-[#F0E7DA] transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -88,10 +90,10 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
           <button
             type="button"
             onClick={() => setKind('link')}
-            className={`flex items-center justify-center gap-1.5 p-2 border transition-all ${
+            className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-full border transition-all ${
               kind === 'link'
-                ? 'border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[1.5px_1.5px_0_var(--ink)]'
-                : 'border-[var(--line)] bg-[var(--paper)] text-[var(--ink-2)] hover:border-[var(--ink)]'
+                ? 'neu-burgundy-pill border-[#6A1F35] text-[#FAF6EF] font-semibold'
+                : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
             }`}
           >
             <Link2 className="h-3.5 w-3.5" />
@@ -101,10 +103,10 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
           <button
             type="button"
             onClick={() => setKind('post')}
-            className={`flex items-center justify-center gap-1.5 p-2 border transition-all ${
+            className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-full border transition-all ${
               kind === 'post'
-                ? 'border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[1.5px_1.5px_0_var(--ink)]'
-                : 'border-[var(--line)] bg-[var(--paper)] text-[var(--ink-2)] hover:border-[var(--ink)]'
+                ? 'neu-burgundy-pill border-[#6A1F35] text-[#FAF6EF] font-semibold'
+                : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
             }`}
           >
             <FileText className="h-3.5 w-3.5" />
@@ -114,10 +116,10 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
           <button
             type="button"
             onClick={() => setKind('note')}
-            className={`flex items-center justify-center gap-1.5 p-2 border transition-all ${
+            className={`flex items-center justify-center gap-1.5 py-2 px-3 rounded-full border transition-all ${
               kind === 'note'
-                ? 'border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[1.5px_1.5px_0_var(--ink)]'
-                : 'border-[var(--line)] bg-[var(--paper)] text-[var(--ink-2)] hover:border-[var(--ink)]'
+                ? 'neu-burgundy-pill border-[#6A1F35] text-[#FAF6EF] font-semibold'
+                : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
             }`}
           >
             <StickyNote className="h-3.5 w-3.5" />
@@ -133,8 +135,8 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
           className="space-y-4"
         >
           {kind === 'link' && (
-            <div className="space-y-1">
-              <label className="block font-mono text-xs text-[var(--ink)]">
+            <div className="space-y-1.5">
+              <label className="block font-mono text-xs text-[#34252A]/80 font-medium">
                 External Resource URL (https:// only):
               </label>
               <input
@@ -143,18 +145,18 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
                 onChange={(e) => setUrl(e.target.value)}
                 placeholder="https://archive.org/... or https://museum.org/..."
                 required
-                className="w-full border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-xs font-mono text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)]"
+                className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] px-3.5 py-2.5 text-xs font-mono text-[#34252A] placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
               />
             </div>
           )}
 
           {kind === 'post' && (
-            <div className="space-y-1">
-              <label className="block font-mono text-xs text-[var(--ink)]">
+            <div className="space-y-1.5">
+              <label className="block font-mono text-xs text-[#34252A]/80 font-medium">
                 Select One of Your Published Dispatches:
               </label>
               {userPosts.length === 0 ? (
-                <p className="text-xs text-[var(--ink-2)] p-2 border border-dashed border-[var(--line)]">
+                <p className="text-xs text-[#34252A]/60 p-3 rounded-xl border border-dashed border-[#E0D4C5]">
                   You have not published any dispatches yet. Switch to Link Citation or Archival Note.
                 </p>
               ) : (
@@ -162,7 +164,7 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
                   value={postId}
                   onChange={(e) => setPostId(e.target.value)}
                   required
-                  className="w-full border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-xs font-mono text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)]"
+                  className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] px-3.5 py-2.5 text-xs font-mono text-[#34252A] focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
                 >
                   <option value="">-- Choose a dispatch --</option>
                   {userPosts.map((p) => (
@@ -175,8 +177,22 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
             </div>
           )}
 
-          <div className="space-y-1">
-            <label className="block font-mono text-xs text-[var(--ink)]">
+          {/* Artifact Photo URL */}
+          <div className="space-y-1.5">
+            <label className="block font-mono text-xs text-[#34252A]/80 font-medium">
+              Artifact Photo / Image URL (optional):
+            </label>
+            <input
+              type="url"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              placeholder="https://images.unsplash.com/... or direct image link"
+              className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] px-3.5 py-2 text-xs font-mono text-[#34252A] placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block font-mono text-xs text-[#34252A]/80 font-medium">
               {kind === 'note' ? 'Archival Note (required):' : 'Curation Annotation (optional note):'}
             </label>
             <textarea
@@ -186,21 +202,21 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
               placeholder="Explain historical context, significance, or provenance of this cultural artifact..."
               maxLength={500}
               required={kind === 'note'}
-              className="w-full border border-[var(--line)] bg-[var(--paper)] p-3 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+              className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] p-3 text-xs text-[#34252A] placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
             />
-            <div className="flex justify-end font-mono text-[10px] text-[var(--ink-2)]">
+            <div className="flex justify-end font-mono text-[10px] text-[#34252A]/50">
               <span>{note.length} / 500</span>
             </div>
           </div>
 
           {!isPersonal && (
-            <p className="font-mono text-[11px] text-[var(--ink-2)] bg-amber-50 p-2.5 border border-amber-200">
+            <p className="font-mono text-[11px] text-[#34252A]/70 bg-amber-50/70 p-3 rounded-xl border border-amber-200/80">
               ℹ️ Community proposals enter the <strong>curator triage queue</strong>. Upon curator approval, a cryptographic contribution record is created for onchain attestation.
             </p>
           )}
 
           {errorMsg && (
-            <div className="flex items-center gap-2 text-xs text-[var(--clay)] bg-red-50 p-2.5 border border-red-200">
+            <div className="flex items-center gap-2 text-xs text-rose-800 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -210,7 +226,7 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 font-mono text-xs text-[var(--ink-2)] hover:text-[var(--ink)]"
+              className="px-4 py-2 font-mono text-xs neu-pill rounded-full text-[#34252A]/70 hover:text-[#34252A] border border-[#E0D4C5] bg-[#FAF6EF] transition-all"
             >
               Cancel
             </button>
@@ -218,7 +234,7 @@ export function ProposeItemModal({ isOpen, onClose, collectionId, isPersonal, us
             <button
               type="submit"
               disabled={proposeMutation.isPending}
-              className="flex items-center gap-2 border border-[var(--ink)] bg-[var(--clay)] px-5 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90 disabled:opacity-40"
+              className="flex items-center gap-2 neu-burgundy-pill px-5 py-2 font-mono text-xs uppercase tracking-wider text-[#FAF6EF] hover:bg-[#511528] rounded-full disabled:opacity-40 transition-all font-semibold"
             >
               {proposeMutation.isPending ? (
                 <>

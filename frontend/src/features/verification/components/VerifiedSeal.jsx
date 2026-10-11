@@ -8,9 +8,9 @@ export function VerifiedSeal({ status, txHash }) {
     const explorerLink = txHash ? `${explorerBaseUrl}/tx/${txHash}` : null
 
     return (
-      <span className="inline-flex items-center gap-1.5 rounded bg-[var(--onchain)]/15 border border-[var(--onchain)] px-2 py-0.5 font-mono text-[11px] font-bold text-[var(--onchain)] shadow-xs">
+      <span className="neu-pill inline-flex items-center gap-1.5 rounded-full bg-[#6A1F35]/10 border border-[#6A1F35]/30 px-2.5 py-0.5 font-mono text-[11px] font-bold text-[#6A1F35] shadow-xs">
         <ShieldCheck className="h-3.5 w-3.5 stroke-[2.5]" />
-        <span>Verified · on Monad</span>
+        <span>Verified · Monad</span>
         {explorerLink && (
           <a
             href={explorerLink}
@@ -28,8 +28,8 @@ export function VerifiedSeal({ status, txHash }) {
 
   if (status === 'submitted') {
     return (
-      <span className="inline-flex items-center gap-1 rounded bg-blue-50 border border-blue-300 px-2 py-0.5 font-mono text-[10px] text-blue-800 font-semibold">
-        <Sparkles className="h-3 w-3 animate-spin" />
+      <span className="neu-pill inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 font-mono text-[10px] text-blue-800 font-semibold">
+        <Sparkles className="h-3 w-3 animate-spin text-blue-700" />
         <span>Attestation Queued</span>
       </span>
     )
@@ -37,8 +37,8 @@ export function VerifiedSeal({ status, txHash }) {
 
   if (status === 'awaiting_wallet') {
     return (
-      <span className="inline-flex items-center gap-1 rounded bg-amber-50 border border-amber-300 px-2 py-0.5 font-mono text-[10px] text-amber-800 font-semibold">
-        <Clock className="h-3 w-3" />
+      <span className="neu-pill inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 font-mono text-[10px] text-amber-800 font-semibold">
+        <Clock className="h-3 w-3 text-amber-700" />
         <span>Awaiting Wallet Link</span>
       </span>
     )
@@ -46,16 +46,16 @@ export function VerifiedSeal({ status, txHash }) {
 
   if (status === 'failed') {
     return (
-      <span className="inline-flex items-center gap-1 rounded bg-red-50 border border-red-300 px-2 py-0.5 font-mono text-[10px] text-red-800 font-semibold">
-        <AlertCircle className="h-3 w-3" />
+      <span className="neu-pill inline-flex items-center gap-1 rounded-full bg-red-50 border border-red-200 px-2.5 py-0.5 font-mono text-[10px] text-red-800 font-semibold">
+        <AlertCircle className="h-3 w-3 text-red-700" />
         <span>Attestation Failed</span>
       </span>
     )
   }
 
   return (
-    <span className="inline-flex items-center gap-1 rounded bg-gray-50 border border-[var(--line)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-2)]">
-      <Clock className="h-3 w-3" />
+    <span className="neu-pill inline-flex items-center gap-1 rounded-full bg-[#F0E7DA] border border-[#E0D4C5] px-2.5 py-0.5 font-mono text-[10px] text-[#34252A]/60">
+      <Clock className="h-3 w-3 text-[#34252A]/50" />
       <span>Pending Review</span>
     </span>
   )

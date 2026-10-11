@@ -88,65 +88,100 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
     }
   }
 
+  const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?q=80&w=800&auto=format&fit=crop'
+  const imageUrl = market.image_url || market.media_url || DEFAULT_IMAGE
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg p-6 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-zinc-100 max-h-[90vh] overflow-y-auto space-y-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#34252A]/40 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-lg p-6 md:p-8 neu-card bg-[#FAF6EF] border border-[#E0D4C5] rounded-3xl shadow-2xl text-[#34252A] max-h-[90vh] overflow-y-auto space-y-4">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-5 right-5 text-[#34252A]/50 hover:text-[#34252A] p-1.5 rounded-full hover:bg-[#F0E7DA] transition-colors z-10"
         >
           ✕
         </button>
 
-        <div>
-          <span className="text-xs font-mono uppercase px-2 py-0.5 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded">
-            {market.category?.replace('_', ' ')}
-          </span>
-          <h2 className="text-xl font-bold text-white mt-2">{market.title}</h2>
-          <p className="text-xs text-zinc-400 mt-1 leading-relaxed">{market.description}</p>
+        {/* Hero Cultural Product Image */}
+        <div className="relative w-full h-52 -mt-2 rounded-2xl overflow-hidden bg-[#E0D4C5]/30 border border-[#E0D4C5]">
+          <img
+            src={imageUrl}
+            alt={market.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          {market.cultural_origin && (
+            <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-[#FAF6EF]/90 backdrop-blur-md text-xs font-mono font-bold text-[#6A1F35]">
+              📍 {market.cultural_origin}
+            </div>
+          )}
         </div>
 
-        <div className="p-3 bg-zinc-850 bg-zinc-800/40 rounded-xl border border-zinc-800 text-xs space-y-1">
-          <div className="flex justify-between text-zinc-400">
-            <span>Resolution Source:</span>
-            <span className="text-zinc-200 font-medium">{market.resolution_source}</span>
+        <div>
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 bg-[#F0E7DA] text-[#6A1F35] border border-[#E0D4C5] rounded-full font-semibold">
+              {market.category?.replace('_', ' ')}
+            </span>
+            {market.price_estimate && (
+              <span className="text-xs font-mono font-bold text-[#B08A50]">
+                Est. Value: {market.price_estimate}
+              </span>
+            )}
+            {market.craft_tradition && (
+              <span className="text-xs font-mono text-[#34252A]/70">
+                · {market.craft_tradition}
+              </span>
+            )}
           </div>
-          <div className="flex justify-between text-zinc-400">
+          <h2 className="font-serif text-2xl font-bold text-[#34252A]">{market.title}</h2>
+          {market.artisan && (
+            <p className="text-xs font-mono text-[#6A1F35] font-semibold mt-1">
+              Artisan / Guild: {market.artisan}
+            </p>
+          )}
+          <p className="text-xs text-[#34252A]/80 mt-1.5 leading-relaxed">{market.description}</p>
+        </div>
+
+        <div className="p-3.5 neu-card bg-[#F0E7DA]/50 rounded-2xl border border-[#E0D4C5] text-xs space-y-1.5 font-mono">
+          <div className="flex justify-between text-[#34252A]/70">
+            <span>Resolution Source:</span>
+            <span className="text-[#34252A] font-semibold">{market.resolution_source}</span>
+          </div>
+          <div className="flex justify-between text-[#34252A]/70">
             <span>Deadline:</span>
-            <span className="text-zinc-200 font-mono">
+            <span className="text-[#34252A]">
               {new Date(market.resolution_deadline).toLocaleString()}
             </span>
           </div>
-          <div className="flex justify-between text-zinc-400">
+          <div className="flex justify-between text-[#34252A]/70">
             <span>Total Market Stake:</span>
-            <span className="text-emerald-400 font-mono font-bold">${totalStake.toFixed(2)} USDC</span>
+            <span className="text-[#6A1F35] font-bold">${totalStake.toFixed(2)} USDC</span>
           </div>
         </div>
 
         {error && (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-lg text-xs">
+          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs neu-card">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 rounded-lg text-xs">
+          <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs neu-card">
             {success}
           </div>
         )}
 
         {/* Resolution Evidence Box if resolved */}
         {isResolved && market.market_resolutions && (
-          <div className="p-4 bg-emerald-950/20 border border-emerald-500/30 rounded-xl space-y-2 text-xs">
-            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block">
+          <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl space-y-2 text-xs neu-card">
+            <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-800 block">
               🏆 Verified Cultural Outcome
             </span>
-            <p className="text-white font-medium">{market.market_resolutions.source_description}</p>
+            <p className="text-[#34252A] font-medium">{market.market_resolutions.source_description}</p>
             <a
               href={market.market_resolutions.evidence_url}
               target="_blank"
               rel="noreferrer"
-              className="text-emerald-400 hover:underline block truncate text-[11px]"
+              className="text-[#6A1F35] hover:underline block truncate text-[11px] font-mono"
             >
               🔗 View Verifiable Evidence: {market.market_resolutions.evidence_url}
             </a>
@@ -155,7 +190,7 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
 
         {/* Options */}
         <div className="space-y-2">
-          <label className="block text-xs font-semibold text-zinc-300">Outcomes & Current Stakes</label>
+          <label className="block text-xs font-mono font-semibold text-[#34252A]/80">Outcomes & Current Stakes</label>
           <div className="space-y-2">
             {(market.market_options || []).map((opt) => {
               const stake = parseFloat(opt.total_stake || 0)
@@ -167,23 +202,23 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
                 <div
                   key={opt.id}
                   onClick={() => !isResolved && !isClosed && setSelectedOptionId(opt.id)}
-                  className={`p-3 rounded-xl border text-xs cursor-pointer transition ${
+                  className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
                     isWinner
-                      ? 'border-emerald-500/50 bg-emerald-500/10'
+                      ? 'border-emerald-300 bg-emerald-50/80 neu-card'
                       : isSelected
-                      ? 'border-blue-500 bg-blue-500/10'
-                      : 'border-zinc-800 bg-zinc-800/40 hover:border-zinc-700'
+                      ? 'border-[#6A1F35] bg-[#6A1F35]/10 neu-inset'
+                      : 'border-[#E0D4C5] bg-[#FAF6EF] neu-card hover:border-[#6A1F35]/40'
                   }`}
                 >
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="font-semibold text-white">
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className="font-semibold text-[#34252A]">
                       {opt.label} {isWinner && '🏆 (Winner)'}
                     </span>
-                    <span className="font-mono text-zinc-300">{stake} USDC ({pct}%)</span>
+                    <span className="font-mono text-[#34252A]/70">{stake} USDC ({pct}%)</span>
                   </div>
-                  <div className="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                  <div className="w-full bg-[#E0D4C5]/60 h-2 rounded-full overflow-hidden">
                     <div
-                      className={`h-full ${isWinner ? 'bg-emerald-400' : 'bg-blue-500'}`}
+                      className={`h-full rounded-full transition-all ${isWinner ? 'bg-emerald-600' : 'bg-[#6A1F35]'}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -195,16 +230,16 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
 
         {/* Participation Form (only if open) */}
         {!isResolved && !isClosed && (
-          <form onSubmit={handlePosition} className="space-y-3 pt-2 border-t border-zinc-800">
-            <div>
-              <label className="block text-xs font-medium text-zinc-300 mb-1">Stake Amount (USDC)</label>
+          <form onSubmit={handlePosition} className="space-y-3 pt-3 border-t border-[#E0D4C5]">
+            <div className="space-y-1">
+              <label className="block text-xs font-mono font-medium text-[#34252A]/80">Stake Amount (USDC)</label>
               <input
                 type="number"
                 step="0.1"
                 min="0.1"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-blue-400"
+                className="w-full px-3.5 py-2 neu-inset-input bg-[#FAF6EF] border border-[#E0D4C5] rounded-xl text-[#34252A] font-mono text-xs focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
                 required
               />
             </div>
@@ -212,7 +247,7 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
             <button
               type="submit"
               disabled={loading || !selectedOptionId}
-              className="w-full py-2.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 text-xs transition disabled:opacity-50"
+              className="w-full py-3 px-4 bg-[#6A1F35] text-[#FAF6EF] hover:bg-[#511528] active:bg-[#3D0F1D] font-bold rounded-full text-xs uppercase tracking-wider shadow-md transition-all disabled:opacity-50 cursor-pointer"
             >
               {loading ? 'Submitting Stake...' : `Back Selected Outcome ($${amount} USDC)`}
             </button>
@@ -221,24 +256,24 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
 
         {/* Admin/Oracle Resolve Section */}
         {!isResolved && session && (
-          <div className="pt-2 border-t border-zinc-800">
+          <div className="pt-2 border-t border-[#E0D4C5]">
             <button
               type="button"
               onClick={() => setShowResolve(!showResolve)}
-              className="text-[11px] text-zinc-500 hover:text-zinc-300 transition"
+              className="text-[11px] font-mono text-[#34252A]/60 hover:text-[#6A1F35] transition-colors"
             >
               {showResolve ? '▾ Hide Oracle Resolution' : '▸ Resolve Market with Objective Evidence'}
             </button>
 
             {showResolve && (
-              <form onSubmit={handleResolve} className="mt-3 space-y-3 p-3 bg-zinc-950 rounded-xl border border-zinc-800">
-                <p className="text-[11px] text-zinc-400">Select the winning option above, then provide verifiable evidence:</p>
+              <form onSubmit={handleResolve} className="mt-3 space-y-3 p-3.5 neu-card bg-[#F0E7DA]/50 rounded-2xl border border-[#E0D4C5]">
+                <p className="text-[11px] text-[#34252A]/70">Select the winning option above, then provide verifiable evidence:</p>
                 <input
                   type="url"
                   placeholder="Evidence URL (e.g. news article, contract tx, photo archive)"
                   value={evidenceUrl}
                   onChange={(e) => setEvidenceUrl(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-white text-xs"
+                  className="w-full px-3 py-2 neu-inset-input bg-[#FAF6EF] border border-[#E0D4C5] rounded-xl text-[#34252A] placeholder:text-[#34252A]/40 text-xs focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
                   required
                 />
                 <textarea
@@ -246,13 +281,13 @@ export function MarketDetailModal({ market, isOpen, onClose, onUpdated }) {
                   placeholder="Detailed source description and justification"
                   value={sourceDesc}
                   onChange={(e) => setSourceDesc(e.target.value)}
-                  className="w-full px-3 py-1.5 bg-zinc-900 border border-zinc-700 rounded-lg text-white text-xs"
+                  className="w-full px-3 py-2 neu-inset-input bg-[#FAF6EF] border border-[#E0D4C5] rounded-xl text-[#34252A] placeholder:text-[#34252A]/40 text-xs focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
                   required
                 />
                 <button
                   type="submit"
                   disabled={loading || !selectedOptionId}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-lg transition disabled:opacity-50"
+                  className="w-full py-2.5 neu-pill bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs uppercase tracking-wider rounded-full transition disabled:opacity-50"
                 >
                   {loading ? 'Resolving...' : 'Confirm Objective Resolution'}
                 </button>

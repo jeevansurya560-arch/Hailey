@@ -17,9 +17,10 @@ import { OnboardingPage } from '@/features/onboarding/pages/OnboardingPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
 import { MessagesPage } from '@/features/messages/pages/MessagesPage'
 import { AuthPage } from '@/features/auth/pages/AuthPage'
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
-import { TermsPage } from '@/features/auth/pages/TermsPage'
-import { PrivacyPolicyPage } from '@/features/auth/pages/PrivacyPolicyPage'
+import { TermsPage } from '@/features/legal/pages/TermsPage'
+import { PrivacyPage } from '@/features/legal/pages/PrivacyPage'
 import { RedditFieldGuidePage } from '@/features/reddit/pages/RedditFieldGuidePage'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 
@@ -52,10 +53,11 @@ export function AppRoutes() {
         <Route path="/u/:handle" element={<ProfilePage />} />
         <Route path="/login" element={<AuthPage />} />
         <Route path="/signup" element={<AuthPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/reddit" element={<RedditFieldGuidePage />} />
         <Route path="/terms" element={<TermsPage />} />
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/reddit" element={<RedditFieldGuidePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
