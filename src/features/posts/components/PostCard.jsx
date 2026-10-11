@@ -108,20 +108,20 @@ export function PostCard({ post, onDelete, onHide }) {
   }
 
   return (
-    <article className="border border-[var(--ink)] bg-[var(--paper-2)] p-5 md:p-6 shadow-[var(--shadow-hard)] hover:translate-x-0.5 hover:translate-y-0.5 transition-all space-y-4">
+    <article className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-5 md:p-6 hover:border-[#6A1F35]/30 transition-all space-y-4">
       {/* Header / Author line */}
-      <div className="flex items-start justify-between gap-3 border-b border-[var(--line)] pb-3">
+      <div className="flex items-start justify-between gap-3 border-b border-[#E0D4C5] pb-3">
         <div>
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               to={`/u/${post.author?.handle || 'member'}`}
-              className="font-mono text-xs font-bold text-[var(--ink)] hover:text-[var(--clay)] transition-colors"
+              className="font-mono text-xs font-bold text-[#34252A] hover:text-[#6A1F35] transition-colors"
             >
               @{post.author?.handle || 'contributor'}
             </Link>
 
             {post.is_editorial && (
-              <span className="inline-flex items-center gap-1 rounded bg-[var(--clay)] px-1.5 py-0.5 font-mono text-[9px] uppercase font-bold text-[var(--paper)]">
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#6A1F35] px-2 py-0.5 font-mono text-[9px] uppercase font-bold text-[#FAF6EF] shadow-xs">
                 <ShieldCheck className="h-3 w-3" />
                 Editorial
               </span>
@@ -129,10 +129,10 @@ export function PostCard({ post, onDelete, onHide }) {
 
             {post.community && (
               <>
-                <span className="text-[var(--ink-2)] font-mono text-xs">in</span>
+                <span className="text-[#34252A]/60 font-mono text-xs">in</span>
                 <Link
                   to={`/communities/${post.community.slug}`}
-                  className="font-mono text-xs text-[var(--clay)] font-semibold hover:underline"
+                  className="font-mono text-xs text-[#6A1F35] font-semibold hover:underline"
                 >
                   {post.community.name}
                 </Link>
@@ -140,7 +140,7 @@ export function PostCard({ post, onDelete, onHide }) {
             )}
           </div>
 
-          <div className="flex items-center gap-2 font-mono text-[10px] text-[var(--ink-2)] mt-0.5">
+          <div className="flex items-center gap-2 font-mono text-[10px] text-[#34252A]/60 mt-1">
             <span>
               {new Date(post.created_at).toLocaleDateString(undefined, {
                 month: 'short',
@@ -149,7 +149,7 @@ export function PostCard({ post, onDelete, onHide }) {
               })}
             </span>
             <span>·</span>
-            <span className="inline-flex items-center gap-0.5 text-emerald-800 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200" title="Protected under PostgreSQL Row Level Security">
+            <span className="inline-flex items-center gap-1 text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200" title="Protected under PostgreSQL Row Level Security">
               <Lock className="h-2.5 w-2.5" />
               RLS Verified
             </span>
@@ -163,7 +163,7 @@ export function PostCard({ post, onDelete, onHide }) {
             onClick={handleDelete}
             disabled={isDeleting}
             title="Delete your post"
-            className="text-[var(--ink-2)] hover:text-red-600 transition-colors p-1"
+            className="text-[#34252A]/50 hover:text-red-700 transition-colors p-1 cursor-pointer"
           >
             <Trash2 className="h-4 w-4" />
           </button>
@@ -171,14 +171,14 @@ export function PostCard({ post, onDelete, onHide }) {
       </div>
 
       {/* Body: strictly Plain Text (POST-05) */}
-      <div className="text-sm text-[var(--ink)] whitespace-pre-wrap leading-relaxed">
+      <div className="text-sm text-[#34252A] whitespace-pre-wrap leading-relaxed">
         {post.body}
       </div>
 
       {/* Media Image with safe referrerpolicy */}
       {post.media_url && (
         <div className="space-y-1.5">
-          <div className="overflow-hidden border border-[var(--line)] bg-[var(--paper)] max-h-96 flex items-center justify-center">
+          <div className="overflow-hidden rounded-xl border border-[#E0D4C5] bg-[#F0E7DA] max-h-96 flex items-center justify-center">
             <img
               src={post.media_url}
               alt={post.media_credit || 'Cultural documentation'}
@@ -188,7 +188,7 @@ export function PostCard({ post, onDelete, onHide }) {
             />
           </div>
           {post.media_credit && (
-            <p className="font-mono text-[10px] text-[var(--ink-2)] italic truncate">
+            <p className="font-mono text-[10px] text-[#34252A]/60 italic truncate">
               Photo: {post.media_credit}
             </p>
           )}
@@ -197,13 +197,13 @@ export function PostCard({ post, onDelete, onHide }) {
 
       {/* Source line (CULT-03) */}
       {post.source_url && (
-        <div className="flex items-center gap-1.5 font-mono text-xs text-[var(--ink-2)] pt-1">
+        <div className="flex items-center gap-1.5 font-mono text-xs text-[#34252A]/70 pt-1">
           <span>Source:</span>
           <a
             href={post.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-[var(--clay)] hover:underline"
+            className="inline-flex items-center gap-1 text-[#6A1F35] font-medium hover:underline"
           >
             <span>{sourceHost}</span>
             <ExternalLink className="h-3 w-3" />
@@ -213,7 +213,7 @@ export function PostCard({ post, onDelete, onHide }) {
 
       {/* Tags Stickers */}
       {post.tags && post.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-2 border-t border-[var(--line)]">
+        <div className="flex flex-wrap gap-2 pt-2 border-t border-[#E0D4C5]">
           {post.tags.map((tag) => (
             <TagSticker
               key={tag.id}
@@ -228,31 +228,31 @@ export function PostCard({ post, onDelete, onHide }) {
       )}
 
       {/* Actions / Reactions Bar */}
-      <div className="flex items-center justify-between pt-2 border-t border-[var(--line)] font-mono text-xs">
-        <div className="flex items-center gap-4">
+      <div className="flex items-center justify-between pt-2 border-t border-[#E0D4C5] font-mono text-xs">
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={handleLike}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${
+            className={`neu-pill flex items-center gap-1.5 px-3 py-1 rounded-full border cursor-pointer transition-all ${
               isLiked
-                ? 'text-[var(--clay)] font-bold'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'bg-[#6A1F35] text-[#FAF6EF] border-[#511528] shadow-xs'
+                : 'bg-[#F0E7DA] text-[#34252A] border-[#E0D4C5] hover:text-[#6A1F35]'
             }`}
           >
-            <Heart className={`h-4 w-4 ${isLiked ? 'fill-[var(--clay)] text-[var(--clay)]' : ''}`} />
+            <Heart className={`h-3.5 w-3.5 ${isLiked ? 'fill-[#FAF6EF] text-[#FAF6EF]' : ''}`} />
             <span>{likesCount}</span>
           </button>
 
           <button
             type="button"
             onClick={handleSave}
-            className={`flex items-center gap-1.5 px-2 py-1 rounded transition-colors ${
+            className={`neu-pill flex items-center gap-1.5 px-3 py-1 rounded-full border cursor-pointer transition-all ${
               isSaved
-                ? 'text-[var(--saffron)] font-bold'
-                : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'bg-[#B08A50] text-[#FAF6EF] border-[#B08A50] shadow-xs'
+                : 'bg-[#F0E7DA] text-[#34252A] border-[#E0D4C5] hover:text-[#B08A50]'
             }`}
           >
-            <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-[var(--saffron)] text-[var(--saffron)]' : ''}`} />
+            <Bookmark className={`h-3.5 w-3.5 ${isSaved ? 'fill-[#FAF6EF] text-[#FAF6EF]' : ''}`} />
             <span>{savesCount}</span>
           </button>
         </div>
@@ -262,7 +262,7 @@ export function PostCard({ post, onDelete, onHide }) {
             type="button"
             onClick={handleHide}
             title="Hide this post from your feed"
-            className="flex items-center gap-1 text-[var(--ink-2)] hover:text-[var(--ink)] px-2 py-1 transition-colors"
+            className="neu-pill flex items-center gap-1 text-[#34252A]/60 hover:text-[#34252A] px-2.5 py-1 rounded-full border border-[#E0D4C5] bg-[#F0E7DA] cursor-pointer transition-all"
           >
             <EyeOff className="h-3.5 w-3.5" />
             <span className="text-[11px]">Not interested</span>

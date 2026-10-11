@@ -5,6 +5,7 @@ import { fetchCultureTags } from '@/features/communities/services/communityServi
 import { TagSticker } from '@/components/ui/TagSticker'
 import { getThreadColor } from '@/features/communities/threadColors'
 import { CultureMasterExplorer } from '../components/CultureMasterExplorer'
+import { OriginHoverCard } from '../components/OriginHoverCard'
 
 export function ExplorePage() {
   const [activeTab, setActiveTab] = useState('master_1m') // 'master_1m' | 'taxonomy'
@@ -58,32 +59,34 @@ export function ExplorePage() {
   return (
     <div className="space-y-6">
       {/* View Switcher Bar */}
-      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-3">
-        <button
-          type="button"
-          onClick={() => setActiveTab('master_1m')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
-            activeTab === 'master_1m'
-              ? 'bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
-              : 'text-[var(--ink-2)] hover:text-[var(--clay)]'
-          }`}
-        >
-          <Database className="h-3.5 w-3.5" />
-          <span>1,000,000 Culture Master Atlas</span>
-        </button>
+      <div className="flex items-center justify-center sm:justify-start gap-2 border-b border-[#E0D4C5]/60 pb-3">
+        <div className="bg-white/90 p-1.5 rounded-full border border-[#E0D4C5]/80 neu-pill inline-flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setActiveTab('master_1m')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+              activeTab === 'master_1m'
+                ? 'bg-[#6A1F35] text-white neu-burgundy-pill'
+                : 'text-[#34252A] hover:bg-[#F0E7DA]/60'
+            }`}
+          >
+            <Database className="h-3.5 w-3.5" />
+            <span>1,000,000 Culture Master Atlas</span>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => setActiveTab('taxonomy')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
-            activeTab === 'taxonomy'
-              ? 'bg-[var(--ink)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
-              : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
-          }`}
-        >
-          <Layers className="h-3.5 w-3.5" />
-          <span>Living Taxonomy Graph ({tags.length})</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('taxonomy')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+              activeTab === 'taxonomy'
+                ? 'bg-[#6A1F35] text-white neu-burgundy-pill'
+                : 'text-[#34252A] hover:bg-[#F0E7DA]/60'
+            }`}
+          >
+            <Layers className="h-3.5 w-3.5" />
+            <span>Living Taxonomy Graph ({tags.length})</span>
+          </button>
+        </div>
       </div>
 
       {activeTab === 'master_1m' ? (
@@ -91,133 +94,145 @@ export function ExplorePage() {
       ) : (
         <div className="space-y-6">
           {/* Header Banner */}
-          <div className="border-b border-[var(--line)] pb-4">
-            <div className="flex items-center gap-2 text-[var(--clay)] mb-1">
+          <div className="border-b border-[#E0D4C5]/60 pb-4">
+            <div className="flex items-center gap-2 text-[#6A1F35] mb-1">
               <Compass className="h-5 w-5" />
-              <span className="font-mono text-xs uppercase tracking-widest font-bold">
+              <span className="font-sans text-xs uppercase tracking-widest font-bold">
                 Taxonomy Directory
               </span>
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)]">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[#34252A]">
               Explore Cultural Threads
             </h1>
-            <p className="mt-1 text-sm text-[var(--ink-2)] max-w-2xl">
+            <p className="mt-1 text-sm text-[#75666B] max-w-2xl">
               Browse the living culture graph across regional heritages, sonic undergrounds, design movements, and culinary traditions.
             </p>
           </div>
 
-      {/* Search & Filter Controls */}
-      <div className="space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-2)]" />
-          <input
-            type="text"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            placeholder="Search tags or descriptions (e.g. Streetwear, Hip-Hop, Tokyo, Fermentation)..."
-            className="w-full border border-[var(--ink)] bg-[var(--paper-2)] pl-10 pr-4 py-2.5 text-sm text-[var(--ink)] placeholder:text-[var(--ink-2)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)] shadow-[2px_2px_0_var(--ink)]"
-          />
-        </div>
+          {/* Search & Filter Controls */}
+          <div className="space-y-3">
+            <div className="relative">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#75666B]" />
+              <input
+                type="text"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                placeholder="Search tags or descriptions (e.g. Streetwear, Hip-Hop, Tokyo, Fermentation)..."
+                className="w-full border border-[#E0D4C5] bg-[#F0E7DA]/50 pl-10 pr-4 py-2.5 text-sm text-[#34252A] placeholder:text-[#75666B] rounded-xl neu-inset-input focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
+              />
+            </div>
 
-        {/* Kind Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 pt-1">
-          <button
-            type="button"
-            onClick={() => setSelectedKind(null)}
-            className={`px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider rounded-[var(--radius)] border transition-all ${
-              selectedKind === null
-                ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]'
-                : 'bg-[var(--paper)] text-[var(--ink-2)] border-[var(--line)] hover:border-[var(--ink)]'
-            }`}
-          >
-            All Kinds ({tags.length})
-          </button>
-          {kinds.map((kind) => (
-            <button
-              key={kind}
-              type="button"
-              onClick={() => setSelectedKind(selectedKind === kind ? null : kind)}
-              style={
-                selectedKind === kind
-                  ? {
-                      backgroundColor: getThreadColor(kind),
-                      borderColor: 'var(--ink)',
-                      color: '#F7F2E8',
-                    }
-                  : {}
-              }
-              className={`px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider rounded-[var(--radius)] border transition-all ${
-                selectedKind === kind
-                  ? 'border-[var(--ink)] font-bold'
-                  : 'bg-[var(--paper)] text-[var(--ink-2)] border-[var(--line)] hover:border-[var(--ink)]'
-              }`}
-            >
-              {kind}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Loading & Error States */}
-      {isLoading && (
-        <div className="flex flex-col items-center justify-center py-16 space-y-3">
-          <Loader2 className="h-6 w-6 animate-spin text-[var(--clay)]" />
-          <p className="font-mono text-xs uppercase tracking-widest text-[var(--ink-2)]">
-            Loading taxonomy directory...
-          </p>
-        </div>
-      )}
-
-      {isError && (
-        <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-6 text-center text-xs text-[var(--clay)]">
-          Failed to fetch culture graph taxonomy from database.
-        </div>
-      )}
-
-      {/* Tags Directory Grid */}
-      {!isLoading && groupedByKind.length === 0 && (
-        <div className="border border-dashed border-[var(--line)] p-12 text-center text-sm text-[var(--ink-2)] font-mono">
-          No cultural tags match "{filter}" {selectedKind && `in [${selectedKind}]`}.
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {groupedByKind.map(([kind, groupTags]) => (
-          <div
-            key={kind}
-            className="border border-[var(--line)] bg-[var(--paper-2)] p-5 flex flex-col justify-between space-y-4"
-          >
-            <div>
-              <div className="flex items-center justify-between border-b border-[var(--line)] pb-2 mb-3">
-                <span
-                  className="font-mono text-xs uppercase tracking-widest font-bold px-2 py-0.5 rounded text-white"
-                  style={{ backgroundColor: getThreadColor(kind) }}
+            {/* Kind Filter Pills */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1">
+              <button
+                type="button"
+                onClick={() => setSelectedKind(null)}
+                className={`px-3 py-1.5 font-sans text-xs rounded-full border transition-all ${
+                  selectedKind === null
+                    ? 'bg-[#6A1F35] text-white border-[#6A1F35] neu-burgundy-pill'
+                    : 'bg-white text-[#34252A] border-[#E0D4C5] hover:border-[#6A1F35] neu-pill active:neu-inset'
+                }`}
+              >
+                All Kinds ({tags.length})
+              </button>
+              {kinds.map((kind) => (
+                <button
+                  key={kind}
+                  type="button"
+                  onClick={() => setSelectedKind(selectedKind === kind ? null : kind)}
+                  style={
+                    selectedKind === kind
+                      ? {
+                          backgroundColor: getThreadColor(kind),
+                          borderColor: getThreadColor(kind),
+                          color: '#FFFFFF',
+                        }
+                      : {}
+                  }
+                  className={`px-3 py-1.5 font-sans text-xs rounded-full border transition-all ${
+                    selectedKind === kind
+                      ? 'border-transparent font-semibold shadow-sm'
+                      : 'bg-white text-[#34252A] border-[#E0D4C5] hover:border-[#34252A] neu-pill active:neu-inset'
+                  }`}
                 >
                   {kind}
-                </span>
-                <span className="font-mono text-[11px] text-[var(--ink-2)]">
-                  {groupTags.length} {groupTags.length === 1 ? 'topic' : 'topics'}
-                </span>
-              </div>
-
-              <div className="flex flex-wrap gap-2 pt-1">
-                {groupTags.map((tag) => (
-                  <div key={tag.id} className="group relative">
-                    <TagSticker
-                      id={tag.id}
-                      name={tag.name}
-                      slug={tag.slug}
-                      kind={tag.kind}
-                      size="sm"
-                    />
-                  </div>
-                ))}
-              </div>
+                </button>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-      </div>
+
+          {/* Loading & Error States */}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-16 space-y-3">
+              <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
+              <p className="text-xs uppercase tracking-widest text-[#75666B]">
+                Loading taxonomy directory...
+              </p>
+            </div>
+          )}
+
+          {isError && (
+            <div className="border border-[#6A1F35] bg-[#FAF6EF] p-6 text-center text-xs text-[#6A1F35] rounded-2xl neu-card">
+              Failed to fetch culture graph taxonomy from database.
+            </div>
+          )}
+
+          {/* Tags Directory Grid */}
+          {!isLoading && groupedByKind.length === 0 && (
+            <div className="border border-dashed border-[#E0D4C5] p-12 text-center text-sm text-[#75666B] rounded-2xl">
+              No cultural tags match "{filter}" {selectedKind && `in [${selectedKind}]`}.
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {groupedByKind.map(([kind, groupTags]) => (
+              <div
+                key={kind}
+                className="bg-white rounded-2xl border border-[#E0D4C5]/80 p-5 flex flex-col justify-between space-y-4 neu-card"
+              >
+                <div>
+                  <div className="flex items-center justify-between border-b border-[#E0D4C5]/40 pb-2 mb-3">
+                    <span
+                      className="text-xs uppercase tracking-widest font-bold px-2.5 py-0.5 rounded-full text-white"
+                      style={{ backgroundColor: getThreadColor(kind) }}
+                    >
+                      {kind}
+                    </span>
+                    <span className="text-[11px] text-[#75666B]">
+                      {groupTags.length} {groupTags.length === 1 ? 'topic' : 'topics'}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    {groupTags.map((tag) => (
+                      <div key={tag.id} className="group relative">
+                        {kind === 'place' || kind === 'origin' ? (
+                          <OriginHoverCard origin={tag.name} placement="top">
+                            <TagSticker
+                              id={tag.id}
+                              name={tag.name}
+                              slug={tag.slug}
+                              kind={tag.kind}
+                              size="sm"
+                            />
+                          </OriginHoverCard>
+                        ) : (
+                          <TagSticker
+                            id={tag.id}
+                            name={tag.name}
+                            slug={tag.slug}
+                            kind={tag.kind}
+                            size="sm"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

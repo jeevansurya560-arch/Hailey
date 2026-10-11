@@ -46,19 +46,19 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] max-w-md w-full p-6 shadow-[var(--shadow-hard)] space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#34252A]/40 backdrop-blur-xs">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-3">
           <div className="flex items-center gap-2">
-            <BookOpen className="h-4 w-4 text-[var(--clay)]" />
-            <h2 className="font-serif text-lg font-bold text-[var(--ink)]">
+            <BookOpen className="h-4 w-4 text-[#6A1F35]" />
+            <h2 className="font-serif text-lg font-bold text-[#34252A]">
               {communityId ? `New ${defaultCommunityName || 'Community'} Collection` : 'New Personal Collection'}
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[var(--ink-2)] hover:text-[var(--ink)] p-1"
+            className="text-[#34252A]/50 hover:text-[#34252A] p-1.5 rounded-full hover:bg-[#F0E7DA] transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -71,8 +71,8 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
           }}
           className="space-y-4"
         >
-          <div className="space-y-1">
-            <label className="block font-mono text-xs text-[var(--ink)]">
+          <div className="space-y-1.5">
+            <label className="block font-mono text-xs text-[#34252A]/80 font-medium">
               Collection Title (required):
             </label>
             <input
@@ -82,12 +82,12 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
               placeholder="e.g. 1990s Tokyo Harajuku Archive"
               maxLength={80}
               required
-              className="w-full border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-sm text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)]"
+              className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] px-3.5 py-2.5 text-sm text-[#34252A] placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
             />
           </div>
 
-          <div className="space-y-1">
-            <label className="block font-mono text-xs text-[var(--ink)]">
+          <div className="space-y-1.5">
+            <label className="block font-mono text-xs text-[#34252A]/80 font-medium">
               Description (optional):
             </label>
             <textarea
@@ -96,12 +96,12 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Curated items documenting aesthetic artifacts, zines, and subcultural movements..."
               maxLength={500}
-              className="w-full border border-[var(--line)] bg-[var(--paper)] p-3 text-xs text-[var(--ink)] focus:border-[var(--ink)] focus:outline-none"
+              className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] p-3 text-xs text-[#34252A] placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
             />
           </div>
 
           {errorMsg && (
-            <div className="flex items-center gap-2 text-xs text-[var(--clay)] bg-red-50 p-2.5 border border-red-200">
+            <div className="flex items-center gap-2 text-xs text-rose-800 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
               <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -111,7 +111,7 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 font-mono text-xs text-[var(--ink-2)] hover:text-[var(--ink)]"
+              className="px-4 py-2 font-mono text-xs neu-pill rounded-full text-[#34252A]/70 hover:text-[#34252A] border border-[#E0D4C5] bg-[#FAF6EF] transition-all"
             >
               Cancel
             </button>
@@ -119,7 +119,7 @@ export function CreateCollectionModal({ isOpen, onClose, communityId, defaultCom
             <button
               type="submit"
               disabled={createMutation.isPending || !title.trim()}
-              className="flex items-center gap-2 border border-[var(--ink)] bg-[var(--clay)] px-5 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90 disabled:opacity-40"
+              className="flex items-center gap-2 neu-burgundy-pill px-5 py-2 font-mono text-xs uppercase tracking-wider text-[#FAF6EF] hover:bg-[#511528] rounded-full disabled:opacity-40 transition-all font-semibold"
             >
               {createMutation.isPending ? (
                 <>

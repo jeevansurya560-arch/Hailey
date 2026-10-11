@@ -25,29 +25,29 @@ export function RelevancePrompt({ userId, postId, initialAnswer = null, onAnswer
 
   if (isSubmitted) {
     return (
-      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--paper)] border border-[var(--line)] font-mono text-[11px] text-[var(--moss)]">
-        <Check className="h-3.5 w-3.5" />
+      <div className="neu-pill inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 font-mono text-[11px] text-emerald-800 font-medium">
+        <Check className="h-3.5 w-3.5 text-emerald-700" />
         <span>Relevance feedback saved</span>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 bg-[var(--paper)] border border-dashed border-[var(--line)] font-mono text-xs text-[var(--ink)]">
-      <div className="flex items-center gap-1.5 text-[var(--ink-2)]">
-        <HelpCircle className="h-3.5 w-3.5 text-[var(--clay)] shrink-0" />
+    <div className="neu-card rounded-2xl bg-[#F0E7DA]/60 border border-[#E0D4C5] p-3 flex flex-wrap items-center justify-between gap-2.5 font-mono text-xs text-[#34252A]">
+      <div className="flex items-center gap-1.5 text-[#34252A]/70">
+        <HelpCircle className="h-3.5 w-3.5 text-[#B08A50] shrink-0" />
         <span className="text-[11px]">Was this dispatch relevant to you?</span>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => handleAnswer('yes')}
           disabled={isSubmitting}
-          className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] uppercase font-bold transition-colors ${
+          className={`neu-pill flex items-center gap-1 px-3 py-1 rounded-full border text-[10px] uppercase font-bold cursor-pointer transition-all ${
             selectedAnswer === 'yes'
-              ? 'bg-emerald-100 border-emerald-600 text-emerald-800'
-              : 'border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)]'
+              ? 'bg-emerald-100 border-emerald-400 text-emerald-800'
+              : 'bg-[#FAF6EF] border-[#E0D4C5] hover:border-emerald-300 text-[#34252A]'
           }`}
         >
           <ThumbsUp className="h-3 w-3" />
@@ -58,10 +58,10 @@ export function RelevancePrompt({ userId, postId, initialAnswer = null, onAnswer
           type="button"
           onClick={() => handleAnswer('somewhat')}
           disabled={isSubmitting}
-          className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] uppercase font-bold transition-colors ${
+          className={`neu-pill flex items-center gap-1 px-3 py-1 rounded-full border text-[10px] uppercase font-bold cursor-pointer transition-all ${
             selectedAnswer === 'somewhat'
-              ? 'bg-amber-100 border-amber-600 text-amber-800'
-              : 'border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)]'
+              ? 'bg-amber-100 border-amber-400 text-amber-800'
+              : 'bg-[#FAF6EF] border-[#E0D4C5] hover:border-amber-300 text-[#34252A]'
           }`}
         >
           <span>Somewhat</span>
@@ -71,10 +71,10 @@ export function RelevancePrompt({ userId, postId, initialAnswer = null, onAnswer
           type="button"
           onClick={() => handleAnswer('no')}
           disabled={isSubmitting}
-          className={`flex items-center gap-1 px-2 py-0.5 rounded border text-[10px] uppercase font-bold transition-colors ${
+          className={`neu-pill flex items-center gap-1 px-3 py-1 rounded-full border text-[10px] uppercase font-bold cursor-pointer transition-all ${
             selectedAnswer === 'no'
-              ? 'bg-red-100 border-red-600 text-red-800'
-              : 'border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)]'
+              ? 'bg-red-100 border-red-400 text-red-800'
+              : 'bg-[#FAF6EF] border-[#E0D4C5] hover:border-red-300 text-[#34252A]'
           }`}
         >
           <ThumbsDown className="h-3 w-3" />

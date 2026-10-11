@@ -13,7 +13,6 @@ import { WikipediaCulturalArticle } from '../components/WikipediaCulturalArticle
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { TagSticker } from '@/components/ui/TagSticker'
 import { PostCard } from '@/features/posts/components/PostCard'
-import { getThreadColor } from '@/features/communities/threadColors'
 
 export function CulturePage() {
   const { slug } = useParams()
@@ -101,8 +100,8 @@ export function CulturePage() {
   if (isTagLoading || (isMasterLoading && !tag)) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-3">
-        <Loader2 className="h-6 w-6 animate-spin text-[var(--clay)]" />
-        <p className="font-mono text-xs uppercase tracking-widest text-[var(--ink-2)]">
+        <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
+        <p className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-semibold">
           Loading culture thread...
         </p>
       </div>
@@ -111,9 +110,9 @@ export function CulturePage() {
 
   if (!effectiveTag) {
     return (
-      <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-8 text-center space-y-3">
-        <h2 className="font-serif text-2xl font-bold text-[var(--ink)]">Culture Thread Not Found</h2>
-        <Link to="/explore" className="font-mono text-xs text-[var(--clay)] underline">
+      <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-8 text-center space-y-3">
+        <h2 className="font-serif text-2xl font-bold text-[#34252A]">Culture Thread Not Found</h2>
+        <Link to="/explore" className="font-mono text-xs text-[#6A1F35] underline font-semibold">
           ← Return to Taxonomy & 1M Atlas
         </Link>
       </div>
@@ -126,23 +125,20 @@ export function CulturePage() {
   return (
     <div className="space-y-8">
       {/* Culture Header Card */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 md:p-8 shadow-[var(--shadow-hard)] space-y-4">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 md:p-8 space-y-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-              <span
-                className="font-mono text-xs uppercase tracking-widest font-bold px-2 py-0.5 rounded text-white"
-                style={{ backgroundColor: getThreadColor(activeTag.kind) }}
-              >
+            <div className="flex items-center gap-2 mb-2 flex-wrap">
+              <span className="font-mono text-xs uppercase tracking-widest font-bold px-3 py-0.5 rounded-full bg-[#6A1F35] text-[#FAF6EF] shadow-xs">
                 {activeTag.kind}
               </span>
 
               {activeTag.parent && (
-                <div className="flex items-center gap-1 font-mono text-xs text-[var(--ink-2)]">
+                <div className="flex items-center gap-1 font-mono text-xs text-[#34252A]/70">
                   <span>child of</span>
                   <Link
                     to={`/c/${activeTag.parent.slug}`}
-                    className="text-[var(--clay)] font-semibold hover:underline"
+                    className="text-[#6A1F35] font-semibold hover:underline"
                   >
                     {activeTag.parent.name}
                   </Link>
@@ -150,12 +146,12 @@ export function CulturePage() {
               )}
             </div>
 
-            <h1 className="font-serif text-3xl md:text-5xl font-bold tracking-tight text-[var(--ink)]">
+            <h1 className="font-serif text-3xl md:text-5xl font-bold tracking-tight text-[#34252A]">
               {activeTag.name}
             </h1>
 
             {activeTag.description && (
-              <p className="mt-2 text-sm md:text-base text-[var(--ink-2)] max-w-2xl leading-relaxed">
+              <p className="mt-2 text-sm md:text-base text-[#34252A]/80 max-w-2xl leading-relaxed">
                 {activeTag.description}
               </p>
             )}
@@ -166,10 +162,10 @@ export function CulturePage() {
               type="button"
               onClick={() => toggleExploringMutation.mutate(!isExploring)}
               disabled={toggleExploringMutation.isPending || typeof activeTag.id !== 'number'}
-              className={`flex items-center gap-1.5 px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-[var(--radius)] border self-start md:self-auto transition-all ${
+              className={`flex items-center gap-1.5 px-5 py-2.5 font-mono text-xs uppercase tracking-wider rounded-full border self-start md:self-auto cursor-pointer transition-all ${
                 isExploring
-                  ? 'border-[var(--moss)] bg-emerald-50 text-[var(--moss)] hover:bg-red-50 hover:text-red-700 hover:border-red-300'
-                  : 'border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90'
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-red-50 hover:text-red-700 hover:border-red-300'
+                  : 'neu-burgundy-pill text-[#FAF6EF]'
               }`}
             >
               {isExploring ? (
@@ -189,11 +185,11 @@ export function CulturePage() {
 
         {/* Child Sub-threads */}
         {activeTag.childTags && activeTag.childTags.length > 0 && (
-          <div className="border-t border-[var(--line)] pt-3 space-y-2">
-            <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-2)] font-bold">
+          <div className="border-t border-[#E0D4C5] pt-3.5 space-y-2">
+            <span className="font-mono text-[11px] uppercase tracking-wider text-[#B08A50] font-bold">
               Sub-movements & Variations:
             </span>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-2">
               {activeTag.childTags.map((child) => (
                 <Link key={child.id} to={`/c/${child.slug}`}>
                   <TagSticker
@@ -211,9 +207,9 @@ export function CulturePage() {
 
         {/* Related Topic Edges */}
         {activeTag.relatedTags && activeTag.relatedTags.length > 0 && (
-          <div className="border-t border-[var(--line)] pt-3 space-y-2">
-            <div className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-2)] font-bold">
-              <GitBranch className="h-3.5 w-3.5 text-[var(--clay)]" />
+          <div className="border-t border-[#E0D4C5] pt-3.5 space-y-2">
+            <div className="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider text-[#B08A50] font-bold">
+              <GitBranch className="h-3.5 w-3.5 text-[#6A1F35]" />
               <span>Related Cultural Threads (Culture Graph):</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -226,7 +222,7 @@ export function CulturePage() {
                     kind={rel.kind}
                     size="sm"
                   />
-                  <span className="ml-1 font-mono text-[9px] text-[var(--ink-2)]">
+                  <span className="ml-1.5 font-mono text-[10px] text-[#34252A]/60">
                     ({Math.round(rel.weight * 100)}%)
                   </span>
                 </Link>
@@ -237,14 +233,14 @@ export function CulturePage() {
       </div>
 
       {/* View Switcher: Dispatches vs Encyclopedic Record */}
-      <div className="flex items-center gap-2 border-b border-[var(--line)] pb-2">
+      <div className="flex items-center gap-2 border-b border-[#E0D4C5] pb-3">
         <button
           type="button"
           onClick={() => setActiveTab('dispatches')}
-          className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+          className={`neu-pill px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-full cursor-pointer transition-all ${
             activeTab === 'dispatches'
-              ? 'bg-[var(--ink)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
-              : 'text-[var(--ink-2)] hover:text-[var(--ink)]'
+              ? 'neu-burgundy-pill text-[#FAF6EF] font-bold'
+              : 'bg-[#F0E7DA] text-[#34252A] hover:bg-[#FAF6EF]'
           }`}
         >
           Community Dispatches ({posts.length})
@@ -253,10 +249,10 @@ export function CulturePage() {
         <button
           type="button"
           onClick={() => setActiveTab('encyclopedia')}
-          className={`px-3 py-1.5 font-mono text-xs uppercase tracking-wider rounded transition-all ${
+          className={`neu-pill px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-full cursor-pointer transition-all ${
             activeTab === 'encyclopedia'
-              ? 'bg-[var(--clay)] text-[var(--paper)] font-bold shadow-[2px_2px_0_var(--ink)]'
-              : 'text-[var(--ink-2)] hover:text-[var(--clay)]'
+              ? 'neu-burgundy-pill text-[#FAF6EF] font-bold'
+              : 'bg-[#F0E7DA] text-[#34252A] hover:bg-[#FAF6EF]'
           }`}
         >
           Encyclopedic Archive {culturalEntity ? '· Verified' : ''}
@@ -288,67 +284,67 @@ export function CulturePage() {
         /* Main Grid: Dispatches and Communities */
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <div className="border-b border-[var(--line)] pb-2 flex items-center justify-between">
-              <h2 className="font-serif text-xl font-bold text-[var(--ink)] flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[var(--clay)]" />
+            <div className="border-b border-[#E0D4C5] pb-2 flex items-center justify-between">
+              <h2 className="font-serif text-xl font-bold text-[#34252A] flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-[#B08A50]" />
                 Top Dispatches on {activeTag.name} ({posts.length})
               </h2>
             </div>
 
-          {isPostsLoading && (
-            <div className="py-8 text-center font-mono text-xs text-[var(--ink-2)]">
-              Loading dispatches...
-            </div>
-          )}
-
-          {!isPostsLoading && posts.length === 0 && (
-            <div className="border border-dashed border-[var(--line)] p-8 text-center font-mono text-xs text-[var(--ink-2)]">
-              No dispatches tagged with {activeTag.name} yet.
-            </div>
-          )}
-
-          <div className="space-y-6">
-            {posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onDelete={() => {
-                  queryClient.invalidateQueries({ queryKey: ['culture_posts', activeTag.id] })
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Linked Communities */}
-        <div className="space-y-6">
-          <div className="border border-[var(--line)] bg-[var(--paper-2)] p-5 space-y-4">
-            <div className="flex items-center gap-2 text-[var(--clay)] border-b border-[var(--line)] pb-2">
-              <Users className="h-4 w-4" />
-              <h3 className="font-serif text-base font-bold text-[var(--ink)]">
-                Linked Collectives
-              </h3>
-            </div>
-            {!activeTag.linkedCommunities || activeTag.linkedCommunities.length === 0 ? (
-              <p className="text-xs text-[var(--ink-2)]">No community collectives directly linked.</p>
-            ) : (
-              <div className="space-y-2">
-                {activeTag.linkedCommunities.map((comm) => (
-                  <Link
-                    key={comm.id}
-                    to={`/communities/${comm.slug}`}
-                    className="block p-2 border border-[var(--line)] bg-[var(--paper)] hover:border-[var(--ink)] transition-colors"
-                  >
-                    <span className="font-mono text-xs font-bold text-[var(--ink)]">
-                      {comm.name}
-                    </span>
-                  </Link>
-                ))}
+            {isPostsLoading && (
+              <div className="py-8 text-center font-mono text-xs text-[#B08A50]">
+                Loading dispatches...
               </div>
             )}
+
+            {!isPostsLoading && posts.length === 0 && (
+              <div className="neu-inset rounded-2xl bg-[#F0E7DA]/40 border border-[#E0D4C5] p-8 text-center font-mono text-xs text-[#34252A]/60">
+                No dispatches tagged with {activeTag.name} yet.
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onDelete={() => {
+                    queryClient.invalidateQueries({ queryKey: ['culture_posts', activeTag.id] })
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Linked Communities */}
+          <div className="space-y-6">
+            <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-5 space-y-4">
+              <div className="flex items-center gap-2 text-[#6A1F35] border-b border-[#E0D4C5] pb-2.5">
+                <Users className="h-4 w-4 text-[#6A1F35]" />
+                <h3 className="font-serif text-base font-bold text-[#34252A]">
+                  Linked Collectives
+                </h3>
+              </div>
+              {!activeTag.linkedCommunities || activeTag.linkedCommunities.length === 0 ? (
+                <p className="text-xs text-[#34252A]/60">No community collectives directly linked.</p>
+              ) : (
+                <div className="space-y-2">
+                  {activeTag.linkedCommunities.map((comm) => (
+                    <Link
+                      key={comm.id}
+                      to={`/communities/${comm.slug}`}
+                      className="block p-3 rounded-xl neu-pill bg-[#F0E7DA] border border-[#E0D4C5] hover:border-[#6A1F35]/40 transition-colors"
+                    >
+                      <span className="font-mono text-xs font-bold text-[#34252A] hover:text-[#6A1F35]">
+                        {comm.name}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       )}
     </div>
   )

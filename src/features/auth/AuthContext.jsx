@@ -32,13 +32,15 @@ export function AuthProvider({ children }) {
     }
   }, [])
 
-  const signUp = async (email, password, handle) => {
+  const signUp = async (email, password, handle, name) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
           handle: handle || email.split('@')[0],
+          name: name || undefined,
+          display_name: name || undefined,
         },
       },
     })

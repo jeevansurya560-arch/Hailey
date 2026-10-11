@@ -1,36 +1,65 @@
+import { CURATED_CULTURAL_MARKETS } from './culturalMarketsData'
+
 /**
  * Service for Cultural Outcome Markets.
- * Client-safe: uses fetch to invoke /api/markets.
+ * Client-safe: uses fetch to invoke /api/markets, with rich fallback to curated cultural products.
  */
 
 export async function listMarkets({ status = null, category = null } = {}) {
-  const res = await fetch('/api/markets', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'list', status, category }),
-  })
+  let apiMarkets = []
 
-  const json = await res.json()
-  if (!res.ok) {
-    throw new Error(json.error || 'Failed to list markets')
+  try {
+    const res = await fetch('/api/markets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'list', status, category }),
+    })
+
+    if (res.ok) {
+      const json = await res.json()
+      apiMarkets = json.markets || []
+    }
+  } catch (err) {
+    console.warn('[marketService] Backend API offline, serving curated cultural markets:', err.message)
   }
 
-  return json.markets || []
+  // Combine backend markets with curated cultural product markets
+  const apiIds = new Set(apiMarkets.map((m) => m.id))
+  const enrichedCurated = CURATED_CULTURAL_MARKETS.filter((m) => !apiIds.has(m.id))
+
+  let combined = [...apiMarkets, ...enrichedCurated]
+
+  // Apply filters
+  if (category) {
+    combined = combined.filter((m) => m.category === category)
+  }
+  if (status) {
+    combined = combined.filter((m) => m.status === status)
+  }
+
+  return combined
 }
 
 export async function getMarket(marketId) {
-  const res = await fetch('/api/markets', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action: 'get', marketId }),
-  })
+  try {
+    const res = await fetch('/api/markets', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'get', marketId }),
+    })
 
-  const json = await res.json()
-  if (!res.ok) {
-    throw new Error(json.error || 'Failed to fetch market')
+    if (res.ok) {
+      const json = await res.json()
+      if (json.market) return json.market
+    }
+  } catch {
+    // Fallback to local curated
   }
 
-  return json.market
+  const match = CURATED_CULTURAL_MARKETS.find((m) => m.id === marketId)
+  if (match) return match
+
+  throw new Error('Market not found')
 }
 
 export async function createMarket({

@@ -87,35 +87,35 @@ export function ProfilePage() {
   return (
     <div className="space-y-8">
       {/* Profile Header */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)]">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 md:p-8">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
           <div className="flex items-center gap-4">
-            <div className="h-16 w-16 border border-[var(--ink)] bg-[var(--paper)] flex items-center justify-center shadow-[2px_2px_0_var(--ink)]">
-              <User className="h-8 w-8 text-[var(--ink-2)]" />
+            <div className="h-16 w-16 rounded-full neu-circle bg-[#F0E7DA] border border-[#E0D4C5] flex items-center justify-center shrink-0">
+              <User className="h-8 w-8 text-[#6A1F35]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="font-serif text-2xl font-bold text-[var(--ink)]">
+                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#34252A]">
                   @{profile.handle}
                 </h1>
                 {isOwnProfile && (
-                  <span className="rounded bg-[var(--paper)] border border-[var(--line)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-2)] font-bold">
+                  <span className="rounded-full bg-[#F0E7DA] border border-[#E0D4C5] px-2.5 py-0.5 font-mono text-[10px] text-[#6A1F35] font-bold">
                     You
                   </span>
                 )}
               </div>
-              <p className="mt-0.5 text-xs text-[var(--ink-2)] font-mono">
+              <p className="mt-0.5 text-xs text-[#34252A]/60 font-mono">
                 Cultural Contributor · Monad Testnet (Chain ID 10143)
               </p>
               {profile.wallet_address && (
-                <div className="flex items-center gap-1 font-mono text-[11px] text-[var(--onchain)] font-semibold mt-1">
+                <div className="flex items-center gap-1 font-mono text-[11px] text-[#6A1F35] font-semibold mt-1">
                   <Link2 className="h-3 w-3" />
                   <span>
                     {profile.wallet_address.slice(0, 6)}...{profile.wallet_address.slice(-4)}
                   </span>
                   <a
                     href={`/verify/${profile.wallet_address}`}
-                    className="ml-2 text-[10px] text-[var(--clay)] hover:underline"
+                    className="ml-2 text-[10px] text-[#B08A50] hover:underline"
                   >
                     View Onchain Ledger →
                   </a>
@@ -126,9 +126,9 @@ export function ProfilePage() {
 
           <div className="flex flex-wrap items-center gap-3">
             {isOwnProfile && <LazyWalletSection profile={profile} />}
-            <div className="flex items-center gap-2 border border-[var(--onchain)]/30 bg-[var(--paper)] px-3 py-1.5 text-xs shadow-[1.5px_1.5px_0_var(--ink)]">
-              <ShieldCheck className="h-4 w-4 text-[var(--onchain)]" />
-              <span className="font-mono text-[11px] text-[var(--ink)]">
+            <div className="flex items-center gap-2 neu-pill rounded-full border border-[#E0D4C5] bg-[#F0E7DA]/60 px-3.5 py-1.5 text-xs">
+              <ShieldCheck className="h-4 w-4 text-[#6A1F35]" />
+              <span className="font-mono text-[11px] text-[#34252A]">
                 Attestations: <strong>{attestedCount}</strong>
               </span>
             </div>
@@ -141,10 +141,10 @@ export function ProfilePage() {
 
       {/* Exploring Threads (PROF-01) */}
       {userInterests.length > 0 && (
-        <div className="border border-[var(--line)] bg-[var(--paper-2)] p-5 space-y-3 shadow-[var(--shadow-hard)]">
-          <div className="flex items-center gap-2 text-[var(--clay)] border-b border-[var(--line)] pb-2">
+        <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 space-y-3">
+          <div className="flex items-center gap-2 text-[#6A1F35] border-b border-[#E0D4C5] pb-3">
             <Compass className="h-4 w-4" />
-            <h2 className="font-serif text-base font-bold text-[var(--ink)]">
+            <h2 className="font-serif text-base font-bold text-[#34252A]">
               Exploring Threads ({userInterests.length})
             </h2>
           </div>
@@ -166,10 +166,10 @@ export function ProfilePage() {
 
       {/* Community Memberships */}
       {memberships.length > 0 && (
-        <div className="border border-[var(--line)] bg-[var(--paper-2)] p-5 space-y-3 shadow-[var(--shadow-hard)]">
-          <div className="flex items-center gap-2 text-[var(--clay)] border-b border-[var(--line)] pb-2">
+        <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 space-y-3">
+          <div className="flex items-center gap-2 text-[#6A1F35] border-b border-[#E0D4C5] pb-3">
             <Users className="h-4 w-4" />
-            <h2 className="font-serif text-base font-bold text-[var(--ink)]">
+            <h2 className="font-serif text-base font-bold text-[#34252A]">
               Collectives & Memberships ({memberships.length})
             </h2>
           </div>
@@ -178,11 +178,11 @@ export function ProfilePage() {
               <Link
                 key={m.id}
                 to={`/communities/${m.slug}`}
-                className="inline-flex items-center gap-1.5 border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 font-mono text-xs text-[var(--ink)] hover:border-[var(--ink)] transition-colors"
+                className="inline-flex items-center gap-1.5 neu-pill rounded-full border border-[#E0D4C5] bg-[#FAF6EF] px-3.5 py-1.5 font-mono text-xs text-[#34252A] hover:bg-[#F0E7DA] transition-all"
               >
                 <span>{m.name}</span>
                 {m.role === 'curator' && (
-                  <span className="bg-[var(--onchain)]/20 text-[var(--onchain)] text-[9px] px-1 py-0.2 rounded font-bold uppercase">
+                  <span className="bg-[#6A1F35]/15 text-[#6A1F35] text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">
                     Curator
                   </span>
                 )}
@@ -193,11 +193,11 @@ export function ProfilePage() {
       )}
 
       {/* Verified Onchain Contributions (PROF-02 / PROF-03) */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)] space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+      <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-[var(--onchain)]" />
-            <h2 className="font-serif text-xl font-bold text-[var(--ink)]">
+            <ShieldCheck className="h-5 w-5 text-[#6A1F35]" />
+            <h2 className="font-serif text-xl font-bold text-[#34252A]">
               Verified Contributions ({contributions.length})
             </h2>
           </div>
@@ -205,7 +205,7 @@ export function ProfilePage() {
           {profile.wallet_address && (
             <Link
               to={`/verify/${profile.wallet_address}`}
-              className="font-mono text-xs text-[var(--clay)] hover:underline flex items-center gap-1"
+              className="font-mono text-xs text-[#6A1F35] hover:text-[#511528] flex items-center gap-1 transition-colors"
             >
               <span>Onchain Ledger Verification</span>
               <ExternalLink className="h-3 w-3" />
@@ -214,7 +214,7 @@ export function ProfilePage() {
         </div>
 
         {contributions.length === 0 ? (
-          <div className="border border-dashed border-[var(--line)] p-8 text-center text-xs text-[var(--ink-2)] font-mono">
+          <div className="border border-dashed border-[#E0D4C5] rounded-xl p-8 text-center text-xs text-[#34252A]/60 font-mono">
             No contributions submitted or verified yet. Submit citations to community collections to earn verifiable onchain stamps.
           </div>
         ) : (
@@ -222,14 +222,14 @@ export function ProfilePage() {
             {contributions.map((c) => (
               <div
                 key={c.id}
-                className="border border-[var(--line)] bg-[var(--paper)] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3"
+                className="neu-card rounded-xl border border-[#E0D4C5] bg-[#F0E7DA]/40 p-4 flex flex-col md:flex-row md:items-center justify-between gap-3"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 font-mono text-xs">
-                    <span className="font-bold text-[var(--clay)]">
+                    <span className="font-bold text-[#6A1F35]">
                       Collective: {c.communities?.name || 'Global'}
                     </span>
-                    <span className="text-[10px] text-[var(--ink-2)]">
+                    <span className="text-[10px] text-[#34252A]/60">
                       · {new Date(c.created_at).toLocaleDateString()}
                     </span>
                   </div>
@@ -239,7 +239,7 @@ export function ProfilePage() {
                       href={c.collection_items.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs font-mono text-[var(--clay)] hover:underline flex items-center gap-1 truncate max-w-lg"
+                      className="text-xs font-mono text-[#6A1F35] hover:underline flex items-center gap-1 truncate max-w-lg"
                     >
                       <span>{c.collection_items.url}</span>
                       <ExternalLink className="h-3 w-3" />
@@ -247,13 +247,13 @@ export function ProfilePage() {
                   )}
 
                   {c.collection_items?.note && (
-                    <p className="text-xs text-[var(--ink)] italic">
+                    <p className="text-xs text-[#34252A] italic">
                       "{c.collection_items.note}"
                     </p>
                   )}
 
-                  <div className="font-mono text-[10px] text-[var(--ink-2)]">
-                    Hash: <code className="bg-gray-100 px-1 py-0.5">{c.content_hash.slice(0, 16)}...</code>
+                  <div className="font-mono text-[10px] text-[#34252A]/60">
+                    Hash: <code className="bg-[#FAF6EF] border border-[#E0D4C5] px-1.5 py-0.5 rounded">{c.content_hash.slice(0, 16)}...</code>
                   </div>
                 </div>
 
@@ -267,57 +267,57 @@ export function ProfilePage() {
       </div>
 
       {/* Security & Access Control Layer */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)] space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+      <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-3">
           <div className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-[var(--clay)]" />
-            <h2 className="font-serif text-lg font-bold text-[var(--ink)]">
+            <Lock className="h-4 w-4 text-[#6A1F35]" />
+            <h2 className="font-serif text-lg font-bold text-[#34252A]">
               Security & Access Control Layer
             </h2>
           </div>
-          <span className="font-mono text-[10px] uppercase font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 border border-emerald-300">
+          <span className="font-mono text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
             System Verified
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs">
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-4 space-y-2">
-            <div className="flex items-center gap-1.5 text-[var(--clay)] font-bold">
+          <div className="neu-card rounded-xl border border-[#E0D4C5] bg-[#F0E7DA]/40 p-4 space-y-2">
+            <div className="flex items-center gap-1.5 text-[#6A1F35] font-bold">
               <KeyRound className="h-4 w-4" />
               <span>Authentication</span>
             </div>
-            <p className="text-[11px] text-[var(--ink-2)] leading-relaxed">
+            <p className="text-[11px] text-[#34252A]/70 leading-relaxed font-sans">
               JWT Sessions managed via Supabase Auth with automated public handle bootstrapping.
             </p>
-            <div className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold pt-1">
+            <div className="flex items-center gap-1 text-[10px] text-emerald-800 font-semibold pt-1">
               <CheckCircle2 className="h-3 w-3" />
               <span>Active JWT Verified</span>
             </div>
           </div>
 
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-4 space-y-2">
-            <div className="flex items-center gap-1.5 text-[var(--clay)] font-bold">
+          <div className="neu-card rounded-xl border border-[#E0D4C5] bg-[#F0E7DA]/40 p-4 space-y-2">
+            <div className="flex items-center gap-1.5 text-[#6A1F35] font-bold">
               <Database className="h-4 w-4" />
               <span>Row Level Security (RLS)</span>
             </div>
-            <p className="text-[11px] text-[var(--ink-2)] leading-relaxed">
+            <p className="text-[11px] text-[#34252A]/70 leading-relaxed font-sans">
               PostgreSQL table-level isolation. User preference vectors and private interactions are protected.
             </p>
-            <div className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold pt-1">
+            <div className="flex items-center gap-1 text-[10px] text-emerald-800 font-semibold pt-1">
               <CheckCircle2 className="h-3 w-3" />
               <span>17 Tables Enforced</span>
             </div>
           </div>
 
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-4 space-y-2">
-            <div className="flex items-center gap-1.5 text-[var(--clay)] font-bold">
+          <div className="neu-card rounded-xl border border-[#E0D4C5] bg-[#F0E7DA]/40 p-4 space-y-2">
+            <div className="flex items-center gap-1.5 text-[#6A1F35] font-bold">
               <Server className="h-4 w-4" />
               <span>Ledger & Cryptography</span>
             </div>
-            <p className="text-[11px] text-[var(--ink-2)] leading-relaxed">
+            <p className="text-[11px] text-[#34252A]/70 leading-relaxed font-sans">
               Monad Testnet smart contract domain-separated Keccak-256 attestation with zero gas fees required.
             </p>
-            <div className="flex items-center gap-1 text-[10px] text-emerald-700 font-semibold pt-1">
+            <div className="flex items-center gap-1 text-[10px] text-emerald-800 font-semibold pt-1">
               <CheckCircle2 className="h-3 w-3" />
               <span>Monad Testnet Ready</span>
             </div>

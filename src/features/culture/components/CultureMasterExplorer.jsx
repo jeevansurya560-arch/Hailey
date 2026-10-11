@@ -14,6 +14,8 @@ import {
   X,
   Compass,
 } from 'lucide-react'
+import BlurText from '@/components/BlurText'
+import { OriginHoverCard } from './OriginHoverCard'
 import {
   fetchCultureMasterNodes,
   fetchCultureMasterDistribution,
@@ -56,79 +58,139 @@ export function CultureMasterExplorer() {
   return (
     <div className="space-y-6">
       {/* 1M Dataset Architectural Banner */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)] space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--line)] pb-4">
-          <div className="space-y-1">
+      <div className="neu-card rounded-2xl bg-[#F0E7DA]/60 border border-[#E0D4C5] p-6 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E0D4C5] pb-4">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs uppercase tracking-widest font-bold px-2 py-0.5 rounded bg-[var(--ink)] text-[var(--paper)]">
+              <span className="font-mono text-[10px] uppercase tracking-widest font-bold px-2.5 py-0.5 rounded-full bg-[#6A1F35] text-[#FAF6EF] shadow-sm">
                 Dataset v3.0-1M
               </span>
-              <span className="font-mono text-xs text-[var(--clay)] font-semibold flex items-center gap-1">
+              <span className="font-mono text-xs text-[#B08A50] font-semibold flex items-center gap-1">
                 <Database className="h-3.5 w-3.5" />
                 1,000,000 Research Nodes
               </span>
             </div>
-            <h2 className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-[var(--ink)]">
-              Hailey 1,000,000 Culture Master Atlas
-            </h2>
-            <p className="text-xs md:text-sm text-[var(--ink-2)] max-w-3xl leading-relaxed">
+            <BlurText
+              as="h2"
+              text="Hailey 1,000,000 Culture Master Atlas"
+              delay={110}
+              animateBy="words"
+              direction="top"
+              className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-[#34252A]"
+            />
+            <p className="text-xs md:text-sm text-[#34252A]/70 max-w-3xl leading-relaxed">
               Normalized structured research catalog covering 50 preserved seed cultures and 999,950 
               expanded anthropological content nodes indexed directly in PostgreSQL for server-side pagination and discovery.
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 text-right">
-            <div className="border border-[var(--line)] bg-[var(--paper)] p-3 rounded">
-              <span className="block font-mono text-[10px] uppercase text-[var(--ink-2)]">Total Nodes</span>
-              <span className="font-serif text-lg font-bold text-[var(--ink)]">
+            <div className="neu-card bg-[#FAF6EF] px-3.5 py-2.5 rounded-xl border border-[#E0D4C5]/80">
+              <span className="block font-mono text-[10px] uppercase text-[#34252A]/60 font-medium">Total Nodes</span>
+              <span className="font-serif text-lg font-bold text-[#34252A]">
                 {distData?.total_records?.toLocaleString() || '1,000,000'}
               </span>
             </div>
-            <div className="border border-[var(--line)] bg-[var(--paper)] p-3 rounded">
-              <span className="block font-mono text-[10px] uppercase text-[var(--ink-2)]">Priority Focus</span>
-              <span className="font-serif text-lg font-bold text-[var(--clay)]">4 Key Nations</span>
+            <div className="neu-card bg-[#FAF6EF] px-3.5 py-2.5 rounded-xl border border-[#E0D4C5]/80">
+              <span className="block font-mono text-[10px] uppercase text-[#34252A]/60 font-medium">Priority Focus</span>
+              <span className="font-serif text-lg font-bold text-[#6A1F35]">4 Key Nations</span>
             </div>
           </div>
         </div>
 
         {/* Priority Regional Distribution Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-2.5 rounded">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-mono font-bold text-[var(--ink)]">🇮🇳 India</span>
-              <span className="font-mono text-[11px] text-[var(--clay)] font-semibold">220,000</span>
-            </div>
-            <p className="font-mono text-[9px] text-[var(--ink-2)] mt-0.5">Ragas, Handlooms, Natya</p>
-          </div>
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-2.5 rounded">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-mono font-bold text-[var(--ink)]">🇺🇸 United States</span>
-              <span className="font-mono text-[11px] text-[var(--clay)] font-semibold">190,000</span>
-            </div>
-            <p className="font-mono text-[9px] text-[var(--ink-2)] mt-0.5">Blues, Jazz, Hip-Hop</p>
-          </div>
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-2.5 rounded">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-mono font-bold text-[var(--ink)]">🇩🇪 Germany</span>
-              <span className="font-mono text-[11px] text-[var(--clay)] font-semibold">150,000</span>
-            </div>
-            <p className="font-mono text-[9px] text-[var(--ink-2)] mt-0.5">Modular Sound, Bauhaus</p>
-          </div>
-          <div className="border border-[var(--line)] bg-[var(--paper)] p-2.5 rounded">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-mono font-bold text-[var(--ink)]">🇯🇵 Japan</span>
-              <span className="font-mono text-[11px] text-[var(--clay)] font-semibold">120,000</span>
-            </div>
-            <p className="font-mono text-[9px] text-[var(--ink-2)] mt-0.5">Indigo, Sashiko, Harajuku</p>
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+          <OriginHoverCard origin="India" placement="bottom" className="w-full">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedOrigin(selectedOrigin === 'India' ? '' : 'India')
+                setPage(1)
+              }}
+              className={`w-full text-left neu-card p-2.5 rounded-xl border transition-all cursor-pointer ${
+                selectedOrigin === 'India'
+                  ? 'bg-[#F0E7DA] border-[#6A1F35] shadow-xs'
+                  : 'bg-[#FAF6EF] border-[#E0D4C5]/70 hover:border-[#6A1F35]/40 hover:bg-[#F0E7DA]/50'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-mono font-bold text-[#34252A]">🇮🇳 India</span>
+                <span className="font-mono text-[11px] text-[#6A1F35] font-semibold">220,000</span>
+              </div>
+              <p className="font-mono text-[9px] text-[#34252A]/60 mt-0.5">Ragas, Handlooms, Natya</p>
+            </button>
+          </OriginHoverCard>
+
+          <OriginHoverCard origin="United States" placement="bottom" className="w-full">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedOrigin(selectedOrigin === 'United States' ? '' : 'United States')
+                setPage(1)
+              }}
+              className={`w-full text-left neu-card p-2.5 rounded-xl border transition-all cursor-pointer ${
+                selectedOrigin === 'United States'
+                  ? 'bg-[#F0E7DA] border-[#6A1F35] shadow-xs'
+                  : 'bg-[#FAF6EF] border-[#E0D4C5]/70 hover:border-[#6A1F35]/40 hover:bg-[#F0E7DA]/50'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-mono font-bold text-[#34252A]">🇺🇸 United States</span>
+                <span className="font-mono text-[11px] text-[#6A1F35] font-semibold">190,000</span>
+              </div>
+              <p className="font-mono text-[9px] text-[#34252A]/60 mt-0.5">Blues, Jazz, Hip-Hop</p>
+            </button>
+          </OriginHoverCard>
+
+          <OriginHoverCard origin="Germany" placement="bottom" className="w-full">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedOrigin(selectedOrigin === 'Germany' ? '' : 'Germany')
+                setPage(1)
+              }}
+              className={`w-full text-left neu-card p-2.5 rounded-xl border transition-all cursor-pointer ${
+                selectedOrigin === 'Germany'
+                  ? 'bg-[#F0E7DA] border-[#6A1F35] shadow-xs'
+                  : 'bg-[#FAF6EF] border-[#E0D4C5]/70 hover:border-[#6A1F35]/40 hover:bg-[#F0E7DA]/50'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-mono font-bold text-[#34252A]">🇩🇪 Germany</span>
+                <span className="font-mono text-[11px] text-[#6A1F35] font-semibold">150,000</span>
+              </div>
+              <p className="font-mono text-[9px] text-[#34252A]/60 mt-0.5">Modular Sound, Bauhaus</p>
+            </button>
+          </OriginHoverCard>
+
+          <OriginHoverCard origin="Japan" placement="bottom" className="w-full">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedOrigin(selectedOrigin === 'Japan' ? '' : 'Japan')
+                setPage(1)
+              }}
+              className={`w-full text-left neu-card p-2.5 rounded-xl border transition-all cursor-pointer ${
+                selectedOrigin === 'Japan'
+                  ? 'bg-[#F0E7DA] border-[#6A1F35] shadow-xs'
+                  : 'bg-[#FAF6EF] border-[#E0D4C5]/70 hover:border-[#6A1F35]/40 hover:bg-[#F0E7DA]/50'
+              }`}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-mono font-bold text-[#34252A]">🇯🇵 Japan</span>
+                <span className="font-mono text-[11px] text-[#6A1F35] font-semibold">120,000</span>
+              </div>
+              <p className="font-mono text-[9px] text-[#34252A]/60 mt-0.5">Indigo, Sashiko, Harajuku</p>
+            </button>
+          </OriginHoverCard>
         </div>
       </div>
 
       {/* Search & Filters */}
       <div className="space-y-3">
-        <div className="flex flex-col md:flex-row gap-2">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--ink-2)]" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#34252A]/40" />
             <input
               type="text"
               value={query}
@@ -137,11 +199,11 @@ export function CultureMasterExplorer() {
                 setPage(1)
               }}
               placeholder="Search 1M nodes by name, description, region, or slug (e.g. Raga, Modular, Indigo, Bronx)..."
-              className="w-full border border-[var(--ink)] bg-[var(--paper-2)] pl-10 pr-4 py-2 text-sm text-[var(--ink)] placeholder:text-[var(--ink-2)] focus:outline-none focus:ring-1 focus:ring-[var(--clay)] shadow-[2px_2px_0_var(--ink)]"
+              className="w-full neu-inset-input rounded-xl pl-10 pr-4 py-2.5 text-sm text-[#34252A] placeholder:text-[#34252A]/45 border border-[#E0D4C5] focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
             />
           </div>
 
-          <label className="flex items-center gap-2 px-3 py-2 border border-[var(--line)] bg-[var(--paper)] font-mono text-xs cursor-pointer select-none">
+          <label className="flex items-center gap-2 px-3.5 py-2 neu-pill rounded-xl border border-[#E0D4C5] bg-[#FAF6EF] font-mono text-xs cursor-pointer select-none text-[#34252A] hover:bg-[#F0E7DA] transition-colors">
             <input
               type="checkbox"
               checked={seedOnly}
@@ -149,7 +211,7 @@ export function CultureMasterExplorer() {
                 setSeedOnly(e.target.checked)
                 setPage(1)
               }}
-              className="rounded accent-[var(--clay)]"
+              className="rounded accent-[#6A1F35]"
             />
             <span>Original Seed Only</span>
           </label>
@@ -157,42 +219,45 @@ export function CultureMasterExplorer() {
 
         {/* Filter Chips: Origin & Kind */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-2)] font-bold">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-[#34252A]/60 font-bold">
             Origin:
           </span>
-          <button
-            type="button"
-            onClick={() => {
-              setSelectedOrigin('')
-              setPage(1)
-            }}
-            className={`px-2.5 py-0.5 font-mono text-xs rounded border transition-all ${
-              selectedOrigin === ''
-                ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]'
-                : 'bg-[var(--paper)] text-[var(--ink-2)] border-[var(--line)] hover:border-[var(--ink)]'
-            }`}
-          >
-            All Origins
-          </button>
-          {PRIORITY_ORIGINS.map((orig) => (
+          <OriginHoverCard origin="Global" placement="bottom">
             <button
-              key={orig}
               type="button"
               onClick={() => {
-                setSelectedOrigin(orig === selectedOrigin ? '' : orig)
+                setSelectedOrigin('')
                 setPage(1)
               }}
-              className={`px-2.5 py-0.5 font-mono text-xs rounded border transition-all ${
-                selectedOrigin === orig
-                  ? 'bg-[var(--clay)] text-[var(--paper)] border-[var(--clay)] font-bold'
-                  : 'bg-[var(--paper)] text-[var(--ink-2)] border-[var(--line)] hover:border-[var(--ink)]'
+              className={`px-3 py-1 font-mono text-xs rounded-full border transition-all cursor-pointer ${
+                selectedOrigin === ''
+                  ? 'neu-burgundy-pill border-[#6A1F35] font-semibold'
+                  : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
               }`}
             >
-              {orig}
+              All Origins
             </button>
+          </OriginHoverCard>
+          {PRIORITY_ORIGINS.map((orig) => (
+            <OriginHoverCard key={orig} origin={orig} placement="bottom">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedOrigin(orig === selectedOrigin ? '' : orig)
+                  setPage(1)
+                }}
+                className={`px-3 py-1 font-mono text-xs rounded-full border transition-all cursor-pointer ${
+                  selectedOrigin === orig
+                    ? 'neu-burgundy-pill border-[#6A1F35] font-semibold'
+                    : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
+                }`}
+              >
+                {orig}
+              </button>
+            </OriginHoverCard>
           ))}
 
-          <span className="ml-2 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-2)] font-bold">
+          <span className="ml-2 font-mono text-[11px] uppercase tracking-wider text-[#34252A]/60 font-bold">
             Kind:
           </span>
           <button
@@ -201,10 +266,10 @@ export function CultureMasterExplorer() {
               setSelectedKind('')
               setPage(1)
             }}
-            className={`px-2.5 py-0.5 font-mono text-xs rounded border transition-all ${
+            className={`px-3 py-1 font-mono text-xs rounded-full border transition-all ${
               selectedKind === ''
-                ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)]'
-                : 'bg-[var(--paper)] text-[var(--ink-2)] border-[var(--line)] hover:border-[var(--ink)]'
+                ? 'neu-burgundy-pill border-[#6A1F35] font-semibold'
+                : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
             }`}
           >
             All Kinds
@@ -217,10 +282,10 @@ export function CultureMasterExplorer() {
                 setSelectedKind(k === selectedKind ? '' : k)
                 setPage(1)
               }}
-              className={`px-2.5 py-0.5 font-mono text-xs rounded border capitalize transition-all ${
+              className={`px-3 py-1 font-mono text-xs rounded-full border capitalize transition-all ${
                 selectedKind === k
-                  ? 'bg-[var(--moss)] text-[var(--paper)] border-[var(--moss)] font-bold'
-                  : 'bg-[var(--paper)] text-[var(--ink-2)] border-[var(--line)] hover:border-[var(--ink)]'
+                  ? 'neu-burgundy-pill border-[#6A1F35] font-semibold'
+                  : 'neu-pill bg-[#FAF6EF] text-[#34252A]/70 border-[#E0D4C5] hover:border-[#6A1F35]/40'
               }`}
             >
               {k}
@@ -231,14 +296,14 @@ export function CultureMasterExplorer() {
 
       {/* Nodes Grid */}
       {isLoading ? (
-        <div className="py-16 text-center font-mono text-xs uppercase tracking-widest text-[var(--ink-2)]">
+        <div className="py-16 text-center font-mono text-xs uppercase tracking-widest text-[#34252A]/50">
           Querying 1,000,000 Culture Master Index...
         </div>
       ) : nodes.length === 0 ? (
-        <div className="border border-dashed border-[var(--line)] p-12 text-center space-y-2">
-          <Compass className="h-8 w-8 text-[var(--clay)] mx-auto opacity-70" />
-          <h3 className="font-serif text-lg font-bold text-[var(--ink)]">No Culture Nodes Found</h3>
-          <p className="text-xs text-[var(--ink-2)]">
+        <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-dashed border-[#E0D4C5] p-12 text-center space-y-2">
+          <Compass className="h-8 w-8 text-[#6A1F35] mx-auto opacity-70" />
+          <h3 className="font-serif text-lg font-bold text-[#34252A]">No Culture Nodes Found</h3>
+          <p className="text-xs text-[#34252A]/60">
             Try adjusting your search query, clearing origin filters, or unchecking "Original Seed Only".
           </p>
         </div>
@@ -247,61 +312,63 @@ export function CultureMasterExplorer() {
           {nodes.map((node) => (
             <div
               key={node.slug}
-              className="border border-[var(--line)] bg-[var(--paper-2)] p-4 rounded hover:border-[var(--ink)] transition-all flex flex-col justify-between space-y-3 shadow-sm"
+              className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-5 hover:border-[#6A1F35]/40 transition-all flex flex-col justify-between space-y-3"
             >
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between gap-1 flex-wrap">
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-[var(--clay)] text-white">
+                    <span className="font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-[#6A1F35] text-[#FAF6EF]">
                       {node.kind}
                     </span>
-                    <span className="font-mono text-[10px] text-[var(--ink-2)] border border-[var(--line)] px-1.5 py-0.5 rounded">
-                      {node.origin}
-                    </span>
+                    <OriginHoverCard origin={node.origin} placement="top">
+                      <span className="font-mono text-[10px] text-[#34252A]/70 border border-[#E0D4C5] bg-[#F0E7DA]/50 px-2 py-0.5 rounded-full hover:border-[#6A1F35]/60 hover:text-[#6A1F35] transition-colors cursor-help inline-block">
+                        {node.origin}
+                      </span>
+                    </OriginHoverCard>
                   </div>
 
                   {node.is_original_seed ? (
-                    <span className="font-mono text-[9px] uppercase tracking-wider font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-300 flex items-center gap-0.5">
+                    <span className="font-mono text-[9px] uppercase tracking-wider font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-0.5">
                       <ShieldCheck className="h-3 w-3" />
                       Seed Record
                     </span>
                   ) : (
-                    <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--ink-2)] bg-[var(--paper)] px-1.5 py-0.5 rounded border border-[var(--line)]">
+                    <span className="font-mono text-[9px] uppercase tracking-wider text-[#34252A]/60 bg-[#F0E7DA]/40 px-2 py-0.5 rounded-full border border-[#E0D4C5]">
                       Research Node
                     </span>
                   )}
                 </div>
 
-                <h3 className="font-serif text-base font-bold text-[var(--ink)] leading-snug line-clamp-2">
+                <h3 className="font-serif text-base font-bold text-[#34252A] leading-snug line-clamp-2">
                   {node.name}
                 </h3>
 
-                <p className="text-xs text-[var(--ink-2)] line-clamp-3 leading-relaxed">
+                <p className="text-xs text-[#34252A]/70 line-clamp-3 leading-relaxed">
                   {node.description}
                 </p>
 
                 {node.experiences && node.experiences.length > 0 && (
-                  <div className="border-t border-[var(--line)] pt-2 space-y-1">
-                    <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--clay)] font-bold flex items-center gap-1">
+                  <div className="border-t border-[#E0D4C5]/80 pt-2.5 space-y-1">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-[#B08A50] font-bold flex items-center gap-1">
                       <Sparkles className="h-3 w-3" />
                       Exploration Vector:
                     </span>
-                    <p className="text-[11px] text-[var(--ink)] italic line-clamp-2">
+                    <p className="text-[11px] text-[#34252A]/85 italic line-clamp-2">
                       "{node.experiences[0]}"
                     </p>
                   </div>
                 )}
               </div>
 
-              <div className="border-t border-[var(--line)] pt-2 flex items-center justify-between">
-                <span className="font-mono text-[10px] text-[var(--ink-2)] truncate max-w-[150px]">
+              <div className="border-t border-[#E0D4C5]/80 pt-2.5 flex items-center justify-between">
+                <span className="font-mono text-[10px] text-[#34252A]/50 truncate max-w-[150px]">
                   {node.slug}
                 </span>
 
                 <button
                   type="button"
                   onClick={() => setSelectedNode(node)}
-                  className="flex items-center gap-1 font-mono text-[11px] text-[var(--clay)] hover:text-[var(--ink)] font-bold transition-colors"
+                  className="flex items-center gap-1 font-mono text-[11px] text-[#6A1F35] hover:text-[#511528] font-bold transition-colors"
                 >
                   <span>Inspect</span>
                   <ChevronRight className="h-3.5 w-3.5" />
@@ -314,8 +381,8 @@ export function CultureMasterExplorer() {
 
       {/* Pagination Bar */}
       {pagination.totalPages > 1 && (
-        <div className="flex items-center justify-between border-t border-[var(--line)] pt-4 font-mono text-xs">
-          <span className="text-[var(--ink-2)]">
+        <div className="flex items-center justify-between border-t border-[#E0D4C5] pt-4 font-mono text-xs">
+          <span className="text-[#34252A]/60">
             Showing Page {pagination.page} of {pagination.totalPages} ({pagination.total} records)
           </span>
 
@@ -324,7 +391,7 @@ export function CultureMasterExplorer() {
               type="button"
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-3 py-1.5 border border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[var(--paper-2)]"
+              className="px-3.5 py-1.5 neu-pill rounded-full border border-[#E0D4C5] bg-[#FAF6EF] text-[#34252A] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#F0E7DA] transition-all"
             >
               Previous
             </button>
@@ -332,7 +399,7 @@ export function CultureMasterExplorer() {
               type="button"
               disabled={page >= pagination.totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1.5 border border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[var(--paper-2)]"
+              className="px-3.5 py-1.5 neu-pill rounded-full border border-[#E0D4C5] bg-[#FAF6EF] text-[#34252A] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#F0E7DA] transition-all"
             >
               Next
             </button>
@@ -342,27 +409,29 @@ export function CultureMasterExplorer() {
 
       {/* Detailed Node Inspection Modal */}
       {selectedNode && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="border border-[var(--ink)] bg-[var(--paper-2)] max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-6">
-            <div className="flex items-start justify-between border-b border-[var(--line)] pb-4">
+        <div className="fixed inset-0 z-50 bg-[#34252A]/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl space-y-6">
+            <div className="flex items-start justify-between border-b border-[#E0D4C5] pb-4">
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs uppercase px-2 py-0.5 rounded bg-[var(--clay)] text-white font-bold">
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span className="font-mono text-xs uppercase px-2.5 py-0.5 rounded-full bg-[#6A1F35] text-[#FAF6EF] font-bold">
                     {selectedNode.kind}
                   </span>
-                  <span className="font-mono text-xs text-[var(--ink-2)] border border-[var(--line)] px-2 py-0.5 rounded">
-                    {selectedNode.origin}
-                  </span>
+                  <OriginHoverCard origin={selectedNode.origin} placement="bottom">
+                    <span className="font-mono text-xs text-[#34252A]/70 border border-[#E0D4C5] bg-[#F0E7DA]/60 px-2.5 py-0.5 rounded-full hover:border-[#6A1F35]/60 hover:text-[#6A1F35] transition-colors cursor-help inline-block">
+                      {selectedNode.origin}
+                    </span>
+                  </OriginHoverCard>
                   {selectedNode.era && (
-                    <span className="font-mono text-[11px] text-[var(--ink-2)]">
+                    <span className="font-mono text-[11px] text-[#34252A]/60">
                       · {selectedNode.era}
                     </span>
                   )}
                 </div>
-                <h2 className="font-serif text-2xl font-bold text-[var(--ink)]">
+                <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#34252A]">
                   {selectedNode.name}
                 </h2>
-                <span className="font-mono text-[11px] text-[var(--ink-2)]">
+                <span className="font-mono text-[11px] text-[#34252A]/50">
                   Slug: {selectedNode.slug}
                 </span>
               </div>
@@ -370,7 +439,7 @@ export function CultureMasterExplorer() {
               <button
                 type="button"
                 onClick={() => setSelectedNode(null)}
-                className="p-1 rounded text-[var(--ink-2)] hover:text-[var(--ink)] hover:bg-[var(--paper)]"
+                className="p-1.5 rounded-full text-[#34252A]/60 hover:text-[#34252A] hover:bg-[#F0E7DA] transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -378,21 +447,21 @@ export function CultureMasterExplorer() {
 
             {/* Description */}
             <div className="space-y-2">
-              <span className="font-mono text-xs uppercase font-bold text-[var(--clay)] tracking-wider">
+              <span className="font-mono text-xs uppercase font-bold text-[#6A1F35] tracking-wider">
                 Research Summary:
               </span>
-              <p className="text-sm text-[var(--ink)] leading-relaxed">
+              <p className="text-sm text-[#34252A]/85 leading-relaxed">
                 {selectedNode.description}
               </p>
             </div>
 
             {/* Experiences / Prompts */}
             {selectedNode.experiences && selectedNode.experiences.length > 0 && (
-              <div className="space-y-2 border-t border-[var(--line)] pt-3">
-                <span className="font-mono text-xs uppercase font-bold text-[var(--clay)] tracking-wider">
+              <div className="space-y-2 border-t border-[#E0D4C5] pt-3.5">
+                <span className="font-mono text-xs uppercase font-bold text-[#B08A50] tracking-wider">
                   Field Guide Experiences:
                 </span>
-                <ul className="list-disc pl-5 space-y-1 text-xs text-[var(--ink)]">
+                <ul className="list-disc pl-5 space-y-1 text-xs text-[#34252A]/80">
                   {selectedNode.experiences.map((exp, i) => (
                     <li key={i}>{exp}</li>
                   ))}
@@ -401,18 +470,18 @@ export function CultureMasterExplorer() {
             )}
 
             {/* Practices & Places */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[var(--line)] pt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#E0D4C5] pt-3.5">
               {selectedNode.practices && selectedNode.practices.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="font-mono text-xs uppercase font-bold text-[var(--moss)] tracking-wider flex items-center gap-1">
+                  <span className="font-mono text-xs uppercase font-bold text-[#6A1F35] tracking-wider flex items-center gap-1">
                     <BookOpen className="h-3.5 w-3.5" />
                     Living Practices:
                   </span>
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {selectedNode.practices.map((p, i) => (
-                      <div key={i} className="text-xs border border-[var(--line)] bg-[var(--paper)] p-1.5 rounded">
-                        <span className="font-semibold">{p.name}</span>
-                        {p.type && <span className="font-mono text-[10px] text-[var(--ink-2)] block">{p.type}</span>}
+                      <div key={i} className="text-xs border border-[#E0D4C5] bg-[#F0E7DA]/50 p-2 rounded-xl">
+                        <span className="font-semibold text-[#34252A]">{p.name}</span>
+                        {p.type && <span className="font-mono text-[10px] text-[#34252A]/60 block">{p.type}</span>}
                       </div>
                     ))}
                   </div>
@@ -421,15 +490,15 @@ export function CultureMasterExplorer() {
 
               {selectedNode.places && selectedNode.places.length > 0 && (
                 <div className="space-y-1.5">
-                  <span className="font-mono text-xs uppercase font-bold text-[var(--clay)] tracking-wider flex items-center gap-1">
+                  <span className="font-mono text-xs uppercase font-bold text-[#B08A50] tracking-wider flex items-center gap-1">
                     <MapPin className="h-3.5 w-3.5" />
                     Key Geography:
                   </span>
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     {selectedNode.places.map((place, i) => (
-                      <div key={i} className="text-xs border border-[var(--line)] bg-[var(--paper)] p-1.5 rounded">
-                        <span className="font-semibold">{place.name}</span>
-                        {place.note && <span className="text-[11px] text-[var(--ink-2)] block">{place.note}</span>}
+                      <div key={i} className="text-xs border border-[#E0D4C5] bg-[#F0E7DA]/50 p-2 rounded-xl">
+                        <span className="font-semibold text-[#34252A]">{place.name}</span>
+                        {place.note && <span className="text-[11px] text-[#34252A]/60 block">{place.note}</span>}
                       </div>
                     ))}
                   </div>
@@ -439,18 +508,18 @@ export function CultureMasterExplorer() {
 
             {/* Timeline */}
             {selectedNode.timeline && selectedNode.timeline.length > 0 && (
-              <div className="space-y-2 border-t border-[var(--line)] pt-3">
-                <span className="font-mono text-xs uppercase font-bold text-[var(--clay)] tracking-wider flex items-center gap-1">
+              <div className="space-y-2 border-t border-[#E0D4C5] pt-3.5">
+                <span className="font-mono text-xs uppercase font-bold text-[#6A1F35] tracking-wider flex items-center gap-1">
                   <Clock className="h-3.5 w-3.5" />
                   Historical Milestones:
                 </span>
                 <div className="space-y-1.5">
                   {selectedNode.timeline.map((item, i) => (
                     <div key={i} className="flex items-start gap-2 text-xs">
-                      <span className="font-mono font-bold text-[var(--clay)] shrink-0 min-w-[70px]">
+                      <span className="font-mono font-bold text-[#6A1F35] shrink-0 min-w-[70px]">
                         {item.year}:
                       </span>
-                      <span className="text-[var(--ink)]">{item.event}</span>
+                      <span className="text-[#34252A]/85">{item.event}</span>
                     </div>
                   ))}
                 </div>
@@ -458,7 +527,7 @@ export function CultureMasterExplorer() {
             )}
 
             {/* Editorial Status & License Notice */}
-            <div className="border border-amber-300 bg-amber-50 p-3 rounded space-y-1 text-xs text-amber-900">
+            <div className="neu-card border border-amber-300/70 bg-amber-50/70 p-3.5 rounded-xl space-y-1 text-xs text-amber-900">
               <div className="flex items-center gap-1.5 font-bold">
                 <AlertCircle className="h-4 w-4 shrink-0 text-amber-700" />
                 <span>Editorial Provenance Notice:</span>
@@ -475,8 +544,8 @@ export function CultureMasterExplorer() {
 
             {/* Sources */}
             {selectedNode.sources && selectedNode.sources.length > 0 && (
-              <div className="space-y-1.5 border-t border-[var(--line)] pt-3">
-                <span className="font-mono text-xs uppercase font-bold text-[var(--ink-2)] tracking-wider">
+              <div className="space-y-1.5 border-t border-[#E0D4C5] pt-3.5">
+                <span className="font-mono text-xs uppercase font-bold text-[#34252A]/60 tracking-wider">
                   Academic & Institutional Sources:
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -486,7 +555,7 @@ export function CultureMasterExplorer() {
                       href={src.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--clay)] underline hover:text-[var(--ink)]"
+                      className="inline-flex items-center gap-1 font-mono text-[11px] text-[#6A1F35] underline hover:text-[#511528]"
                     >
                       <span>{src.label}</span>
                       <ExternalLink className="h-3 w-3" />

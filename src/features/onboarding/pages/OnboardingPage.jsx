@@ -117,8 +117,8 @@ export function OnboardingPage() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-[var(--clay)]" />
-        <p className="font-mono text-xs uppercase tracking-widest text-[var(--ink-2)]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#6A1F35]" />
+        <p className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-semibold">
           Loading culture catalog...
         </p>
       </div>
@@ -127,9 +127,9 @@ export function OnboardingPage() {
 
   if (isError) {
     return (
-      <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-6 text-center space-y-3">
-        <AlertCircle className="h-6 w-6 text-[var(--clay)] mx-auto" />
-        <p className="text-sm font-medium text-[var(--ink)]">
+      <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 text-center space-y-3">
+        <AlertCircle className="h-6 w-6 text-[#6A1F35] mx-auto" />
+        <p className="text-sm font-medium text-[#34252A]">
           Unable to load cultural taxonomy catalog.
         </p>
       </div>
@@ -139,30 +139,30 @@ export function OnboardingPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8 pb-12">
       {/* Header Banner */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 md:p-8 shadow-[var(--shadow-hard)]">
-        <div className="flex items-center gap-2 mb-2">
-          <Sparkles className="h-4 w-4 text-[var(--saffron)]" />
-          <span className="font-mono text-[11px] uppercase tracking-widest text-[var(--clay)] font-bold">
+      <div className="neu-card rounded-3xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 md:p-8 space-y-4">
+        <div className="flex items-center gap-2 mb-1">
+          <Sparkles className="h-4 w-4 text-[#B08A50]" />
+          <span className="font-mono text-[11px] uppercase tracking-widest text-[#B08A50] font-bold">
             Personalize Exploration
           </span>
         </div>
 
-        <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)]">
+        <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[#34252A]">
           What are you curious about?
         </h1>
 
-        <p className="mt-2 text-sm text-[var(--ink-2)] leading-relaxed">
-          Select <strong>3 to 10 cultural threads</strong> to guide your personalized feed and community recommendations. You can explore and adjust your threads anytime.
+        <p className="text-sm text-[#34252A]/80 leading-relaxed max-w-2xl">
+          Select <strong className="text-[#34252A]">3 to 10 cultural threads</strong> to guide your personalized feed and community recommendations. You can explore and adjust your threads anytime.
         </p>
 
         {/* Counter Badge */}
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--line)] pt-4">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-4 border-t border-[#E0D4C5] pt-4">
           <div className="flex items-center gap-2">
             <span
-              className={`font-mono text-xs px-2.5 py-1 border ${
+              className={`font-mono text-xs px-3 py-1 rounded-full border transition-all ${
                 isValid
-                  ? 'border-emerald-600 bg-emerald-50 text-emerald-800'
-                  : 'border-[var(--line)] bg-[var(--paper)] text-[var(--ink)]'
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
+                  : 'neu-inset bg-[#F0E7DA] border-[#E0D4C5] text-[#34252A]'
               }`}
             >
               <strong>{selectionCount}</strong> / 10 selected {selectionCount < 3 && '(minimum 3 required)'}
@@ -173,24 +173,24 @@ export function OnboardingPage() {
             type="button"
             onClick={() => saveInterestsMutation.mutate(Array.from(selectedTagIds))}
             disabled={!isValid || saveInterestsMutation.isPending}
-            className="flex items-center gap-2 border border-[var(--ink)] bg-[var(--clay)] px-5 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90 disabled:opacity-40 disabled:pointer-events-none transition-all"
+            className="neu-burgundy-pill flex items-center gap-2 rounded-full px-6 py-2.5 font-mono text-xs uppercase tracking-wider text-[#FAF6EF] disabled:opacity-40 disabled:pointer-events-none cursor-pointer transition-all"
           >
             {saveInterestsMutation.isPending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#FAF6EF]" />
                 <span>Saving...</span>
               </>
             ) : (
               <>
                 <span>Start Exploring</span>
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4 text-[#FAF6EF]" />
               </>
             )}
           </button>
         </div>
 
         {errorMsg && (
-          <div className="mt-4 flex items-center gap-2 text-xs text-[var(--clay)] bg-red-50 p-2.5 border border-red-200">
+          <div className="mt-4 flex items-center gap-2 text-xs text-[#6A1F35] bg-red-50 p-3 rounded-xl border border-red-200">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMsg}</span>
           </div>
@@ -198,23 +198,23 @@ export function OnboardingPage() {
       </div>
 
       {/* Category Groups Matrix */}
-      <div className="space-y-8">
+      <div className="space-y-6">
         {groupedBuckets.map((group) => (
           <section
             key={group.title}
-            className="border border-[var(--line)] bg-[var(--paper-2)] p-6 space-y-4"
+            className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-6 space-y-4"
           >
             <div>
-              <h2 className="font-serif text-lg font-bold text-[var(--ink)] flex items-center gap-2">
-                <Compass className="h-4 w-4 text-[var(--clay)]" />
+              <h2 className="font-serif text-lg font-bold text-[#34252A] flex items-center gap-2">
+                <Compass className="h-4 w-4 text-[#6A1F35]" />
                 {group.title}
               </h2>
-              <p className="text-xs text-[var(--ink-2)] font-mono mt-0.5">
+              <p className="text-xs text-[#34252A]/70 font-mono mt-0.5">
                 {group.subtitle}
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2.5 pt-2">
+            <div className="flex flex-wrap gap-2.5 pt-1">
               {group.tags.map((tag) => (
                 <TagSticker
                   key={tag.id}
@@ -233,15 +233,15 @@ export function OnboardingPage() {
       </div>
 
       {/* Floating Bottom Sticky Bar on Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[var(--paper)]/95 backdrop-blur border-t border-[var(--line)] md:hidden z-40 flex items-center justify-between">
-        <span className="font-mono text-xs">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#FAF6EF]/95 backdrop-blur-md border-t border-[#E0D4C5] neu-raised md:hidden z-40 flex items-center justify-between">
+        <span className="font-mono text-xs text-[#34252A]">
           <strong>{selectionCount}</strong>/10 selected
         </span>
         <button
           type="button"
           onClick={() => saveInterestsMutation.mutate(Array.from(selectedTagIds))}
           disabled={!isValid || saveInterestsMutation.isPending}
-          className="flex items-center gap-1.5 border border-[var(--ink)] bg-[var(--clay)] px-4 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] disabled:opacity-40"
+          className="neu-burgundy-pill flex items-center gap-1.5 rounded-full px-5 py-2 font-mono text-xs uppercase tracking-wider text-[#FAF6EF] disabled:opacity-40"
         >
           <span>Continue</span>
           <ArrowRight className="h-3.5 w-3.5" />

@@ -87,18 +87,18 @@ export function CommunityPage() {
   return (
     <div className="space-y-8">
       {/* Community Header Banner */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 md:p-8 shadow-[var(--shadow-hard)] space-y-4">
+      <div className="neu-card rounded-3xl bg-[#F0E7DA]/60 border border-[#E0D4C5] p-6 md:p-8 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-mono text-[11px] uppercase tracking-widest text-[var(--clay)] font-bold">
+            <div className="flex items-center gap-2 mb-1.5">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-[#B08A50] font-bold">
                 Cultural Collective
               </span>
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[var(--ink)]">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-[#34252A]">
               {community.name}
             </h1>
-            <p className="mt-2 text-sm text-[var(--ink-2)] max-w-2xl leading-relaxed">
+            <p className="mt-2 text-sm text-[#34252A]/75 max-w-2xl leading-relaxed">
               {community.description}
             </p>
           </div>
@@ -108,10 +108,10 @@ export function CommunityPage() {
               type="button"
               onClick={() => toggleMembershipMutation.mutate(!isMember)}
               disabled={toggleMembershipMutation.isPending}
-              className={`flex items-center gap-1.5 px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-[var(--radius)] border self-start md:self-auto transition-all ${
+              className={`flex items-center gap-1.5 px-4 py-2 font-mono text-xs uppercase tracking-wider rounded-full self-start md:self-auto transition-all ${
                 isMember
-                  ? 'border-[var(--moss)] bg-emerald-50 text-[var(--moss)] hover:bg-red-50 hover:text-red-700 hover:border-red-300'
-                  : 'border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] shadow-[2px_2px_0_var(--ink)] hover:opacity-90'
+                  ? 'neu-pill border border-emerald-300 bg-emerald-50/80 text-emerald-800 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300'
+                  : 'neu-burgundy-pill text-[#FAF6EF] hover:bg-[#511528]'
               }`}
             >
               {isMember ? (
@@ -130,24 +130,24 @@ export function CommunityPage() {
         </div>
 
         {/* Stats and Curators metadata row */}
-        <div className="flex flex-wrap items-center gap-6 border-t border-[var(--line)] pt-4 font-mono text-xs text-[var(--ink-2)]">
+        <div className="flex flex-wrap items-center gap-6 border-t border-[#E0D4C5] pt-4 font-mono text-xs text-[#34252A]/70">
           <div className="flex items-center gap-1.5">
-            <Users className="h-4 w-4 text-[var(--clay)]" />
+            <Users className="h-4 w-4 text-[#6A1F35]" />
             <span>
-              <strong>{community.membersCount}</strong> members
+              <strong className="text-[#34252A]">{community.membersCount}</strong> members
             </span>
           </div>
 
           {community.curators.length > 0 && (
             <div className="flex items-center gap-1.5">
-              <Shield className="h-4 w-4 text-[var(--onchain)]" />
+              <Shield className="h-4 w-4 text-[#B08A50]" />
               <span>
                 Curators:{' '}
                 {community.curators.map((curator) => (
                   <Link
                     key={curator.handle}
                     to={`/u/${curator.handle}`}
-                    className="text-[var(--ink)] font-bold hover:underline mr-1.5"
+                    className="text-[#6A1F35] font-bold hover:underline mr-1.5"
                   >
                     @{curator.handle}
                   </Link>
@@ -185,20 +185,20 @@ export function CommunityPage() {
             }}
           />
 
-          <div className="border-b border-[var(--line)] pb-2 flex items-center justify-between">
-            <h2 className="font-serif text-xl font-bold text-[var(--ink)]">
+          <div className="border-b border-[#E0D4C5] pb-2 flex items-center justify-between">
+            <h2 className="font-serif text-xl font-bold text-[#34252A]">
               Community Dispatches ({posts.length})
             </h2>
           </div>
 
           {isPostsLoading && (
-            <div className="py-8 text-center font-mono text-xs text-[var(--ink-2)]">
+            <div className="py-8 text-center font-mono text-xs text-[#34252A]/50">
               Loading dispatches...
             </div>
           )}
 
           {!isPostsLoading && posts.length === 0 && (
-            <div className="border border-dashed border-[var(--line)] p-8 text-center font-mono text-xs text-[var(--ink-2)]">
+            <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-dashed border-[#E0D4C5] p-8 text-center font-mono text-xs text-[#34252A]/60">
               No dispatches shared in this community yet. Be the first to publish one!
             </div>
           )}
@@ -218,11 +218,11 @@ export function CommunityPage() {
 
         {/* Right 1 Col: Collections section (COLL-01 / COLL-06) */}
         <div className="space-y-6">
-          <div className="border border-[var(--line)] bg-[var(--paper-2)] p-5 space-y-4 shadow-[var(--shadow-hard)]">
-            <div className="flex items-center justify-between border-b border-[var(--line)] pb-2">
-              <div className="flex items-center gap-2 text-[var(--saffron)]">
+          <div className="neu-card rounded-2xl bg-[#FAF6EF] border border-[#E0D4C5] p-5 space-y-4">
+            <div className="flex items-center justify-between border-b border-[#E0D4C5] pb-2.5">
+              <div className="flex items-center gap-2 text-[#6A1F35]">
                 <BookOpen className="h-4 w-4" />
-                <h3 className="font-serif text-base font-bold text-[var(--ink)]">
+                <h3 className="font-serif text-base font-bold text-[#34252A]">
                   Community Collections
                 </h3>
               </div>
@@ -231,7 +231,7 @@ export function CommunityPage() {
                 <button
                   type="button"
                   onClick={() => setIsCreateColOpen(true)}
-                  className="flex items-center gap-1 font-mono text-[11px] font-bold text-[var(--clay)] hover:underline"
+                  className="flex items-center gap-1 font-mono text-[11px] font-bold text-[#6A1F35] hover:text-[#511528] transition-colors"
                 >
                   <Plus className="h-3 w-3" />
                   <span>New</span>
@@ -239,12 +239,12 @@ export function CommunityPage() {
               )}
             </div>
 
-            <p className="text-xs text-[var(--ink-2)] leading-relaxed">
+            <p className="text-xs text-[#34252A]/65 leading-relaxed">
               Curated archives and verified contribution sets for this collective.
             </p>
 
             {collections.length === 0 ? (
-              <div className="border border-dashed border-[var(--line)] p-4 text-center font-mono text-[11px] text-[var(--ink-2)]">
+              <div className="border border-dashed border-[#E0D4C5] rounded-xl p-4 text-center font-mono text-[11px] text-[#34252A]/60">
                 No collections created yet. Start one today!
               </div>
             ) : (
@@ -253,24 +253,48 @@ export function CommunityPage() {
                   <Link
                     key={col.id}
                     to={`/collections/${col.id}`}
-                    className="block p-3 border border-[var(--line)] bg-[var(--paper)] hover:border-[var(--ink)] transition-all space-y-1 group"
+                    className="block p-3.5 rounded-xl border border-[#E0D4C5] bg-[#F0E7DA]/40 hover:bg-[#F0E7DA]/70 hover:border-[#6A1F35]/40 transition-all space-y-1 group"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-serif text-sm font-bold text-[var(--ink)] group-hover:text-[var(--clay)] transition-colors">
+                      <span className="font-serif text-sm font-bold text-[#34252A] group-hover:text-[#6A1F35] transition-colors">
                         {col.title}
                       </span>
-                      <span className="font-mono text-[10px] text-[var(--ink-2)]">
+                      <span className="font-mono text-[10px] text-[#34252A]/60">
                         {col.collection_items?.[0]?.count || 0} items
                       </span>
                     </div>
 
                     {col.description && (
-                      <p className="text-[11px] text-[var(--ink-2)] line-clamp-2">
+                      <p className="text-[11px] text-[#34252A]/70 line-clamp-2">
                         {col.description}
                       </p>
                     )}
 
-                    <div className="font-mono text-[10px] text-[var(--ink-2)] pt-1">
+                    {/* Cultural Artifact Product Thumbnails Strip */}
+                    {col.preview_thumbnails && col.preview_thumbnails.length > 0 && (
+                      <div className="flex items-center gap-1.5 pt-1 overflow-hidden">
+                        {col.preview_thumbnails.slice(0, 3).map((thumb, idx) => (
+                          <div
+                            key={idx}
+                            className="h-12 w-12 rounded-lg overflow-hidden bg-[#E0D4C5]/40 shrink-0 border border-[#E0D4C5]"
+                          >
+                            <img
+                              src={thumb}
+                              alt="Artifact Thumbnail"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              loading="lazy"
+                            />
+                          </div>
+                        ))}
+                        {col.preview_thumbnails.length > 3 && (
+                          <div className="h-12 w-8 rounded-lg bg-[#E0D4C5]/60 flex items-center justify-center text-[10px] font-mono text-[#6A1F35] font-bold shrink-0">
+                            +{col.preview_thumbnails.length - 3}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="font-mono text-[10px] text-[#34252A]/50 pt-1">
                       by @{col.profiles?.handle}
                     </div>
                   </Link>

@@ -21,8 +21,47 @@
   --color-plum: var(--plum);
   --color-onchain: var(--onchain);
 
+  --color-burgundy: var(--royal-burgundy);
+  --color-wine: var(--deep-wine);
+  --color-ivory: var(--porcelain-ivory);
+  --color-linen: var(--warm-linen);
+  --color-gold: var(--antique-gold);
+  --color-stone: var(--archive-stone);
+  --color-terracotta: var(--muted-terracotta);
+
   --radius-hailey: var(--radius);
   --shadow-hard: var(--shadow-hard);
+  --shadow-subtle: var(--shadow-subtle);
+  --shadow-card: var(--shadow-card);
+}
+
+@utility neu-raised {
+  box-shadow: var(--shadow-soft-raised);
+}
+@utility neu-card {
+  box-shadow: var(--shadow-soft-card);
+}
+@utility neu-pill {
+  box-shadow: var(--shadow-soft-pill);
+}
+@utility neu-circle {
+  box-shadow: var(--shadow-soft-circle);
+}
+@utility neu-inset {
+  box-shadow: var(--shadow-soft-inset);
+}
+@utility neu-inset-input {
+  box-shadow: var(--shadow-soft-inset-input);
+}
+@utility neu-burgundy {
+  background-color: #6A1F35;
+  color: #FAF6EF;
+  box-shadow: var(--shadow-burgundy-glow);
+}
+@utility neu-burgundy-pill {
+  background-color: #6A1F35;
+  color: #FAF6EF;
+  box-shadow: var(--shadow-burgundy-pill);
 }
 
 @layer base {
@@ -46,5 +85,19 @@
 
   code, pre, .font-mono {
     font-family: var(--font-mono);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--royal-burgundy);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

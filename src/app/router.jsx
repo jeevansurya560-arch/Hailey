@@ -16,6 +16,10 @@ import { PostDetailPage } from '@/features/posts/pages/PostDetailPage'
 import { OnboardingPage } from '@/features/onboarding/pages/OnboardingPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
 import { AuthPage } from '@/features/auth/pages/AuthPage'
+import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
+import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
+import { TermsPage } from '@/features/legal/pages/TermsPage'
+import { PrivacyPage } from '@/features/legal/pages/PrivacyPage'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 
 export function AppRoutes() {
@@ -44,6 +48,11 @@ export function AppRoutes() {
         />
         <Route path="/u/:handle" element={<ProfilePage />} />
         <Route path="/login" element={<AuthPage />} />
+        <Route path="/signup" element={<AuthPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

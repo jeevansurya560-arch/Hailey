@@ -21,7 +21,7 @@ export function WalletLinkSection({ profile }) {
             type="button"
             onClick={linkWallet}
             disabled={isLinking}
-            className="flex items-center gap-1.5 border border-[var(--onchain)] bg-[var(--paper)] px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-[var(--onchain)] font-bold shadow-[2px_2px_0_var(--onchain)] hover:bg-emerald-50 transition-all disabled:opacity-50"
+            className="flex items-center gap-1.5 neu-pill rounded-full border border-[#6A1F35] bg-[#FAF6EF] px-4 py-1.5 font-mono text-xs uppercase tracking-wider text-[#6A1F35] font-bold hover:bg-[#F0E7DA] transition-all disabled:opacity-50"
           >
             {isLinking ? (
               <>
@@ -38,15 +38,15 @@ export function WalletLinkSection({ profile }) {
         )}
 
         {isVerifiedForThisProfile && (
-          <div className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 border border-emerald-500 font-mono text-[11px] text-emerald-800 font-bold rounded-xs">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-300 font-mono text-[11px] text-emerald-800 font-bold rounded-full neu-pill">
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
             <span>Verified Owner</span>
           </div>
         )}
       </div>
 
       {error && (
-        <div className="flex items-center gap-1.5 text-red-600 font-mono text-xs mt-1">
+        <div className="flex items-center gap-1.5 text-rose-700 font-mono text-xs mt-1 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl neu-card">
           <AlertCircle className="h-3.5 w-3.5 shrink-0" />
           <span>{error}</span>
         </div>

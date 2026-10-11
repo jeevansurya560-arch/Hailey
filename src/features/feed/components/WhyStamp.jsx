@@ -9,20 +9,20 @@ export function WhyStamp({ why, isExplore = false, className = '' }) {
   return (
     <div
       className={`
-        inline-flex items-center gap-1.5 px-2.5 py-1 font-mono text-[10px] uppercase font-bold tracking-wider
-        rounded-[var(--radius)] border shadow-[1.5px_1.5px_0_var(--ink)]
+        neu-pill inline-flex items-center gap-1.5 px-3 py-1 font-mono text-[10px] uppercase font-bold tracking-wider
+        rounded-full border transition-all
         ${
           isExplore
-            ? '-rotate-1 bg-amber-50 border-[var(--saffron)] text-[var(--saffron)]'
-            : 'rotate-1 bg-[var(--paper)] border-[var(--ink)] text-[var(--ink)]'
+            ? 'bg-[#F0E7DA] border-[#B08A50]/40 text-[#B08A50]'
+            : 'bg-[#FAF6EF] border-[#6A1F35]/30 text-[#6A1F35]'
         }
         ${className}
       `}
     >
       {isExplore ? (
-        <Compass className="h-3 w-3 text-[var(--saffron)] shrink-0" />
+        <Compass className="h-3 w-3 text-[#B08A50] shrink-0" />
       ) : (
-        <Sparkles className="h-3 w-3 text-[var(--clay)] shrink-0" />
+        <Sparkles className="h-3 w-3 text-[#6A1F35] shrink-0" />
       )}
       <span>
         {isExplore ? 'DISCOVERY' : 'BECAUSE'} · {tagsFormatted}

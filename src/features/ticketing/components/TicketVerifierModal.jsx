@@ -35,37 +35,37 @@ export function TicketVerifierModal({ isOpen, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-md p-6 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl text-zinc-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#34252A]/40 backdrop-blur-sm animate-fade-in">
+      <div className="relative w-full max-w-md p-6 md:p-8 neu-card bg-[#FAF6EF] border border-[#E0D4C5] rounded-3xl shadow-2xl text-[#34252A] space-y-4">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
+          className="absolute top-5 right-5 text-[#34252A]/50 hover:text-[#34252A] p-1.5 rounded-full hover:bg-[#F0E7DA] transition-colors"
         >
           ✕
         </button>
 
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-purple-400">
+          <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-[#B08A50]">
             Access Gatekeeper
           </span>
-          <h2 className="text-lg font-bold text-white mt-0.5">Verify Wallet Entitlement</h2>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <h2 className="text-xl font-serif font-bold text-[#34252A] mt-0.5">Verify Wallet Entitlement</h2>
+          <p className="text-xs text-[#34252A]/70 mt-1 leading-relaxed">
             Check if an EVM address holds valid, unrevoked access without relying on email.
           </p>
         </div>
 
         {error && (
-          <div className="mt-4 p-3 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-lg text-xs">
+          <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs neu-card">
             {error}
           </div>
         )}
 
         {result && (
           <div
-            className={`mt-4 p-4 rounded-xl border text-xs space-y-2 ${
+            className={`p-4 rounded-2xl border text-xs space-y-2 neu-card ${
               result.granted
-                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200'
-                : 'bg-rose-500/10 border-rose-500/30 text-rose-200'
+                ? 'bg-emerald-50/80 border-emerald-300 text-emerald-900'
+                : 'bg-rose-50/80 border-rose-300 text-rose-900'
             }`}
           >
             <div className="flex items-center gap-2 text-sm font-bold">
@@ -73,7 +73,7 @@ export function TicketVerifierModal({ isOpen, onClose }) {
             </div>
             {result.granted ? (
               <div>
-                <p>Valid ticket: <span className="font-semibold">{result.ticket.event_title}</span></p>
+                <p>Valid ticket: <span className="font-semibold text-[#34252A]">{result.ticket.event_title}</span></p>
                 <p className="font-mono text-[11px] opacity-80 mt-1">Tier: {result.ticket.ticket_type} • ID: {result.ticket.id}</p>
               </div>
             ) : (
@@ -82,27 +82,27 @@ export function TicketVerifierModal({ isOpen, onClose }) {
           </div>
         )}
 
-        <form onSubmit={handleVerify} className="mt-4 space-y-3">
-          <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1">Event ID</label>
+        <form onSubmit={handleVerify} className="space-y-3.5">
+          <div className="space-y-1">
+            <label className="block text-xs font-mono font-medium text-[#34252A]/80">Event ID</label>
             <input
               type="text"
               placeholder="e.g. tokyo-underground-summit-2026"
               value={eventId}
               onChange={(e) => setEventId(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+              className="w-full px-3.5 py-2 neu-inset-input bg-[#FAF6EF] border border-[#E0D4C5] rounded-xl text-[#34252A] text-xs font-mono placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-xs font-medium text-zinc-300 mb-1">Attendee Wallet Address</label>
+          <div className="space-y-1">
+            <label className="block text-xs font-mono font-medium text-[#34252A]/80">Attendee Wallet Address</label>
             <input
               type="text"
               placeholder="0x..."
               value={walletAddress}
               onChange={(e) => setWalletAddress(e.target.value)}
-              className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-xl text-white text-xs font-mono focus:outline-none focus:border-purple-400"
+              className="w-full px-3.5 py-2 neu-inset-input bg-[#FAF6EF] border border-[#E0D4C5] rounded-xl text-[#34252A] text-xs font-mono placeholder:text-[#34252A]/40 focus:outline-none focus:ring-1 focus:ring-[#6A1F35]"
               required
             />
           </div>
@@ -110,7 +110,7 @@ export function TicketVerifierModal({ isOpen, onClose }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 px-4 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl shadow-lg shadow-purple-600/20 text-xs transition disabled:opacity-50"
+            className="w-full mt-2 py-3 px-4 bg-[#6A1F35] text-[#FAF6EF] hover:bg-[#511528] active:bg-[#3D0F1D] font-bold rounded-full text-xs uppercase tracking-wider shadow-md transition-all disabled:opacity-50 cursor-pointer"
           >
             {loading ? 'Verifying on Registry...' : 'Check Entitlement Status'}
           </button>

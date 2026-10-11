@@ -11,7 +11,7 @@ export function LazyWalletSection({ profile }) {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center gap-2 border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 font-mono text-xs text-[var(--ink-2)] animate-pulse">
+        <div className="neu-pill flex items-center gap-2 rounded-full border border-[#E0D4C5] bg-[#F0E7DA] px-4 py-2 font-mono text-xs text-[#34252A]/60 animate-pulse">
           <span>Loading wallet interface...</span>
         </div>
       }
