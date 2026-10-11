@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/tickets.js'
+export { default } from '../backend/api/tickets.js'

@@ -3,8 +3,8 @@ import {
   createMarket,
   takePosition,
   resolveMarket,
-} from '../../server/services/markets/marketService.js'
-import { supabaseAdmin } from '../../server/config/supabaseAdmin.js'
+} from '../../backend/server/services/markets/marketService.js'
+import { supabaseAdmin } from '../../backend/server/config/supabaseAdmin.js'
 
 describe('Cultural Outcome Markets (Unit Tests)', () => {
   beforeEach(() => {

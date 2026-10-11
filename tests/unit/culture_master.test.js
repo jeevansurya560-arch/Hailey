@@ -5,7 +5,7 @@ import {
   fetchCultureMasterNodes,
   fetchCultureMasterNodeBySlug,
   fetchCultureMasterDistribution,
-} from '../../src/features/culture/services/cultureMasterService.js'
+} from '../../frontend/src/features/culture/services/cultureMasterService.js'
 
 describe('Hailey 1,000,000 Culture Master Dataset Suite', () => {
   it('verifies SQL migration 0007 exists and defines high-performance schema', () => {

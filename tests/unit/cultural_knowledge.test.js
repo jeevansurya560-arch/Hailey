@@ -2,11 +2,11 @@ import { describe, it, expect } from 'vitest'
 import {
   VERIFIED_CULTURAL_ARCHIVE,
   fetchCulturalEntityBySlug,
-} from '../../src/features/culture/services/culturalKnowledgeService.js'
+} from '../../frontend/src/features/culture/services/culturalKnowledgeService.js'
 import {
   VERIFIED_FESTIVALS,
   fetchFestivalBySlug,
-} from '../../src/features/festivals/services/festivalService.js'
+} from '../../frontend/src/features/festivals/services/festivalService.js'
 
 describe('Cultural Knowledge & Festival Archives Integrity Test', () => {
   it('contains verified cultural entities with academic citations', () => {

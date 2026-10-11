@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { relayer } from '../../server/blockchain/relayer/relayer.js'
+import { relayer } from '../../backend/server/blockchain/relayer/relayer.js'
 import { computeCommunityId, computeContentHash } from '../../shared/crypto/hashing.js'
 
 // Load .env.local and .env into process.env if present

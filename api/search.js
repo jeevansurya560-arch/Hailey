@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/search.js'
+export { default } from '../backend/api/search.js'

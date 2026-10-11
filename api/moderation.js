@@ -1,1 +1,1 @@
-export { default } from '../server/api/routes/moderation.js'
+export { default } from '../backend/api/moderation.js'

@@ -98,4 +98,31 @@ describe('Adversarial Live RLS Security Defense (Vitest Security Suite)', () => 
 
     expect(error !== null || !data || data.length === 0).toBe(true)
   })
+
+  it('blocks direct client insertion and spoofing of media_assets records', async () => {
+    const { error } = await anonClient.from('media_assets').insert({
+      sha256_hash: '0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef',
+      media_type: 'image',
+      mime_type: 'image/jpeg',
+      file_size: 1024,
+      uploaded_by: '550e8400-e29b-41d4-a716-446655440099',
+    })
+
+    expect(error).not.toBeNull()
+  })
+
+  it('blocks direct client insertion and spoofing of media_safety_analyses records', async () => {
+    const { error } = await anonClient.from('media_safety_analyses').insert({
+      media_asset_id: '550e8400-e29b-41d4-a716-446655440099',
+      analysis_status: 'ANALYZED',
+      policy_status: 'ALLOWED',
+      overall_score: 0.0,
+      provider: 'client_hacked',
+      model: 'fake_model',
+      model_version: '1.0',
+      policy_version: 'graphic-content-v1',
+    })
+
+    expect(error).not.toBeNull()
+  })
 })

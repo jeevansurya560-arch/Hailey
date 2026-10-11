@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { aiAssistantService } from '../../server/services/ai/aiProviderService.js'
+import { aiAssistantService } from '../../backend/server/services/ai/aiProviderService.js'
 
 describe('server/services/ai/aiProviderService.js - Cultural AI Grounding Test', () => {
   it('answers queries matching verified cultural records with academic citations', async () => {

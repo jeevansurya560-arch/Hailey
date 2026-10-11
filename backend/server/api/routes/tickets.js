@@ -1,0 +1,185 @@
+import { verifyAuth } from '../../security/authorization/auth.js'
+import {
+  issueTicket,
+  verifyTicketAccess,
+  revokeTicket,
+  consumeTicket,
+} from '../../services/tickets/ticketService.js'
+import { supabaseAdmin } from '../../config/supabaseAdmin.js'
+import { rateLimiter, resolveTrustedIp } from '../../security/rateLimit.js'
+import { logAuditEvent } from '../../observability/auditLogger.js'
+
+export default async function ticketsRoute(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed. Use POST.' })
+  }
+
+  const ip = resolveTrustedIp(req)
+  const limit = await rateLimiter.check(`tickets:${ip}`, 40, 60000)
+
+  if (limit.isServiceUnavailable) {
+    res.setHeader('Retry-After', '30')
+    return res.status(503).json({
+      error: 'Rate limit service unavailable. Please retry shortly.',
+      retryAfterSeconds: 30,
+    })
+  }
+
+  if (!limit.allowed) {
+    const retrySec = Math.ceil(limit.resetMs / 1000)
+    res.setHeader('Retry-After', retrySec.toString())
+    return res.status(429).json({
+      error: 'Ticket operation rate limit exceeded. Please wait a moment.',
+      retryAfterSeconds: retrySec,
+    })
+  }
+
+  const { action } = req.body || {}
+
+  try {
+    // Public/Wallet-based verification endpoint (can be verified with or without user login)
+    if (action === 'verify') {
+      const { eventId, walletAddress, signature, challenge } = req.body || {}
+      if (!eventId || !walletAddress) {
+        return res.status(400).json({ error: 'eventId and walletAddress are required' })
+      }
+
+      const result = await verifyTicketAccess({
+        eventId,
+        walletAddress,
+        signature,
+        challenge,
+      })
+
+      await logAuditEvent({
+        who: walletAddress,
+        what: 'TICKET_VERIFIED',
+        target: eventId,
+        result: result.accessGranted ? 'SUCCESS' : 'DENIED',
+        ipAddress: ip,
+      })
+
+      return res.status(200).json(result)
+    }
+
+    // Authenticated endpoints
+    const { user, error: authError } = await verifyAuth(req.headers.authorization)
+    if (authError || !user) {
+      return res.status(401).json({ error: authError || 'Unauthorized. Valid Bearer token required.' })
+    }
+
+    if (action === 'issue' || action === 'claim') {
+      const { eventId, eventTitle, walletAddress, ticketType, metadata, expiresAt } = req.body || {}
+      if (!eventId || !eventTitle) {
+        return res.status(400).json({ error: 'eventId and eventTitle are required' })
+      }
+
+      // If walletAddress is not supplied, look up the user's linked wallet
+      let targetWallet = walletAddress
+      if (!targetWallet) {
+        const { data: profile } = await supabaseAdmin
+          .from('profiles')
+          .select('wallet_address')
+          .eq('id', user.id)
+          .single()
+        targetWallet = profile?.wallet_address
+      }
+
+      if (!targetWallet) {
+        return res.status(400).json({
+          error: 'No wallet address provided and user has no linked wallet. Connect wallet first.',
+        })
+      }
+
+      const ticket = await issueTicket({
+        eventId,
+        eventTitle,
+        ownerWalletAddress: targetWallet,
+        ownerUserId: user.id,
+        ticketType: ticketType || 'general',
+        metadata: metadata || {},
+        expiresAt: expiresAt || null,
+      })
+
+      await logAuditEvent({
+        who: user.id,
+        what: 'TICKET_ISSUED',
+        target: ticket.id,
+        result: 'SUCCESS',
+        ipAddress: ip,
+      })
+
+      return res.status(200).json({ ok: true, ticket })
+    }
+
+    if (action === 'list') {
+      const { data: tickets, error } = await supabaseAdmin
+        .from('tickets')
+        .select('*')
+        .eq('owner_user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        return res.status(500).json({ error: 'Failed to fetch tickets: ' + error.message })
+      }
+
+      return res.status(200).json({ ok: true, tickets })
+    }
+
+    if (action === 'consume' || action === 'revoke') {
+      const { ticketId } = req.body || {}
+      if (!ticketId) {
+        return res.status(400).json({ error: 'ticketId is required' })
+      }
+
+      // Fetch ticket to check ownership / authorization
+      const { data: ticket, error: ticketErr } = await supabaseAdmin
+        .from('tickets')
+        .select('*')
+        .eq('id', ticketId)
+        .single()
+
+      if (ticketErr || !ticket) {
+        return res.status(404).json({ error: 'Ticket not found.' })
+      }
+
+      // Check caller's profile for editorial status or linked wallet
+      const { data: profile } = await supabaseAdmin
+        .from('profiles')
+        .select('is_editorial, wallet_address')
+        .eq('id', user.id)
+        .single()
+
+      const isOwner =
+        ticket.owner_user_id === user.id ||
+        (profile?.wallet_address &&
+          ticket.owner_wallet_address &&
+          profile.wallet_address.toLowerCase() === ticket.owner_wallet_address.toLowerCase())
+      const isEditorial = Boolean(profile?.is_editorial)
+
+      if (!isOwner && !isEditorial) {
+        return res.status(403).json({
+          error: 'Forbidden. You are not the owner or authorized organizer of this ticket.',
+        })
+      }
+
+      if (action === 'consume') {
+        const consumed = await consumeTicket(ticketId)
+        return res.status(200).json({ ok: true, ticket: consumed })
+      }
+
+      if (action === 'revoke') {
+        const revoked = await revokeTicket(ticketId)
+        return res.status(200).json({ ok: true, ticket: revoked })
+      }
+    }
+
+    return res.status(400).json({
+      error: `Unsupported action '${action}'. Valid actions: 'verify', 'claim', 'issue', 'list', 'consume', 'revoke'`,
+    })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Internal Server Error'
+    console.error('[api/tickets] Error:', err)
+    return res.status(500).json({ error: msg })
+  }
+}

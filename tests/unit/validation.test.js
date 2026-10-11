@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validateApproveItemInput, validateProposeItemInput } from '../../server/security/validation/validate.js'
+import { validateApproveItemInput, validateProposeItemInput } from '../../backend/server/security/validation/validate.js'
 
 describe('server/security/validation/validate.js - Input Validation Unit Tests', () => {
   describe('validateApproveItemInput', () => {
