@@ -3,17 +3,41 @@ import { supabase } from '@/lib/supabase/client'
 import { AuthContext } from './types'
 import { getAppUrl } from './utils/urlUtils'
 
+import { ensureUserProfile } from '@/features/profile/services/profileService'
+
+function getInitialOAuthError() {
+  if (typeof window === 'undefined') return null
+  const hash = window.location.hash ? window.location.hash.substring(1) : ''
+  const hashParams = new URLSearchParams(hash)
+  const searchParams = new URLSearchParams(window.location.search)
+  const errorDesc = hashParams.get('error_description') || searchParams.get('error_description')
+  const errCode = hashParams.get('error_code') || searchParams.get('error_code')
+  const err = hashParams.get('error') || searchParams.get('error')
+
+  if (errorDesc || err) {
+    return errorDesc
+      ? decodeURIComponent(errorDesc.replace(/\+/g, ' '))
+      : `Authentication failed (${errCode || err})`
+  }
+  return null
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [oauthError, setOauthError] = useState(getInitialOAuthError)
 
   useEffect(() => {
+
     supabase.auth
       .getSession()
       .then(({ data: { session } }) => {
         setSession(session)
         setUser(session?.user ?? null)
+        if (session?.user) {
+          ensureUserProfile(session.user).catch(() => {})
+        }
         setLoading(false)
       })
       .catch(() => {
@@ -25,6 +49,10 @@ export function AuthProvider({ children }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      if (session?.user) {
+        setOauthError(null)
+        ensureUserProfile(session.user).catch(() => {})
+      }
       setLoading(false)
     })
 
@@ -195,6 +223,8 @@ export function AuthProvider({ children }) {
         user,
         session,
         loading,
+        oauthError,
+        clearOAuthError: () => setOauthError(null),
         signUp,
         signIn,
         signInWithGoogle,

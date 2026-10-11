@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { MapPin, Sparkles, Layers } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 
 const DEFAULT_CULTURAL_IMAGE = 'https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?q=80&w=800&auto=format&fit=crop'
 

@@ -1,17 +1,11 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { 
-  ShieldCheck, 
-  BookOpen, 
-  FileText, 
   ArrowLeft, 
   ArrowRight, 
   ExternalLink, 
   Scale, 
-  CheckCircle2, 
-  Sparkles,
-  Lock,
-  Globe
+  CheckCircle2
 } from 'lucide-react'
 import BlurText from '@/components/BlurText'
 

@@ -64,6 +64,36 @@
   box-shadow: var(--shadow-burgundy-pill);
 }
 
+/* ─── Hailey Festivals Two-Panel Layout (Desktop 42% / 58% side-by-side) ─────── */
+.hailey-festivals-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .hailey-festivals-layout {
+    display: grid !important;
+    grid-template-columns: 42% minmax(0, 1fr) !important;
+    column-gap: 2rem !important;
+    row-gap: 1.5rem !important;
+    align-items: start !important;
+  }
+
+  .hailey-festivals-calendar-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+    position: sticky;
+    top: 1.5rem;
+  }
+
+  .hailey-festivals-explorer-panel {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--line);

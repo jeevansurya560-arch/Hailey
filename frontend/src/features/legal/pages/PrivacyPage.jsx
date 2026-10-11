@@ -2,15 +2,10 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { 
   ShieldCheck, 
-  Lock, 
-  Database, 
-  Eye, 
   ArrowLeft, 
   ArrowRight, 
   ExternalLink, 
-  CheckCircle2, 
-  Globe, 
-  FileCheck
+  CheckCircle2
 } from 'lucide-react'
 import BlurText from '@/components/BlurText'
 

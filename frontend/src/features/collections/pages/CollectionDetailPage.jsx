@@ -14,7 +14,6 @@ import {
   AlertCircle,
   Lock,
   MapPin,
-  Sparkles,
   Image as ImageIcon,
 } from 'lucide-react'
 import {

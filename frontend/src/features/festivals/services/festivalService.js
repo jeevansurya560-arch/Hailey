@@ -9,13 +9,20 @@ export { VERIFIED_FESTIVALS }
  */
 export async function fetchAllFestivals() {
   try {
-    const { data, error } = await supabase
+    const fetchPromise = supabase
       .from('festivals')
       .select(`
         *,
         festival_occurrences (*)
       `)
       .order('name', { ascending: true })
+
+    // Timeout promise (3.5s) to guarantee loading never hangs permanently
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Supabase request timeout')), 3500)
+    )
+
+    const { data, error } = await Promise.race([fetchPromise, timeoutPromise])
 
     if (!error && data && data.length > 0) {
       return data
