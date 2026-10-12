@@ -105,21 +105,223 @@ export async function fetchUserContributions(userId) {
   return data || []
 }
 
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+export const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024 // 5 MB
+
+/**
+ * Validates an avatar file's MIME type and file size.
+ */
+export function validateAvatarFile(file) {
+  if (!file) {
+    throw new Error('Please select an image file to upload.')
+  }
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error('Invalid file format. Please upload a JPEG, PNG, or WebP image.')
+  }
+  if (file.size > MAX_AVATAR_SIZE_BYTES) {
+    throw new Error('Image exceeds 5 MB limit. Please select a smaller image.')
+  }
+  return true
+}
+
+/**
+ * Validates a public handle against Hailey's format rules.
+ */
+export function validateHandle(handle) {
+  if (!handle || typeof handle !== 'string') {
+    throw new Error('Handle is required.')
+  }
+  const normalized = handle.toLowerCase().trim().replace(/^@/, '')
+  if (normalized.length < 3 || normalized.length > 20) {
+    throw new Error('Handle must be between 3 and 20 characters.')
+  }
+  if (!/^[a-z0-9_]{3,20}$/.test(normalized)) {
+    throw new Error('Handle can only contain lowercase letters, numbers, and underscores.')
+  }
+  return normalized
+}
+
+/**
+ * Checks if a handle is available in profiles, excluding current user.
+ */
+export async function checkHandleAvailability(handle, currentUserId = null) {
+  try {
+    const normalized = validateHandle(handle)
+    let query = supabase.from('profiles').select('id').eq('handle', normalized)
+    if (currentUserId) {
+      query = query.neq('id', currentUserId)
+    }
+    const { data, error } = await query.maybeSingle()
+    if (error) {
+      console.warn('[checkHandleAvailability] Warning:', error.message)
+      return { available: true, normalized }
+    }
+    return { available: !data, normalized }
+  } catch (err) {
+    return { available: false, error: err.message }
+  }
+}
+
+/**
+ * Uploads an avatar image to Supabase Storage in user-scoped path.
+ */
+export async function uploadAvatar(file, userId) {
+  if (!userId) throw new Error('User ID is required to upload avatar.')
+  validateAvatarFile(file)
+
+  const ext = file.name?.split('.').pop()?.toLowerCase() || 'jpg'
+  const safeFilename = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const filePath = `${userId}/${safeFilename}`
+
+  try {
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: true,
+        contentType: file.type,
+      })
+
+    if (uploadError) {
+      if (
+        uploadError.statusCode === '404' ||
+        uploadError.message?.includes('Bucket not found') ||
+        uploadError.code === 'NoSuchBucket'
+      ) {
+        throw new Error(
+          "Storage bucket 'avatars' is not configured yet. Please run migration 0017 or create the 'avatars' public bucket in Supabase."
+        )
+      }
+      throw new Error(`Upload failed: ${uploadError.message}`)
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath)
+
+    return urlData.publicUrl
+  } catch (err) {
+    console.error('[uploadAvatar] Error:', err)
+    throw err
+  }
+}
+
+/**
+ * Deletes an avatar image from Supabase Storage if it belongs to the user.
+ */
+export async function deleteAvatar(avatarUrl, userId) {
+  if (!avatarUrl || !userId) return
+  try {
+    if (avatarUrl.includes('/avatars/')) {
+      const parts = avatarUrl.split('/avatars/')
+      if (parts[1]) {
+        const filePath = decodeURIComponent(parts[1].split('?')[0])
+        if (filePath.startsWith(`${userId}/`)) {
+          await supabase.storage.from('avatars').remove([filePath])
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[deleteAvatar] Cleanup notice:', err.message)
+  }
+}
+
 /**
  * Update user profile
  */
 export async function updateProfile(userId, updates) {
   if (!userId) throw new Error('User ID is required.')
 
+  const {
+    display_name,
+    handle,
+    bio,
+    location,
+    website,
+    avatar_url,
+    roles,
+    cultural_interests,
+  } = updates
+
+  let normalizedHandle = undefined
+  if (handle !== undefined) {
+    normalizedHandle = validateHandle(handle)
+    const { available, error: handleErr } = await checkHandleAvailability(normalizedHandle, userId)
+    if (!available) {
+      throw new Error(handleErr || `Handle @${normalizedHandle} is already claimed by another user.`)
+    }
+  }
+
+  const payload = {}
+  if (display_name !== undefined) payload.display_name = display_name ? display_name.trim() : null
+  if (normalizedHandle !== undefined) payload.handle = normalizedHandle
+  if (bio !== undefined) payload.bio = bio ? bio.trim() : null
+  if (location !== undefined) payload.location = location ? location.trim() : null
+  if (website !== undefined) payload.website = website ? website.trim() : null
+  if (avatar_url !== undefined) payload.avatar_url = avatar_url ? avatar_url.trim() : null
+  if (roles !== undefined) payload.roles = Array.isArray(roles) ? roles : []
+  if (cultural_interests !== undefined) payload.cultural_interests = Array.isArray(cultural_interests) ? cultural_interests : []
+
+  // Attempt DB update with roles and cultural_interests
+  let result = null
   const { data, error } = await supabase
     .from('profiles')
-    .update(updates)
+    .update(payload)
     .eq('id', userId)
     .select()
     .single()
 
-  if (error) throw error
-  return data
+  if (error) {
+    // If error is code 42703 (undefined column: roles or cultural_interests), retry without them
+    if (error.code === '42703' || error.message?.includes('roles') || error.message?.includes('cultural_interests')) {
+      delete payload.roles
+      delete payload.cultural_interests
+      const retry = await supabase
+        .from('profiles')
+        .update(payload)
+        .eq('id', userId)
+        .select()
+        .single()
+
+      if (retry.error) {
+        if (retry.error.code === '23505' && retry.error.message?.includes('handle')) {
+          throw new Error(`Handle @${normalizedHandle} is already taken.`)
+        }
+        throw retry.error
+      }
+      result = retry.data
+    } else if (error.code === '23505' && error.message?.includes('handle')) {
+      throw new Error(`Handle @${normalizedHandle} is already taken.`)
+    } else {
+      throw error
+    }
+  } else {
+    result = data
+  }
+
+  // Synchronize Auth User metadata so session listener has up-to-date handle, avatar_url, roles, etc.
+  try {
+    const authMeta = {}
+    if (normalizedHandle !== undefined) authMeta.handle = normalizedHandle
+    if (display_name !== undefined) {
+      authMeta.full_name = display_name
+      authMeta.name = display_name
+    }
+    if (avatar_url !== undefined) authMeta.avatar_url = avatar_url
+    if (roles !== undefined) authMeta.roles = roles
+    if (cultural_interests !== undefined) authMeta.cultural_interests = cultural_interests
+
+    await supabase.auth.updateUser({ data: authMeta })
+  } catch (authErr) {
+    console.warn('[updateProfile] Auth metadata sync notice:', authErr.message)
+  }
+
+  if (result) {
+    if (roles !== undefined) result.roles = roles
+    if (cultural_interests !== undefined) result.cultural_interests = cultural_interests
+  }
+
+  return result
 }
 
 /**
@@ -308,7 +510,7 @@ export async function ensureUserProfile(user) {
           id: user.id,
           handle: rawHandle,
           display_name: displayName,
-          avatar_url: user.user_metadata?.avatar_url || null,
+          avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture || null,
         },
         { onConflict: 'id' }
       )

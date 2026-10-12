@@ -66,9 +66,14 @@ async function runChainChecks() {
     '0x0000000000000000000000000000000000000000'
 
   if (!isAddress(contractAddress) || contractAddress === '0x0000000000000000000000000000000000000000') {
-    throw new Error(
-      `CONTRACT_ADDRESS is not deployed or configured (${contractAddress}). Cannot verify onchain state against zero address.`
-    )
+    console.log('⚠️ Status: BLOCKED')
+    console.log(`ℹ️ Reason: CONTRACT_ADDRESS is unconfigured (${contractAddress}).`)
+    console.log('ℹ️ Live onchain verification requires deploying contracts/src/HaileyContributions.sol and configuring a non-zero CONTRACT_ADDRESS in .env.local.')
+    console.log('\n🔒 Onchain check completed: marked as BLOCKED per specification (zero false claims).')
+    return {
+      status: 'BLOCKED',
+      reason: 'CONTRACT_ADDRESS unconfigured',
+    }
   }
 
   console.log(`📍 Contributor Address: ${testAddress}`)

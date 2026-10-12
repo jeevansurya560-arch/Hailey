@@ -3,6 +3,9 @@ import { useNavigate, useLocation, Link } from 'react-router-dom'
 import { Eye, EyeOff, ArrowRight, ArrowLeft, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 import { supabase } from '@/lib/supabase/client'
+import { DateOfBirthSelector } from '../components/DateOfBirthSelector'
+import { validateDateOfBirth } from '../utils/authValidation'
+import { getAppUrl } from '../utils/urlUtils'
 import BlurText from '@/components/BlurText'
 
 import { ARCHIVE_CULTURAL_IMAGES } from '../constants/culturalArchiveImages'
@@ -46,7 +49,9 @@ function GoogleIcon({ className = "h-4 w-4" }) {
 export function AuthPage() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { signIn, signUp } = useAuth()
+  const { user, loading: authLoading, signIn, signUp, signInWithGoogle, oauthError, clearOAuthError } = useAuth()
+
+  const from = location.state?.from?.pathname || '/'
 
   const isInitiallySignUp = location.pathname === '/signup'
   const [isSignUp, setIsSignUp] = useState(isInitiallySignUp)
@@ -59,19 +64,37 @@ export function AuthPage() {
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [errorMsg, setErrorMsg] = useState(null)
+  const [errorMsg, setErrorMsg] = useState(oauthError || null)
   const [submitting, setSubmitting] = useState(false)
   const [googleSubmitting, setGoogleSubmitting] = useState(false)
   const [imageList, setImageList] = useState(ARCHIVE_CULTURAL_IMAGES)
   const [imageIndex, setImageIndex] = useState(isInitiallySignUp ? 1 : 0)
 
-  // Sync state and image if URL changes between /login and /signup
+  // Redirect already authenticated users (or OAuth completions) to intended route
   useEffect(() => {
+    if (!authLoading && user) {
+      navigate(from, { replace: true })
+    }
+  }, [user, authLoading, from, navigate])
+
+  // Surface any OAuth redirect or session errors without cascading renders
+  const [prevOauthError, setPrevOauthError] = useState(oauthError)
+  if (prevOauthError !== oauthError) {
+    setPrevOauthError(oauthError)
+    if (oauthError) {
+      setErrorMsg(oauthError)
+    }
+  }
+
+  // Sync state and image if URL changes between /login and /signup without cascading renders
+  const [prevPathname, setPrevPathname] = useState(location.pathname)
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname)
     const nextSignUp = location.pathname === '/signup'
     setIsSignUp(nextSignUp)
     setImageIndex(nextSignUp ? 1 : 0)
     setErrorMsg(null)
-  }, [location.pathname])
+  }
 
   // Query live images from database tables (posts, communities, culture_master_dataset)
   useEffect(() => {
@@ -166,8 +189,6 @@ export function AuthPage() {
     setImageIndex((prev) => (prev - 1 + imageList.length) % imageList.length)
   }
 
-  const from = location.state?.from?.pathname || '/'
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrorMsg(null)
@@ -182,7 +203,23 @@ export function AuthPage() {
       return
     }
 
+    let dobVal = null
     if (isSignUp) {
+      if (!dob) {
+        setErrorMsg('Please select your complete Date of Birth (Month, Day, Year).')
+        return
+      }
+
+      const parts = dob.split('-')
+      if (parts.length === 3) {
+        dobVal = validateDateOfBirth(parts[2], parts[1], parts[0])
+      }
+
+      if (!dobVal || !dobVal.valid) {
+        setErrorMsg(dobVal?.error || 'Invalid Date of Birth.')
+        return
+      }
+
       if (confirmPassword && password !== confirmPassword) {
         setErrorMsg('Passwords do not match.')
         return
@@ -202,18 +239,15 @@ export function AuthPage() {
     setSubmitting(true)
     try {
       if (isSignUp) {
-        const birthYear = dob ? parseInt(dob.split('-')[0], 10) : undefined
-        const currentYear = new Date().getFullYear()
-        const isMinor = birthYear ? (currentYear - birthYear < 18) : false
-
         const { error } = await signUp(
           email,
           password,
           {
             handle: handle || undefined,
             fullName: fullName.trim() || undefined,
-            declaredBirthYear: birthYear,
-            isMinor,
+            declaredBirthYear: dobVal?.declaredBirthYear,
+            isMinor: Boolean(dobVal?.isMinor),
+            birthDate: dobVal?.birthDateString,
             termsAcceptedAt: new Date().toISOString(),
             termsVersion: 'v1.0',
           },
@@ -245,13 +279,12 @@ export function AuthPage() {
 
   const handleGoogleSignIn = async () => {
     setErrorMsg(null)
+    clearOAuthError?.()
     setGoogleSubmitting(true)
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}${from}`,
-        },
+      const redirectUrl = getAppUrl(from || '/')
+      const { error } = await signInWithGoogle({
+        redirectTo: redirectUrl,
       })
       if (error) {
         setErrorMsg(error.message)
@@ -474,22 +507,15 @@ export function AuthPage() {
                   />
                 </div>
 
-                {/* Date of Birth */}
-                <div className="space-y-1">
-                  <label
-                    htmlFor="auth-dob"
-                    className="block text-xs font-mono uppercase tracking-wider text-[#34252A]/80 font-medium"
-                  >
-                    Date of Birth
-                  </label>
-                  <input
-                    id="auth-dob"
-                    type="date"
-                    value={dob}
-                    onChange={(e) => setDob(e.target.value)}
-                    className="w-full neu-inset-input rounded-xl border border-[#E0D4C5] bg-[#FAF6EF] px-3.5 py-2.5 text-sm text-[#34252A] focus:outline-none focus:ring-1 focus:ring-[#6A1F35] transition-all"
-                  />
-                </div>
+                {/* Date of Birth Selector */}
+                <DateOfBirthSelector
+                  value={dob}
+                  onChange={(canonicalDate) => {
+                    setDob(canonicalDate)
+                    if (errorMsg) setErrorMsg(null)
+                  }}
+                  disabled={submitting}
+                />
               </>
             )}
 

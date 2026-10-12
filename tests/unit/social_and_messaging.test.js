@@ -2,13 +2,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import {
   fetchPostComments,
   addPostComment,
-  deletePostComment,
-  recordPostShare,
-  fetchPostSocialCounts,
 } from '../../frontend/src/features/posts/services/postInteractionService'
 import {
   getOrCreateConversation,
-  fetchMessages,
   sendMessage,
 } from '../../frontend/src/features/messages/services/messageService'
 import {
@@ -179,7 +175,7 @@ describe('Social Discourse & Author-Reader Interaction Suite', () => {
             select: (cols, opts) => {
               if (opts?.count === 'exact') {
                 return {
-                  eq: (col, val) => {
+                  eq: (col, _val) => {
                     if (col === 'following_id') return Promise.resolve({ count: 42, error: null })
                     if (col === 'follower_id') return Promise.resolve({ count: 18, error: null })
                     return Promise.resolve({ count: 0, error: null })

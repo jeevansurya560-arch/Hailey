@@ -6,9 +6,7 @@ import {
   Users,
   User,
   LogOut,
-  ShieldCheck,
   Ticket,
-  TrendingUp,
   Calendar,
   BarChart3,
   Sparkles,
@@ -19,7 +17,9 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { fetchUserInterestsCount } from '@/features/feed/services/feedService'
+import { fetchProfileById } from '@/features/profile/services/profileService'
 import { CulturalAssistantModal } from '@/features/assistant/components/CulturalAssistantModal'
+import { UserAvatar } from '@/components/ui/UserAvatar'
 
 function BotanicalEmblem({ className = "h-8 w-8 text-[#6A1F35]" }) {
   return (
@@ -72,8 +72,16 @@ export function AppShell() {
     }
   }, [user, checkingInterests, interestsCount, location.pathname, navigate])
 
+  // Fetch persisted profile to keep header avatar, display name and handle synchronized with updates
+  const { data: userProfile } = useQuery({
+    queryKey: ['profile', user?.id],
+    queryFn: () => (user ? fetchProfileById(user.id) : null),
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+  })
+
   const profilePath = user
-    ? `/u/${user.user_metadata?.handle || user.email?.split('@')[0] || 'me'}`
+    ? `/u/${userProfile?.handle || user.user_metadata?.handle || user.email?.split('@')[0] || 'me'}`
     : '/login'
 
   const [isCommunityOpen, setIsCommunityOpen] = useState(false)
@@ -96,10 +104,12 @@ export function AppShell() {
     }
   }, [])
 
-  // Close community menu on route change
-  useEffect(() => {
+  // Close community menu on route change without cascading renders
+  const [prevPathname, setPrevPathname] = useState(location.pathname)
+  if (prevPathname !== location.pathname) {
+    setPrevPathname(location.pathname)
     setIsCommunityOpen(false)
-  }, [location.pathname])
+  }
 
   const navItems = [
     { to: '/', label: 'Home', icon: Home, exact: true },
@@ -148,17 +158,18 @@ export function AppShell() {
               <div className="flex items-center gap-3">
                 <Link
                   to={profilePath}
-                  className="relative group rounded-full overflow-hidden border border-[#E0D4C5] p-0.5 hover:border-[#6A1F35] transition-colors"
+                  className="relative group"
                 >
-                  <img
-                    src={user.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=120&auto=format&fit=crop"}
-                    alt={user.user_metadata?.handle || "User Avatar"}
-                    className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover"
+                  <UserAvatar
+                    src={userProfile?.avatar_url || user.user_metadata?.avatar_url || user.user_metadata?.picture}
+                    handle={userProfile?.handle || user.user_metadata?.handle}
+                    displayName={userProfile?.display_name || user.user_metadata?.full_name || user.user_metadata?.name}
+                    size="sm"
                   />
                 </Link>
                 <button
                   type="button"
-                  onClick={() => signOut()}
+                  onClick={async () => { await signOut(); navigate('/login') }}
                   className="flex items-center gap-1.5 border border-[#6A1F35]/30 hover:border-[#6A1F35] bg-transparent text-[#6A1F35] hover:bg-[#6A1F35]/5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors"
                 >
                   <LogOut className="h-3.5 w-3.5" />

@@ -41,6 +41,8 @@ import { TagSticker } from '@/components/ui/TagSticker'
 import { CuratorEarningsCard } from '@/features/payments/components/CuratorEarningsCard'
 import { PostCard } from '@/features/posts/components/PostCard'
 import { EditProfileModal } from '../components/EditProfileModal'
+import { EditProfileErrorBoundary } from '../components/EditProfileErrorBoundary'
+import { UserAvatar } from '@/components/ui/UserAvatar'
 
 export function ProfilePage() {
   const { handle } = useParams()
@@ -247,19 +249,13 @@ export function ProfilePage() {
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
           {/* Avatar (Instagram Circle Style) */}
           <div className="relative group shrink-0">
-            <div className="h-24 w-24 md:h-28 md:w-28 rounded-full border-2 border-[var(--ink)] bg-[var(--paper)] overflow-hidden shadow-[2px_2px_0_var(--ink)] flex items-center justify-center">
-              {profile.avatar_url ? (
-                <img
-                  src={profile.avatar_url}
-                  alt={profile.handle}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <span className="font-serif text-3xl font-black text-[var(--clay)] uppercase">
-                  {(profile.handle || 'H').slice(0, 2)}
-                </span>
-              )}
-            </div>
+            <UserAvatar
+              src={profile.avatar_url}
+              handle={profile.handle}
+              displayName={profile.display_name}
+              size="2xl"
+              className="border-2 border-[var(--ink)] shadow-[2px_2px_0_var(--ink)]"
+            />
 
             {isOwnProfile && (
               <button
@@ -941,14 +937,18 @@ export function ProfilePage() {
       )}
 
       {/* ─── Edit Profile Modal ─────────────────────────────────────── */}
-      <EditProfileModal
-        profile={profile}
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onUpdated={() => {
-          queryClient.invalidateQueries({ queryKey: ['profile'] })
-        }}
-      />
+      {isEditModalOpen && (
+        <EditProfileErrorBoundary onClose={() => setIsEditModalOpen(false)}>
+          <EditProfileModal
+            profile={profile}
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            onUpdated={() => {
+              queryClient.invalidateQueries({ queryKey: ['profile'] })
+            }}
+          />
+        </EditProfileErrorBoundary>
+      )}
     </div>
   )
 }
