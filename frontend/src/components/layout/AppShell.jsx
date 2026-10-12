@@ -427,7 +427,6 @@ export function AppShell() {
               <Link to="/communities" className="hover:text-[#6A1F35] transition-colors">Collectives</Link>
               <Link to="/tickets" className="hover:text-[#6A1F35] transition-colors">Passes</Link>
               <Link to="/markets" className="hover:text-[#6A1F35] transition-colors">Markets</Link>
-              <Link to="/reddit" className="hover:text-[#6A1F35] transition-colors">Reddit Dispatches</Link>
               <span className="text-[#E0D4C5]">|</span>
               <Link to="/terms" className="hover:text-[#6A1F35] transition-colors">Terms</Link>
               <Link to="/privacy" className="hover:text-[#6A1F35] transition-colors">Privacy</Link>

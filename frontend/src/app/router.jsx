@@ -21,7 +21,6 @@ import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
 import { TermsPage } from '@/features/legal/pages/TermsPage'
 import { PrivacyPage } from '@/features/legal/pages/PrivacyPage'
-import { RedditFieldGuidePage } from '@/features/reddit/pages/RedditFieldGuidePage'
 import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute'
 
 export function AppRoutes() {
@@ -57,7 +56,6 @@ export function AppRoutes() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/reddit" element={<RedditFieldGuidePage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
