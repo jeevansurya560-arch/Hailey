@@ -75,7 +75,7 @@
 @media (min-width: 1024px) {
   .hailey-festivals-layout {
     display: grid !important;
-    grid-template-columns: 42% minmax(0, 1fr) !important;
+    grid-template-columns: 36% minmax(0, 1fr) !important;
     column-gap: 2rem !important;
     row-gap: 1.5rem !important;
     align-items: start !important;

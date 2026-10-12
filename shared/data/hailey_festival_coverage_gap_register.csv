@@ -1,0 +1,13 @@
+﻿tradition_group,priority,required_work,scope,recommended_sources,status
+Hindu,High,Annual dates by regional panchang for all 2025–2035 years,"Andhra/Telangana, Tamil, Bengali, Marathi, Gujarati, Nepali, other regional calendars",Drik Panchang by location/year; regional temple calendars,Not complete
+Islam,High,"Generate every Hijri observance for 2025–2035, with local moon-sighting differences",Global; Sunni/Shia distinctions and country authorities,Umm al-Qura calendar + national religious authorities,Not complete
+Judaism,High,"Pull major/minor holidays, fasts, Rosh Chodesh and special Shabbatot from Hebcal for every year",Israel and diaspora variants,Hebcal API with maj/min/mod/nx/mf/ss/ykk options,Partial; API extraction required
+Christianity,High,"Western, Eastern Orthodox, Oriental Orthodox, Ethiopian/Eritrean calendars and local saints' days",Global denominations and local calendars,Year-specific church calendars and computus,Not complete
+Buddhism,High,"Major and minor Theravada, Mahayana, Vajrayana and regional observances","Sri Lanka, Thailand, Myanmar, Laos, Cambodia, Tibet, Bhutan, Japan, Korea, China, Vietnam",National Sangha / temple calendars and reputable Buddhist sources,Not complete
+Sikhism,High,"Gurpurabs, martyrdom anniversaries, historical days and calendar conventions","Punjab, diaspora, SGPC/Nanakshahi vs lunar calendar differences",SGPC and Sikh calendar sources,Not complete
+Jainism,High,"Paryushana, Das Lakshana, fasting days, Tirthankara anniversaries",Shvetambara/Digambara calendars,Jain community calendar sources,Not complete
+Bahá’í,Medium,All holy days with correct calendar and sunset handling,Global; calendar rules changed in modern period,Official Bahá’í calendar and authoritative texts,Not complete
+Zoroastrian,Medium,"Gahambars, Nowruz, Khordad Sal, Muktad, Pateti, regional Parsi/Iranian differences","Fasli, Shahenshahi, Kadmi calendar traditions",Zoroastrian community calendars,Not complete
+Chinese / East Asian,High,"Chinese, Korean, Japanese, Vietnamese, Taoist and folk calendars separately","China, Taiwan, Hong Kong, Korea, Japan, Vietnam and diaspora",Published conversion tables and national cultural calendars,Partial; some Chinese dates included
+Indigenous / African / local,High,"Named local festival records, not umbrella placeholders",Every region; community-led documentation essential,UNESCO ICH plus official/community sources,Not complete
+National / civic / seasonal,Medium,"Official public holidays, harvest festivals, solstices and local commemorations",Country-specific,Official government and tourism calendars; astronomical sources,Partial
