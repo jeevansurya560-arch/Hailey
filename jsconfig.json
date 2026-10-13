@@ -1,13 +1,27 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "checkJs": false,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["frontend/src/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": [
-    "src"
+    "frontend/src/**/*",
+    "shared/**/*",
+    "tests/**/*",
+    "api/**/*",
+    "backend/**/*",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
   ]
 }
