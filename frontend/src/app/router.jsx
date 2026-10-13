@@ -30,7 +30,7 @@ export function AppRoutes() {
         <Route path="/" element={<HomePage />} />
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/festivals" element={<FestivalsPage />} />
-        <Route path="/analytics" element={<CreatorAnalyticsPage />} />
+        <Route path="/analytics" element={<Navigate to="/profile?tab=analytics" replace />} />
         <Route path="/c/:slug" element={<CulturePage />} />
         <Route path="/communities" element={<CommunitiesPage />} />
         <Route path="/communities/:slug" element={<CommunityPage />} />

@@ -110,6 +110,12 @@ export function AuthProvider({ children }) {
           terms_version: metadata.termsVersion || 'v1.0',
           is_minor: typeof metadata.isMinor === 'boolean' ? metadata.isMinor : false,
           declared_birth_year: metadata.declaredBirthYear,
+          ...(metadata.birthDate || metadata.birth_date || metadata.date_of_birth
+            ? {
+                birth_date: metadata.birthDate || metadata.birth_date || metadata.date_of_birth,
+                date_of_birth: metadata.birthDate || metadata.birth_date || metadata.date_of_birth,
+              }
+            : {}),
         },
       },
     })

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ShieldCheck,
@@ -50,10 +50,20 @@ export function ProfilePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const [activeTab, setActiveTab] = useState('posts') // 'posts' | 'saved' | 'analytics' | 'threads' | 'collectives' | 'attestations'
+  const [searchParams] = useSearchParams()
+  const initialTab = searchParams.get('tab') || 'posts'
+  const [activeTab, setActiveTab] = useState(initialTab) // 'posts' | 'saved' | 'analytics' | 'threads' | 'collectives' | 'attestations'
   const [viewMode, setViewMode] = useState('feed') // 'feed' | 'grid'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [copiedProfile, setCopiedProfile] = useState(false)
+
+  // Sync tab if query parameter changes
+  useEffect(() => {
+    const tabParam = searchParams.get('tab')
+    if (tabParam && ['posts', 'saved', 'analytics', 'threads', 'collectives', 'attestations'].includes(tabParam)) {
+      setActiveTab(tabParam)
+    }
+  }, [searchParams])
 
   // 1. Fetch profile by handle or authenticated user session
   const isOwnRoute = !handle || handle === 'me'

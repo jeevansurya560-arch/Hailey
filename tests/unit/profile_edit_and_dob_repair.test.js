@@ -89,6 +89,39 @@ describe('PHASE 3 & 5 — Profile Editing, DOB & OAuth Repair Suite', () => {
       expect(res25.isAdult).toBe(true)
       expect(res25.ageNotice).toBeNull()
     })
+
+    it('safely adjusts day count when transitioning from 31-day month to shorter month', () => {
+      let selectedDay = '31'
+      const newMonth = 4 // April
+      const year = 2024
+      const limit = getDaysInMonth(newMonth, year) // 30
+      if (parseInt(selectedDay, 10) > limit) {
+        selectedDay = String(limit)
+      }
+      expect(selectedDay).toBe('30')
+
+      const febLimit = getDaysInMonth(2, 2023)
+      if (parseInt(selectedDay, 10) > febLimit) {
+        selectedDay = String(febLimit)
+      }
+      expect(selectedDay).toBe('28')
+
+      const leapFebLimit = getDaysInMonth(2, 2024)
+      let leapDay = '31'
+      if (parseInt(leapDay, 10) > leapFebLimit) {
+        leapDay = String(leapFebLimit)
+      }
+      expect(leapDay).toBe('29')
+    })
+
+    it('formats canonical date as YYYY-MM-DD calendar string without UTC shift', () => {
+      const res = validateDateOfBirth(21, 8, 1999)
+      expect(res.valid).toBe(true)
+      expect(res.birthDateString).toBe('1999-08-21')
+      expect(res.declaredBirthYear).toBe(1999)
+      expect(typeof res.birthDateString).toBe('string')
+      expect(res.birthDateString).not.toContain('T') // Calendar date only, not ISO timestamp
+    })
   })
 
   describe('Google OAuth Callback Error Parsing & URL Resilience', () => {

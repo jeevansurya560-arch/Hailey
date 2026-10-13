@@ -77,24 +77,20 @@ export function AuthPage() {
     }
   }, [user, authLoading, from, navigate])
 
-  // Surface any OAuth redirect or session errors without cascading renders
-  const [prevOauthError, setPrevOauthError] = useState(oauthError)
-  if (prevOauthError !== oauthError) {
-    setPrevOauthError(oauthError)
+  // Surface any OAuth redirect or session errors
+  useEffect(() => {
     if (oauthError) {
       setErrorMsg(oauthError)
     }
-  }
+  }, [oauthError])
 
-  // Sync state and image if URL changes between /login and /signup without cascading renders
-  const [prevPathname, setPrevPathname] = useState(location.pathname)
-  if (prevPathname !== location.pathname) {
-    setPrevPathname(location.pathname)
+  // Sync state and image if URL changes between /login and /signup
+  useEffect(() => {
     const nextSignUp = location.pathname === '/signup'
     setIsSignUp(nextSignUp)
     setImageIndex(nextSignUp ? 1 : 0)
     setErrorMsg(null)
-  }
+  }, [location.pathname])
 
   // Query live images from database tables (posts, communities, culture_master_dataset)
   useEffect(() => {

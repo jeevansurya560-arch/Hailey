@@ -1,4 +1,10 @@
 import { supabase } from '@/lib/supabase/client'
+import {
+  isDemoContentEnabled,
+  getDemoAuthorByHandle,
+  getDemoAuthorById,
+  getDemoPostsByAuthorId,
+} from '@/features/culture/data/demonstrationDispatches'
 
 /**
  * Fetch profile by handle
@@ -12,8 +18,29 @@ export async function fetchProfileByHandle(handle) {
     .eq('handle', handle)
     .maybeSingle()
 
+  if (data) return data
+
+  if (isDemoContentEnabled()) {
+    const demo = getDemoAuthorByHandle(handle)
+    if (demo) {
+      return {
+        id: demo.id,
+        handle: demo.handle,
+        display_name: demo.display_name,
+        avatar_url: demo.avatar_url,
+        bio: demo.bio,
+        location: demo.location,
+        roles: demo.roles,
+        is_demo: true,
+        is_editorial: true,
+        is_verified: true,
+        created_at: '2026-01-01T00:00:00Z',
+      }
+    }
+  }
+
   if (error) throw error
-  return data
+  return null
 }
 
 /**
@@ -21,6 +48,25 @@ export async function fetchProfileByHandle(handle) {
  */
 export async function fetchProfileById(userId) {
   if (!userId) return null
+
+  if (typeof userId === 'string' && userId.startsWith('demo-') && isDemoContentEnabled()) {
+    const demo = getDemoAuthorById(userId)
+    if (demo) {
+      return {
+        id: demo.id,
+        handle: demo.handle,
+        display_name: demo.display_name,
+        avatar_url: demo.avatar_url,
+        bio: demo.bio,
+        location: demo.location,
+        roles: demo.roles,
+        is_demo: true,
+        is_editorial: true,
+        is_verified: true,
+        created_at: '2026-01-01T00:00:00Z',
+      }
+    }
+  }
 
   const { data, error } = await supabase
     .from('profiles')
@@ -352,6 +398,10 @@ export async function saveUserInterests({ userId, tagIds, weight = 5, source = '
  */
 export async function fetchUserPosts(userId) {
   if (!userId) return []
+
+  if (typeof userId === 'string' && userId.startsWith('demo-') && isDemoContentEnabled()) {
+    return getDemoPostsByAuthorId(userId)
+  }
 
   const { data: posts, error } = await supabase
     .from('posts')

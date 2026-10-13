@@ -14,7 +14,8 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
   const { user } = useAuth()
   const queryClient = useQueryClient()
   const fileInputRef = useRef(null)
-
+  const [title, setTitle] = useState('')
+  const [location, setLocation] = useState('')
   const [body, setBody] = useState('')
   const [mediaUrl, setMediaUrl] = useState('')
   const [mediaCredit, setMediaCredit] = useState('')
@@ -124,9 +125,17 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
         throw new Error('Source URL must be a valid http:// or https:// web address.')
       }
 
+      let payloadBody = trimmedBody
+      if (title.trim()) {
+        const titleLocation = location.trim()
+          ? `${title.trim()} (${location.trim()})`
+          : title.trim()
+        payloadBody = `${titleLocation} — ${trimmedBody}`
+      }
+
       return createPost({
         authorId: user.id,
-        body: trimmedBody,
+        body: payloadBody,
         communityId: selectedCommunityId || null,
         mediaUrl: mediaUrl.trim() || null,
         mediaCredit: mediaCredit.trim() || null,
@@ -135,6 +144,8 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
       })
     },
     onSuccess: () => {
+      setTitle('')
+      setLocation('')
       setBody('')
       setMediaUrl('')
       setMediaCredit('')
@@ -143,6 +154,8 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
       setShowExtras(false)
       setErrorMsg(null)
       queryClient.invalidateQueries({ queryKey: ['posts'] })
+      queryClient.invalidateQueries({ queryKey: ['explore_dispatches'] })
+      queryClient.invalidateQueries({ queryKey: ['profile_posts'] })
       onPostCreated?.()
     },
     onError: (err) => {
@@ -171,6 +184,37 @@ export function PostComposer({ defaultCommunityId, onPostCreated }) {
         <span className="font-mono text-xs uppercase tracking-widest text-[#B08A50] font-bold">
           Dispatch Composer
         </span>
+      </div>
+
+      {/* Title & Tradition Location Inputs */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="block font-mono text-[11px] text-[#34252A] font-semibold">
+            Tradition / Artifact Title:
+          </label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g. Dohada Ritual, Kintsugi Pottery..."
+            maxLength={100}
+            className="w-full neu-inset-input rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs text-[#34252A] placeholder:text-[#34252A]/50 focus:border-[#6A1F35] focus:outline-none transition-all"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="block font-mono text-[11px] text-[#34252A] font-semibold">
+            Origin / Cultural Context (optional):
+          </label>
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="e.g. Kyoto, Japan or Kerala, India"
+            maxLength={80}
+            className="w-full neu-inset-input rounded-xl bg-[#F0E7DA] border border-[#E0D4C5] px-3.5 py-2 text-xs text-[#34252A] placeholder:text-[#34252A]/50 focus:border-[#6A1F35] focus:outline-none transition-all"
+          />
+        </div>
       </div>
 
       {/* Body textarea */}

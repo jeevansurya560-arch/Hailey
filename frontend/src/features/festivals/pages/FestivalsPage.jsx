@@ -344,12 +344,14 @@ export function FestivalsPage() {
           </p>
         </div>
 
-        {/* Right-side Restrained Cultural Illustration */}
-        <div className="hidden lg:block shrink-0 max-w-[420px]">
+        {/* Right-side Panoramic Cultural Landscape Illustration */}
+        <div className="hidden lg:block shrink-0 max-w-[480px] xl:max-w-[560px]">
           <img
-            src="/festivals/header_landscape.jpg"
-            alt="Traditional cultural landscape illustration with Japanese pagoda, Torii gate, and Mount Fuji under full moon"
-            className="w-full h-auto max-h-[175px] object-contain rounded-2xl opacity-95 shadow-sm"
+            src="/images/cultural-banner.png"
+            alt="Illustrated cultural landscape with mountains, traditional architecture, a moon, and trees"
+            className="w-full h-auto max-h-[175px] object-contain rounded-2xl"
+            loading="eager"
+            fetchPriority="high"
           />
         </div>
       </header>

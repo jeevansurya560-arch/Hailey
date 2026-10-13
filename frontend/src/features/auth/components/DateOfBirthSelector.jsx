@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { getDaysInMonth, validateDateOfBirth } from '../utils/authValidation'
 
 const MONTH_OPTIONS = [
@@ -22,6 +22,19 @@ const YEAR_OPTIONS = Array.from(
   (_, i) => String(CURRENT_SYSTEM_YEAR - i)
 )
 
+function parseDateValue(val) {
+  if (!val || typeof val !== 'string') return { day: '', month: '', year: '' }
+  const parts = val.split('-')
+  if (parts.length === 3) {
+    const [y, m, d] = parts
+    const parsedY = y && !isNaN(parseInt(y, 10)) ? String(parseInt(y, 10)) : ''
+    const parsedM = m && !isNaN(parseInt(m, 10)) ? String(parseInt(m, 10)) : ''
+    const parsedD = d && !isNaN(parseInt(d, 10)) ? String(parseInt(d, 10)) : ''
+    return { year: parsedY, month: parsedM, day: parsedD }
+  }
+  return { day: '', month: '', year: '' }
+}
+
 /**
  * Coordinated 3-part Date of Birth Selector (Day, Month, Year)
  * Built to Hailey's editorial specifications:
@@ -38,24 +51,24 @@ export function DateOfBirthSelector({
   error = null,
   idPrefix = 'auth-dob',
 }) {
-  // Parse incoming value 'YYYY-MM-DD' if available
-  const parsed = useMemo(() => {
-    if (!value || typeof value !== 'string') return { day: '', month: '', year: '' }
-    const parts = value.split('-')
-    if (parts.length === 3) {
-      const [y, m, d] = parts
-      return {
-        year: y ? String(parseInt(y, 10)) : '',
-        month: m ? String(parseInt(m, 10)) : '',
-        day: d ? String(parseInt(d, 10)) : '',
-      }
-    }
-    return { day: '', month: '', year: '' }
-  }, [value])
+  const initial = parseDateValue(value)
+  const [selectedDay, setSelectedDay] = useState(initial.day)
+  const [selectedMonth, setSelectedMonth] = useState(initial.month)
+  const [selectedYear, setSelectedYear] = useState(initial.year)
 
-  const selectedDay = parsed.day
-  const selectedMonth = parsed.month
-  const selectedYear = parsed.year
+  // Track the canonical value last emitted to the parent
+  const lastEmittedValueRef = useRef(value || '')
+
+  // Sync internal state if the external prop `value` changes independently
+  useEffect(() => {
+    if (value !== lastEmittedValueRef.current) {
+      lastEmittedValueRef.current = value || ''
+      const nextParsed = parseDateValue(value)
+      setSelectedDay(nextParsed.day)
+      setSelectedMonth(nextParsed.month)
+      setSelectedYear(nextParsed.year)
+    }
+  }, [value])
 
   // Compute maximum valid days in selected month and year
   const maxDays = useMemo(() => {
@@ -80,11 +93,17 @@ export function DateOfBirthSelector({
       }
     }
 
+    setSelectedDay(nextDay)
+    setSelectedMonth(nextMonth)
+    setSelectedYear(nextYear)
+
     if (nextDay && nextMonth && nextYear) {
       const canonical = `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(nextDay).padStart(2, '0')}`
+      lastEmittedValueRef.current = canonical
       const validation = validateDateOfBirth(nextDay, nextMonth, nextYear)
       onChange?.(canonical, validation)
     } else {
+      lastEmittedValueRef.current = ''
       onChange?.('', { valid: false, error: 'Please enter a complete Date of Birth.' })
     }
   }

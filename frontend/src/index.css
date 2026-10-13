@@ -38,26 +38,33 @@
 @utility neu-raised {
   box-shadow: var(--shadow-soft-raised);
 }
+
 @utility neu-card {
   box-shadow: var(--shadow-soft-card);
 }
+
 @utility neu-pill {
   box-shadow: var(--shadow-soft-pill);
 }
+
 @utility neu-circle {
   box-shadow: var(--shadow-soft-circle);
 }
+
 @utility neu-inset {
   box-shadow: var(--shadow-soft-inset);
 }
+
 @utility neu-inset-input {
   box-shadow: var(--shadow-soft-inset-input);
 }
+
 @utility neu-burgundy {
   background-color: #6A1F35;
   color: #FAF6EF;
   box-shadow: var(--shadow-burgundy-glow);
 }
+
 @utility neu-burgundy-pill {
   background-color: #6A1F35;
   color: #FAF6EF;
@@ -109,11 +116,17 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, .font-display {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
     font-family: var(--font-serif);
   }
 
-  code, pre, .font-mono {
+  code,
+  pre,
+  .font-mono {
     font-family: var(--font-mono);
   }
 
@@ -124,7 +137,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+
+  *,
+  ::before,
+  ::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

@@ -1,4 +1,11 @@
 import { supabase } from '@/lib/supabase/client'
+import {
+  isDemoContentEnabled,
+  DEMONSTRATION_DISPATCHES,
+  DEMONSTRATION_AUTHORS,
+  isDemoPostId,
+  getDemoPostById,
+} from '@/features/culture/data/demonstrationDispatches'
 
 /**
  * Fetch personalized feed using database RPC
@@ -199,6 +206,7 @@ export async function createPost({
       media_credit: mediaCredit || null,
       source_url: sourceUrl || null,
       is_editorial: false,
+      status: 'published',
     })
     .select('id')
     .single()
@@ -226,7 +234,10 @@ export async function createPost({
 export async function fetchPostById({ postId, currentUserId = null }) {
   if (!postId) throw new Error('Post ID is required.')
 
-  const { data: p, error } = await supabase
+  const demoItem = getDemoPostById(postId)
+
+  let p = null
+  const { data, error } = await supabase
     .from('posts')
     .select(`
       id,
@@ -237,59 +248,89 @@ export async function fetchPostById({ postId, currentUserId = null }) {
       source_url,
       is_editorial,
       created_at,
+      status,
       profiles!author_id(id, handle, display_name, avatar_url, bio),
       communities(slug, name),
       post_tags(tags(id, name, slug, kind))
     `)
     .eq('id', postId)
-    .single()
+    .maybeSingle()
 
-  if (error || !p) throw error || new Error('Post not found.')
+  if (data) {
+    p = data
+  } else if (demoItem) {
+    p = demoItem
+  } else {
+    throw error || new Error('Post not found.')
+  }
 
   let userReactions = []
-  if (currentUserId) {
+  if (currentUserId && p.id) {
     const { data: reactionsData } = await supabase
       .from('post_reactions')
       .select('post_id, kind')
       .eq('user_id', currentUserId)
-      .eq('post_id', postId)
+      .eq('post_id', p.id)
     userReactions = reactionsData || []
   }
 
-  const [allReactionsRes, commentsCountRes, sharesCountRes] = await Promise.all([
-    supabase.from('post_reactions').select('post_id, kind').eq('post_id', postId),
-    supabase.from('post_comments').select('*', { count: 'exact', head: true }).eq('post_id', postId),
-    supabase.from('post_shares').select('*', { count: 'exact', head: true }).eq('post_id', postId),
-  ])
+  let likesCount = demoItem ? demoItem.reactions.likesCount : 0
+  let savesCount = demoItem ? demoItem.reactions.savesCount : 0
+  let commentsCount = demoItem ? demoItem.reactions.commentsCount : 0
+  let sharesCount = demoItem ? demoItem.reactions.sharesCount : 0
 
-  let likesCount = 0
-  let savesCount = 0
-  if (allReactionsRes.data) {
-    for (const r of allReactionsRes.data) {
-      if (r.kind === 'like') likesCount++
-      if (r.kind === 'save') savesCount++
+  if (p.id) {
+    const [allReactionsRes, commentsCountRes, sharesCountRes] = await Promise.all([
+      supabase.from('post_reactions').select('post_id, kind').eq('post_id', p.id),
+      supabase.from('post_comments').select('*', { count: 'exact', head: true }).eq('post_id', p.id),
+      supabase.from('post_shares').select('*', { count: 'exact', head: true }).eq('post_id', p.id),
+    ])
+
+    if (allReactionsRes.data && allReactionsRes.data.length > 0) {
+      let lCount = 0
+      let sCount = 0
+      for (const r of allReactionsRes.data) {
+        if (r.kind === 'like') lCount++
+        if (r.kind === 'save') sCount++
+      }
+      likesCount = lCount
+      savesCount = sCount
+    }
+    if (commentsCountRes?.count !== undefined && commentsCountRes.count !== null) {
+      commentsCount = commentsCountRes.count
+    }
+    if (sharesCountRes?.count !== undefined && sharesCountRes.count !== null) {
+      sharesCount = sharesCountRes.count
     }
   }
 
   const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
+  const isSeed = isDemoPostId(p.id) || (p.is_editorial === true && (p.author_id === 'fdd83264-e15c-4b05-8f75-68bbd577df3c' || !p.profiles))
+  const resolvedAuthor = isSeed && demoItem ? demoItem.author : (p.profiles || {
+    id: p.author_id,
+    handle: `user_${p.author_id?.slice(0, 8)}`,
+    display_name: 'Hailey Member',
+    avatar_url: null,
+  })
 
   return {
     id: p.id,
-    author_id: p.author_id,
-    author: p.profiles,
-    community: p.communities,
+    author_id: isSeed && demoItem ? demoItem.author_id : p.author_id,
+    author: resolvedAuthor,
+    community: p.communities || demoItem?.community,
     body: p.body,
     media_url: p.media_url,
     media_credit: p.media_credit,
     source_url: p.source_url,
-    is_editorial: p.is_editorial,
+    is_editorial: isSeed,
+    is_demo: isSeed,
     created_at: p.created_at,
-    tags,
+    tags: tags.length > 0 ? tags : (demoItem?.tags || []),
     reactions: {
       likesCount,
       savesCount,
-      commentsCount: commentsCountRes.count || 0,
-      sharesCount: sharesCountRes.count || 0,
+      commentsCount,
+      sharesCount,
       isLiked: userReactions.some((r) => r.kind === 'like'),
       isSaved: userReactions.some((r) => r.kind === 'save'),
       isHidden: userReactions.some((r) => r.kind === 'hide'),
@@ -559,7 +600,9 @@ export async function fetchFeedStream({ user, userInterestsCount, page, pageSize
 }
 
 /**
- * Fetch live explore dispatches with filtering, sorting, pagination, and reaction hydration
+ * Fetch live explore dispatches with filtering, sorting, pagination, and reaction hydration.
+ * Unifies demonstration posts (authored by diverse fictional ethnographers) with real community posts
+ * (authored by registered authenticated users).
  */
 export async function fetchExploreDispatches({
   query = '',
@@ -569,14 +612,12 @@ export async function fetchExploreDispatches({
   pageSize = 36,
   userId = null,
 } = {}) {
-  const communityEmbedding = communitySlug
-    ? 'communities!inner(slug, name)'
-    : 'communities(slug, name)'
+  const demoEnabled = isDemoContentEnabled()
 
-  let req = supabase
+  // 1. Fetch published posts from Supabase database
+  let dbReq = supabase
     .from('posts')
-    .select(
-      `
+    .select(`
       id,
       author_id,
       body,
@@ -593,123 +634,213 @@ export async function fetchExploreDispatches({
         avatar_url,
         bio
       ),
-      ${communityEmbedding},
+      communities (slug, name),
       post_tags (
         tags (id, name, slug, kind)
       )
-    `,
-      { count: 'exact' }
-    )
+    `)
     .eq('status', 'published')
 
-  if (communitySlug) {
-    req = req.eq('communities.slug', communitySlug)
-  }
-
-  if (query && query.trim()) {
-    req = req.ilike('body', `%${query.trim()}%`)
-  }
-
-  if (orderBy === 'oldest') {
-    req = req.order('created_at', { ascending: true })
-  } else {
-    req = req.order('created_at', { ascending: false })
-  }
-
-  const from = page * pageSize
-  const to = from + pageSize - 1
-  req = req.range(from, to)
-
-  const { data: postsData, error, count } = await req
+  const { data: postsData, error } = await dbReq
 
   if (error) {
-    throw new Error(`Failed to fetch explore dispatches: ${error.message}`)
+    console.warn('Supabase explore query notice:', error.message)
   }
 
   const rawPosts = postsData || []
   const postIds = rawPosts.map((p) => p.id)
 
-  if (postIds.length === 0) {
-    return { posts: [], total: count || 0, hasMore: false }
-  }
+  // 2. Hydrate reactions for all retrieved database posts
+  let countsMap = new Map()
+  let userReactions = []
 
-  const [reactionsRes, commentsRes, sharesRes, userReactionsRes] = await Promise.all([
-    supabase.from('post_reactions').select('post_id, kind').in('post_id', postIds),
-    supabase.from('post_comments').select('post_id').in('post_id', postIds),
-    supabase.from('post_shares').select('post_id').in('post_id', postIds),
-    userId
-      ? supabase
+  if (postIds.length > 0) {
+    const promises = [
+      supabase.from('post_reactions').select('post_id, kind').in('post_id', postIds),
+      supabase.from('post_comments').select('post_id').in('post_id', postIds),
+      supabase.from('post_shares').select('post_id').in('post_id', postIds),
+    ]
+
+    if (userId) {
+      promises.push(
+        supabase
           .from('post_reactions')
           .select('post_id, kind')
           .eq('user_id', userId)
           .in('post_id', postIds)
-      : Promise.resolve({ data: [] }),
-  ])
-
-  const countsMap = new Map()
-  for (const id of postIds) {
-    countsMap.set(id, { likes: 0, saves: 0, comments: 0, shares: 0 })
-  }
-
-  for (const r of reactionsRes.data || []) {
-    const item = countsMap.get(r.post_id)
-    if (item) {
-      if (r.kind === 'like') item.likes++
-      if (r.kind === 'save') item.saves++
+      )
     }
-  }
 
-  for (const c of commentsRes.data || []) {
-    const item = countsMap.get(c.post_id)
-    if (item) item.comments++
-  }
+    const [reactionsRes, commentsRes, sharesRes, userReactionsRes] = await Promise.all(promises)
 
-  for (const s of sharesRes.data || []) {
-    const item = countsMap.get(s.post_id)
-    if (item) item.shares++
-  }
-
-  const userReactions = userReactionsRes.data || []
-
-  let posts = rawPosts.map((p) => {
-    const counts = countsMap.get(p.id) || { likes: 0, saves: 0, comments: 0, shares: 0 }
-    const pReactions = userReactions.filter((r) => r.post_id === p.id)
-    const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
-
-    return {
-      id: p.id,
-      author_id: p.author_id,
-      author: p.profiles,
-      community: p.communities,
-      body: p.body,
-      media_url: p.media_url,
-      media_credit: p.media_credit,
-      source_url: p.source_url,
-      is_editorial: p.is_editorial,
-      created_at: p.created_at,
-      tags,
-      reactions: {
-        likesCount: counts.likes,
-        savesCount: counts.saves,
-        commentsCount: counts.comments,
-        sharesCount: counts.shares,
-        isLiked: pReactions.some((r) => r.kind === 'like'),
-        isSaved: pReactions.some((r) => r.kind === 'save'),
-        isHidden: false,
-      },
+    for (const id of postIds) {
+      countsMap.set(id, { likes: 0, saves: 0, comments: 0, shares: 0 })
     }
-  })
 
-  if (orderBy === 'most_liked') {
-    posts.sort((a, b) => b.reactions.likesCount - a.reactions.likesCount)
+    for (const r of reactionsRes?.data || []) {
+      const item = countsMap.get(r.post_id)
+      if (item) {
+        if (r.kind === 'like') item.likes++
+        if (r.kind === 'save') item.saves++
+      }
+    }
+
+    for (const c of commentsRes?.data || []) {
+      const item = countsMap.get(c.post_id)
+      if (item) item.comments++
+    }
+
+    for (const s of sharesRes?.data || []) {
+      const item = countsMap.get(s.post_id)
+      if (item) item.shares++
+    }
+
+    userReactions = userReactionsRes?.data || []
+  }
+
+  // 3. Process database posts: separate real community posts from seed/demo posts
+  const processedDbPosts = rawPosts
+    .map((p) => {
+      const isSeed =
+        isDemoPostId(p.id) ||
+        (p.is_editorial === true &&
+          (p.author_id === 'fdd83264-e15c-4b05-8f75-68bbd577df3c' || !p.profiles))
+
+      if (isSeed) {
+        if (!demoEnabled) return null // Drop demo posts when demo content is toggled off!
+        const demoItem = getDemoPostById(p.id)
+        const author = demoItem
+          ? demoItem.author
+          : p.profiles || DEMONSTRATION_AUTHORS.jeevan_surya
+        const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
+        const counts = countsMap.get(p.id) || { likes: 42, saves: 5, comments: 8, shares: 3 }
+        const pReactions = userReactions.filter((r) => r.post_id === p.id)
+
+        return {
+          id: p.id,
+          author_id: demoItem ? demoItem.author_id : p.author_id,
+          author,
+          community: p.communities || demoItem?.community,
+          body: p.body,
+          media_url: p.media_url,
+          video_url: demoItem?.video_url || (p.media_url?.endsWith('.mp4') ? p.media_url : null),
+          is_video: Boolean(demoItem?.is_video || p.media_url?.endsWith('.mp4')),
+          media_credit: p.media_credit,
+          source_url: p.source_url,
+          is_editorial: true,
+          is_demo: true,
+          created_at: p.created_at,
+          tags: tags.length > 0 ? tags : demoItem?.tags || [],
+          reactions: {
+            likesCount: counts.likes,
+            savesCount: counts.saves,
+            commentsCount: counts.comments,
+            sharesCount: counts.shares,
+            isLiked: pReactions.some((r) => r.kind === 'like'),
+            isSaved: pReactions.some((r) => r.kind === 'save'),
+            isHidden: false,
+          },
+        }
+      } else {
+        // Genuine authenticated user's post!
+        const userProfile = p.profiles || {
+          id: p.author_id,
+          handle: `user_${p.author_id?.slice(0, 8)}`,
+          display_name: 'Community Member',
+          avatar_url: null,
+        }
+        const tags = (p.post_tags || []).map((pt) => pt.tags).filter(Boolean)
+        const counts = countsMap.get(p.id) || { likes: 0, saves: 0, comments: 0, shares: 0 }
+        const pReactions = userReactions.filter((r) => r.post_id === p.id)
+
+        return {
+          id: p.id,
+          author_id: p.author_id,
+          author: userProfile,
+          community: p.communities,
+          body: p.body,
+          media_url: p.media_url,
+          video_url: p.media_url?.endsWith('.mp4') ? p.media_url : null,
+          is_video: Boolean(p.media_url?.endsWith('.mp4')),
+          media_credit: p.media_credit,
+          source_url: p.source_url,
+          is_editorial: false,
+          is_demo: false,
+          created_at: p.created_at,
+          tags,
+          reactions: {
+            likesCount: counts.likes,
+            savesCount: counts.saves,
+            commentsCount: counts.comments,
+            sharesCount: counts.shares,
+            isLiked: pReactions.some((r) => r.kind === 'like'),
+            isSaved: pReactions.some((r) => r.kind === 'save'),
+            isHidden: false,
+          },
+        }
+      }
+    })
+    .filter(Boolean)
+
+  // 4. If demo content is enabled and database had no demo posts (e.g. offline/isolated environment),
+  // supplement with in-memory DEMONSTRATION_DISPATCHES
+  let combinedPosts = [...processedDbPosts]
+  const hasDemoInDb = processedDbPosts.some((p) => p.is_demo)
+
+  if (demoEnabled && !hasDemoInDb) {
+    combinedPosts = [...combinedPosts, ...DEMONSTRATION_DISPATCHES]
+  }
+
+  // 5. Apply filters across both sources
+  let filteredPosts = combinedPosts
+
+  // Community / Culture filter
+  if (communitySlug) {
+    filteredPosts = filteredPosts.filter((p) => {
+      return p.community?.slug === communitySlug
+    })
+  }
+
+  // Text search filter
+  if (query && query.trim()) {
+    const q = query.trim().toLowerCase()
+    filteredPosts = filteredPosts.filter((p) => {
+      const matchBody = p.body?.toLowerCase().includes(q)
+      const matchAuthor =
+        p.author?.display_name?.toLowerCase().includes(q) ||
+        p.author?.handle?.toLowerCase().includes(q)
+      const matchTags = p.tags?.some((t) => t.name?.toLowerCase().includes(q))
+      return matchBody || matchAuthor || matchTags
+    })
+  }
+
+  // 6. Sorting
+  if (orderBy === 'oldest') {
+    filteredPosts.sort(
+      (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+    )
+  } else if (orderBy === 'most_liked') {
+    filteredPosts.sort((a, b) => (b.reactions?.likesCount || 0) - (a.reactions?.likesCount || 0))
   } else if (orderBy === 'most_discussed') {
-    posts.sort((a, b) => b.reactions.commentsCount - a.reactions.commentsCount)
+    filteredPosts.sort(
+      (a, b) => (b.reactions?.commentsCount || 0) - (a.reactions?.commentsCount || 0)
+    )
+  } else {
+    // Default: newest first (real newly published posts appear at the top!)
+    filteredPosts.sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    )
   }
+
+  // 7. Pagination
+  const from = page * pageSize
+  const to = from + pageSize
+  const pagedPosts = filteredPosts.slice(from, to)
 
   return {
-    posts,
-    total: count || 0,
-    hasMore: to < (count || 0) - 1,
+    posts: pagedPosts,
+    total: filteredPosts.length,
+    hasMore: to < filteredPosts.length,
   }
 }
 
