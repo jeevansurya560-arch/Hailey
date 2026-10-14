@@ -203,28 +203,28 @@ export function ProfilePage() {
 
   if (isOwnRoute && !user) {
     return (
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-12 text-center space-y-5 max-w-lg mx-auto shadow-[var(--shadow-hard)]">
-        <div className="h-14 w-14 mx-auto rounded-full border border-[var(--ink)] bg-[var(--paper)] flex items-center justify-center shadow-[2px_2px_0_var(--ink)]">
-          <User className="h-7 w-7 text-[var(--clay)]" />
+      <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-12 text-center space-y-5 max-w-lg mx-auto neu-card">
+        <div className="h-14 w-14 mx-auto rounded-full bg-[#FAF6EF] border border-[#E0D4C5] flex items-center justify-center">
+          <User className="h-7 w-7 text-[#6A1F35]" />
         </div>
         <div className="space-y-1.5">
-          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[var(--ink)]">
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#34252A]">
             Field Guide Passport
           </h2>
-          <p className="text-xs font-mono text-[var(--ink-2)] leading-relaxed">
+          <p className="text-xs font-sans text-[#75666B] leading-relaxed">
             Sign in to view your cultural dispatches, saved archives, creator analytics, and field notes.
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
           <Link
             to="/login"
-            className="w-full sm:w-auto border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] px-6 py-2.5 font-mono text-xs uppercase font-bold shadow-[2px_2px_0_var(--ink)] hover:opacity-90 transition-opacity"
+            className="w-full sm:w-auto bg-[#6A1F35] hover:bg-[#511528] text-white px-6 py-2.5 rounded-full font-sans text-xs font-bold shadow-xs transition-colors"
           >
             Sign In / Register
           </Link>
           <Link
             to="/explore"
-            className="w-full sm:w-auto border border-[var(--line)] bg-[var(--paper)] text-[var(--ink)] px-5 py-2.5 font-mono text-xs uppercase font-bold hover:border-[var(--ink)] transition-colors"
+            className="w-full sm:w-auto border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] text-[#34252A] px-5 py-2.5 rounded-full font-sans text-xs font-bold transition-colors"
           >
             Explore Field Guide →
           </Link>
@@ -235,14 +235,14 @@ export function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="border border-[var(--clay)] bg-[var(--paper-2)] p-12 text-center space-y-4 max-w-lg mx-auto shadow-[var(--shadow-hard)]">
-        <h2 className="font-serif text-2xl font-bold text-[var(--ink)]">Profile Not Found</h2>
-        <p className="text-xs font-mono text-[var(--ink-2)]">
+      <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-12 text-center space-y-4 max-w-lg mx-auto neu-card">
+        <h2 className="font-serif text-2xl font-bold text-[#34252A]">Profile Not Found</h2>
+        <p className="text-xs font-sans text-[#75666B]">
           The requested cultural contributor @{handle || 'unknown'} does not exist or has not claimed their profile yet.
         </p>
         <Link
           to="/"
-          className="inline-block border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] px-4 py-2 font-mono text-xs uppercase font-bold shadow-[1.5px_1.5px_0_var(--ink)]"
+          className="inline-block bg-[#6A1F35] hover:bg-[#511528] text-white px-5 py-2.5 rounded-full font-sans text-xs font-bold shadow-xs transition-colors"
         >
           ← Return to Field Guide Home
         </Link>
@@ -254,24 +254,24 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
-      {/* ─── Instagram-Grade Profile Header ─────────────────────────── */}
-      <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 md:p-8 shadow-[var(--shadow-hard)] space-y-6">
+      {/* ─── Profile Header Card ─────────────────────────── */}
+      <div className="bg-white rounded-2xl md:rounded-3xl border border-[#E0D4C5]/80 p-6 md:p-8 neu-card space-y-6">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-8">
-          {/* Avatar (Instagram Circle Style) */}
+          {/* Avatar (Circle Style) */}
           <div className="relative group shrink-0">
             <UserAvatar
               src={profile.avatar_url}
               handle={profile.handle}
               displayName={profile.display_name}
               size="2xl"
-              className="border-2 border-[var(--ink)] shadow-[2px_2px_0_var(--ink)]"
+              className="ring-4 ring-[#FAF6EF] shadow-md border border-[#E0D4C5]"
             />
 
             {isOwnProfile && (
               <button
                 type="button"
                 onClick={() => setIsEditModalOpen(true)}
-                className="absolute bottom-0 right-0 p-1.5 rounded-full border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] shadow-sm hover:scale-105 transition-transform"
+                className="absolute bottom-0 right-0 p-2 rounded-full bg-[#6A1F35] text-white shadow-md hover:bg-[#511528] hover:scale-105 transition-all"
                 title="Edit profile photo"
               >
                 <Edit3 className="h-3.5 w-3.5" />
@@ -280,21 +280,21 @@ export function ProfilePage() {
           </div>
 
           {/* Details & Actions */}
-          <div className="flex-1 space-y-4 w-full">
+          <div className="flex-1 space-y-3 w-full">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2.5 flex-wrap">
-                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[var(--ink)]">
+                <h1 className="font-serif text-2xl md:text-3xl font-bold text-[#34252A]">
                   @{profile.handle}
                 </h1>
 
                 {profile.is_editorial && (
-                  <span className="inline-flex items-center gap-1 rounded bg-[var(--clay)] px-2 py-0.5 font-mono text-[9px] uppercase font-bold text-[var(--paper)]">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#6A1F35] px-2.5 py-0.5 text-[10px] uppercase font-bold text-white shadow-xs">
                     <ShieldCheck className="h-3 w-3" />
                     Editorial
                   </span>
                 )}
 
-                <span className="inline-flex items-center gap-1 border border-emerald-800/30 bg-emerald-50 px-2 py-0.5 rounded font-mono text-[10px] text-emerald-800 font-semibold">
+                <span className="inline-flex items-center gap-1 border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 rounded-full text-[10px] text-emerald-800 font-semibold shadow-xs">
                   <Lock className="h-2.5 w-2.5" />
                   RLS Verified
                 </span>
@@ -307,16 +307,16 @@ export function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => setIsEditModalOpen(true)}
-                      className="border border-[var(--ink)] bg-[var(--paper)] px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider font-bold text-[var(--ink)] hover:bg-[var(--paper-2)] transition-colors shadow-[1.5px_1.5px_0_var(--ink)] flex items-center gap-1.5"
+                      className="border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] px-4 py-1.5 rounded-full text-xs font-semibold text-[#34252A] hover:border-[#6A1F35]/40 transition-all shadow-xs flex items-center gap-1.5"
                     >
-                      <Edit3 className="h-3 w-3 text-[var(--clay)]" />
+                      <Edit3 className="h-3.5 w-3.5 text-[#6A1F35]" />
                       <span>Edit Profile</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handleShareProfile}
-                      className="border border-[var(--line)] bg-[var(--paper)] px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-[var(--ink)] hover:border-[var(--ink)] transition-colors flex items-center gap-1"
+                      className="border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] px-3.5 py-1.5 rounded-full text-xs font-semibold text-[#34252A] hover:border-[#6A1F35]/40 transition-all shadow-xs flex items-center gap-1.5"
                       title="Copy profile link"
                     >
                       {copiedProfile ? (
@@ -326,7 +326,7 @@ export function ProfilePage() {
                         </>
                       ) : (
                         <>
-                          <Share2 className="h-3.5 w-3.5 text-[var(--ink-2)]" />
+                          <Share2 className="h-3.5 w-3.5 text-[#75666B]" />
                           <span>Share</span>
                         </>
                       )}
@@ -337,10 +337,10 @@ export function ProfilePage() {
                     <button
                       type="button"
                       onClick={handleToggleFollow}
-                      className={`border border-[var(--ink)] px-4 py-1.5 font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-[1.5px_1.5px_0_var(--ink)] ${
+                      className={`px-5 py-1.5 rounded-full text-xs font-semibold transition-all shadow-xs ${
                         followStats.isFollowing
-                          ? 'bg-[var(--paper)] text-[var(--ink)] hover:bg-red-50 hover:text-red-700'
-                          : 'bg-[var(--clay)] text-[var(--paper)] hover:opacity-90'
+                          ? 'border border-[#E0D4C5] bg-[#FAF6EF] text-[#34252A] hover:bg-red-50 hover:text-red-700'
+                          : 'bg-[#6A1F35] text-white hover:bg-[#511528]'
                       }`}
                     >
                       {followStats.isFollowing ? 'Following' : 'Follow'}
@@ -349,22 +349,22 @@ export function ProfilePage() {
                     <button
                       type="button"
                       onClick={handleMessageAuthor}
-                      className="border border-[var(--ink)] bg-[var(--paper)] px-3.5 py-1.5 font-mono text-xs uppercase tracking-wider font-bold text-[var(--ink)] hover:bg-[var(--paper-2)] transition-colors shadow-[1.5px_1.5px_0_var(--ink)] flex items-center gap-1.5"
+                      className="border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] px-4 py-1.5 rounded-full text-xs font-semibold text-[#34252A] hover:border-[#6A1F35]/40 transition-all shadow-xs flex items-center gap-1.5"
                     >
-                      <MessageSquare className="h-3.5 w-3.5 text-[var(--clay)]" />
+                      <MessageSquare className="h-3.5 w-3.5 text-[#6A1F35]" />
                       <span>Message</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handleShareProfile}
-                      className="border border-[var(--line)] bg-[var(--paper)] p-2 text-[var(--ink)] hover:border-[var(--ink)] transition-colors"
+                      className="border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] p-2 rounded-full text-[#34252A] hover:border-[#6A1F35]/40 transition-all shadow-xs"
                       title="Share Profile"
                     >
                       {copiedProfile ? (
                         <Check className="h-3.5 w-3.5 text-emerald-600" />
                       ) : (
-                        <Share2 className="h-3.5 w-3.5" />
+                        <Share2 className="h-3.5 w-3.5 text-[#75666B]" />
                       )}
                     </button>
                   </>
@@ -372,58 +372,58 @@ export function ProfilePage() {
               </div>
             </div>
 
-            {/* Instagram Counters Bar */}
-            <div className="flex items-center gap-6 md:gap-8 font-mono text-xs border-y border-[var(--line)] py-2.5">
+            {/* Counters Bar */}
+            <div className="flex items-center gap-6 md:gap-8 text-xs border-y border-[#E0D4C5]/60 py-3 my-3">
               <div>
-                <strong className="font-serif text-sm md:text-base font-bold text-[var(--ink)] mr-1">
+                <strong className="font-serif text-sm md:text-base font-bold text-[#34252A] mr-1">
                   {userPosts.length}
                 </strong>
-                <span className="text-[var(--ink-2)]">dispatches</span>
+                <span className="font-sans text-xs text-[#75666B]">dispatches</span>
               </div>
               <div>
-                <strong className="font-serif text-sm md:text-base font-bold text-[var(--ink)] mr-1">
+                <strong className="font-serif text-sm md:text-base font-bold text-[#34252A] mr-1">
                   {followStats.followersCount}
                 </strong>
-                <span className="text-[var(--ink-2)]">followers</span>
+                <span className="font-sans text-xs text-[#75666B]">followers</span>
               </div>
               <div>
-                <strong className="font-serif text-sm md:text-base font-bold text-[var(--ink)] mr-1">
+                <strong className="font-serif text-sm md:text-base font-bold text-[#34252A] mr-1">
                   {followStats.followingCount}
                 </strong>
-                <span className="text-[var(--ink-2)]">following</span>
+                <span className="font-sans text-xs text-[#75666B]">following</span>
               </div>
               <div>
-                <strong className="font-serif text-sm md:text-base font-bold text-[var(--ink)] mr-1">
+                <strong className="font-serif text-sm md:text-base font-bold text-[#34252A] mr-1">
                   {attestedCount}
                 </strong>
-                <span className="text-[var(--ink-2)]">attested</span>
+                <span className="font-sans text-xs text-[#75666B]">attested</span>
               </div>
             </div>
 
             {/* Bio & Profile Metadata */}
             <div className="space-y-2 text-xs">
               {profile.display_name && (
-                <p className="font-serif font-bold text-sm text-[var(--ink)]">
+                <p className="font-serif font-bold text-base text-[#34252A]">
                   {profile.display_name}
                 </p>
               )}
 
               {profile.bio ? (
-                <p className="text-[var(--ink)] whitespace-pre-wrap leading-relaxed max-w-xl font-sans text-xs">
+                <p className="text-[#34252A]/90 whitespace-pre-wrap leading-relaxed max-w-xl font-sans text-xs sm:text-sm">
                   {profile.bio}
                 </p>
               ) : (
                 isOwnProfile && (
-                  <p className="text-[var(--ink-2)] italic font-mono text-[11px]">
-                    No bio added yet. Click "Edit Profile" to share your cultural focus with the network!
+                  <p className="text-[#75666B] italic font-sans text-xs">
+                    No bio added yet. Click &quot;Edit Profile&quot; to share your cultural focus with the network!
                   </p>
                 )
               )}
 
-              <div className="flex flex-wrap items-center gap-4 text-[var(--ink-2)] font-mono text-[11px] pt-1">
+              <div className="flex flex-wrap items-center gap-4 text-[#75666B] font-sans text-xs pt-1">
                 {profile.location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3 text-[var(--clay)]" />
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="h-3.5 w-3.5 text-[#6A1F35]" />
                     <span>{profile.location}</span>
                   </div>
                 )}
@@ -433,23 +433,23 @@ export function ProfilePage() {
                     href={profile.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-[var(--clay)] hover:underline font-bold"
+                    className="flex items-center gap-1.5 text-[#6A1F35] hover:text-[#511528] hover:underline font-semibold"
                   >
-                    <Globe className="h-3 w-3" />
+                    <Globe className="h-3.5 w-3.5" />
                     <span>{profile.website.replace(/^https?:\/\//, '')}</span>
-                    <ExternalLink className="h-2.5 w-2.5" />
+                    <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
 
                 {profile.wallet_address && (
-                  <div className="flex items-center gap-1 text-[var(--onchain)] font-semibold">
-                    <Link2 className="h-3 w-3" />
+                  <div className="flex items-center gap-1.5 text-[#6A1F35] font-semibold">
+                    <Link2 className="h-3.5 w-3.5" />
                     <span>
                       {profile.wallet_address.slice(0, 6)}...{profile.wallet_address.slice(-4)}
                     </span>
                     <Link
                       to={`/verify/${profile.wallet_address}`}
-                      className="ml-1 text-[10px] text-[var(--clay)] hover:underline"
+                      className="ml-1 text-[11px] text-[#B08A50] hover:underline"
                     >
                       (Ledger →)
                     </Link>
@@ -462,11 +462,11 @@ export function ProfilePage() {
 
         {/* Curator Revenue Dashboard & Wallet Connect (if own profile) */}
         {isOwnProfile && (
-          <div className="pt-4 border-t border-[var(--line)] flex flex-wrap items-center justify-between gap-3">
+          <div className="pt-4 border-t border-[#E0D4C5]/60 flex flex-wrap items-center justify-between gap-3">
             <LazyWalletSection profile={profile} />
-            <div className="flex items-center gap-2 border border-[var(--onchain)]/30 bg-[var(--paper)] px-3 py-1.5 text-xs shadow-[1.5px_1.5px_0_var(--ink)]">
-              <ShieldCheck className="h-4 w-4 text-[var(--onchain)]" />
-              <span className="font-mono text-[11px] text-[var(--ink)]">
+            <div className="flex items-center gap-2 border border-[#E0D4C5] bg-[#FAF6EF] px-3.5 py-1.5 rounded-full text-xs shadow-xs">
+              <ShieldCheck className="h-4 w-4 text-[#6A1F35]" />
+              <span className="font-sans text-xs text-[#34252A]">
                 Onchain Attestations: <strong>{attestedCount}</strong>
               </span>
             </div>
@@ -474,16 +474,16 @@ export function ProfilePage() {
         )}
       </div>
 
-      {/* ─── Instagram-Grade Navigation Tabs ─────────────────────────── */}
-      <div className="border-b border-[var(--line)] flex items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-6 overflow-x-auto">
+      {/* ─── Navigation Tabs ─────────────────────────── */}
+      <div className="border-b border-[#E0D4C5] flex items-center justify-between pb-1">
+        <div className="flex items-center gap-2 md:gap-6 overflow-x-auto scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveTab('posts')}
-            className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+            className={`text-xs uppercase tracking-wider py-3 px-2 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'posts'
-                ? 'border-[var(--clay)] text-[var(--clay)]'
-                : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'border-[#6A1F35] text-[#6A1F35]'
+                : 'border-transparent text-[#75666B] hover:text-[#34252A]'
             }`}
           >
             <Grid className="h-3.5 w-3.5" />
@@ -494,10 +494,10 @@ export function ProfilePage() {
             <button
               type="button"
               onClick={() => setActiveTab('saved')}
-              className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+              className={`text-xs uppercase tracking-wider py-3 px-2 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
                 activeTab === 'saved'
-                  ? 'border-[var(--clay)] text-[var(--clay)]'
-                  : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+                  ? 'border-[#6A1F35] text-[#6A1F35]'
+                  : 'border-transparent text-[#75666B] hover:text-[#34252A]'
               }`}
             >
               <Bookmark className="h-3.5 w-3.5" />
@@ -508,10 +508,10 @@ export function ProfilePage() {
           <button
             type="button"
             onClick={() => setActiveTab('analytics')}
-            className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+            className={`text-xs uppercase tracking-wider py-3 px-2 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'analytics'
-                ? 'border-[var(--clay)] text-[var(--clay)]'
-                : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'border-[#6A1F35] text-[#6A1F35]'
+                : 'border-transparent text-[#75666B] hover:text-[#34252A]'
             }`}
           >
             <BarChart3 className="h-3.5 w-3.5" />
@@ -521,10 +521,10 @@ export function ProfilePage() {
           <button
             type="button"
             onClick={() => setActiveTab('threads')}
-            className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+            className={`text-xs uppercase tracking-wider py-3 px-2 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'threads'
-                ? 'border-[var(--clay)] text-[var(--clay)]'
-                : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'border-[#6A1F35] text-[#6A1F35]'
+                : 'border-transparent text-[#75666B] hover:text-[#34252A]'
             }`}
           >
             <Compass className="h-3.5 w-3.5" />
@@ -534,10 +534,10 @@ export function ProfilePage() {
           <button
             type="button"
             onClick={() => setActiveTab('collectives')}
-            className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+            className={`text-xs uppercase tracking-wider py-3 px-2 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'collectives'
-                ? 'border-[var(--clay)] text-[var(--clay)]'
-                : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'border-[#6A1F35] text-[#6A1F35]'
+                : 'border-transparent text-[#75666B] hover:text-[#34252A]'
             }`}
           >
             <Users className="h-3.5 w-3.5" />
@@ -547,10 +547,10 @@ export function ProfilePage() {
           <button
             type="button"
             onClick={() => setActiveTab('attestations')}
-            className={`font-mono text-xs uppercase tracking-wider py-3 px-1 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
+            className={`text-xs uppercase tracking-wider py-3 px-2 border-b-2 font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'attestations'
-                ? 'border-[var(--clay)] text-[var(--clay)]'
-                : 'border-transparent text-[var(--ink-2)] hover:text-[var(--ink)]'
+                ? 'border-[#6A1F35] text-[#6A1F35]'
+                : 'border-transparent text-[#75666B] hover:text-[#34252A]'
             }`}
           >
             <Award className="h-3.5 w-3.5" />
@@ -559,11 +559,15 @@ export function ProfilePage() {
         </div>
 
         {((activeTab === 'posts' && userPosts.length > 0) || (activeTab === 'saved' && savedPosts.length > 0)) && (
-          <div className="hidden sm:flex items-center gap-1 border border-[var(--line)] bg-[var(--paper-2)] p-0.5 rounded">
+          <div className="hidden sm:flex items-center gap-1 border border-[#E0D4C5] bg-white p-1 rounded-xl shadow-xs">
             <button
               type="button"
               onClick={() => setViewMode('feed')}
-              className={`p-1 rounded ${viewMode === 'feed' ? 'bg-[var(--paper)] text-[var(--ink)] shadow-sm' : 'text-[var(--ink-2)]'}`}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === 'feed'
+                  ? 'bg-[#6A1F35] text-white shadow-xs'
+                  : 'text-[#75666B] hover:text-[#34252A]'
+              }`}
               title="Feed View"
             >
               <List className="h-3.5 w-3.5" />
@@ -571,7 +575,11 @@ export function ProfilePage() {
             <button
               type="button"
               onClick={() => setViewMode('grid')}
-              className={`p-1 rounded ${viewMode === 'grid' ? 'bg-[var(--paper)] text-[var(--ink)] shadow-sm' : 'text-[var(--ink-2)]'}`}
+              className={`p-1.5 rounded-lg transition-colors ${
+                viewMode === 'grid'
+                  ? 'bg-[#6A1F35] text-white shadow-xs'
+                  : 'text-[#75666B] hover:text-[#34252A]'
+              }`}
               title="Grid View"
             >
               <Grid className="h-3.5 w-3.5" />
@@ -585,38 +593,38 @@ export function ProfilePage() {
         <div className="space-y-6">
           {isPostsLoading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-5 w-5 animate-spin text-[var(--clay)]" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
             </div>
           ) : userPosts.length === 0 ? (
-            <div className="border border-dashed border-[var(--line)] bg-[var(--paper-2)] p-12 text-center space-y-3">
-              <div className="h-10 w-10 mx-auto rounded-full border border-[var(--ink-2)] flex items-center justify-center">
-                <Grid className="h-5 w-5 text-[var(--ink-2)]" />
+            <div className="border border-dashed border-[#E0D4C5] bg-white rounded-2xl p-12 text-center space-y-3 neu-card">
+              <div className="h-12 w-12 mx-auto rounded-full bg-[#FAF6EF] border border-[#E0D4C5] flex items-center justify-center">
+                <Grid className="h-5 w-5 text-[#6A1F35]" />
               </div>
-              <h3 className="font-serif text-lg font-bold text-[var(--ink)]">
+              <h3 className="font-serif text-lg font-bold text-[#34252A]">
                 No Dispatches Yet
               </h3>
-              <p className="text-xs font-mono text-[var(--ink-2)] max-w-sm mx-auto">
+              <p className="text-xs font-sans text-[#75666B] max-w-sm mx-auto">
                 {isOwnProfile
-                  ? 'You have not published any cultural dispatches yet. Share documentation or archival discoveries from the Home feed.'
+                  ? 'You have not published any cultural dispatches yet. Share documentation or archival discoveries from the Explore feed.'
                   : `@${profile.handle} has not published any dispatches yet.`}
               </p>
               {isOwnProfile && (
                 <Link
-                  to="/"
-                  className="inline-block border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] px-4 py-2 font-mono text-xs uppercase font-bold shadow-[1.5px_1.5px_0_var(--ink)] mt-2"
+                  to="/explore"
+                  className="inline-block bg-[#6A1F35] hover:bg-[#511528] text-white px-5 py-2 rounded-full font-sans text-xs font-semibold shadow-xs mt-2 transition-colors"
                 >
-                  Create First Dispatch →
+                  Explore Archives →
                 </Link>
               )}
             </div>
           ) : viewMode === 'grid' ? (
-            /* Instagram Photo Grid */
+            /* Photo Grid */
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
               {userPosts.map((post) => (
                 <Link
                   key={post.id}
                   to={`/post/${post.id}`}
-                  className="group relative aspect-square border border-[var(--ink)] bg-[var(--paper-2)] overflow-hidden shadow-[1.5px_1.5px_0_var(--ink)]"
+                  className="group relative aspect-square rounded-2xl border border-[#E0D4C5]/80 bg-[#FAF6EF] overflow-hidden neu-card"
                 >
                   {post.media_url ? (
                     <img
@@ -625,18 +633,18 @@ export function ProfilePage() {
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="h-full w-full p-4 flex flex-col justify-between bg-[var(--paper)]">
-                      <p className="text-xs font-serif line-clamp-4 text-[var(--ink)] leading-relaxed">
+                    <div className="h-full w-full p-4 flex flex-col justify-between bg-[#FAF6EF]">
+                      <p className="text-xs font-serif line-clamp-4 text-[#34252A] leading-relaxed">
                         {post.body}
                       </p>
-                      <span className="font-mono text-[9px] uppercase text-[var(--clay)] font-bold">
+                      <span className="font-sans text-[10px] uppercase text-[#6A1F35] font-bold">
                         Read Dispatch →
                       </span>
                     </div>
                   )}
 
                   {/* Hover Overlay with Likes & Comments */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-mono text-xs font-bold">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-sans text-xs font-bold">
                     <span className="flex items-center gap-1">
                       ❤️ {post.reactions?.likesCount ?? 0}
                     </span>
@@ -669,22 +677,22 @@ export function ProfilePage() {
         <div className="space-y-6">
           {isSavedLoading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-5 w-5 animate-spin text-[var(--clay)]" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
             </div>
           ) : savedPosts.length === 0 ? (
-            <div className="border border-dashed border-[var(--line)] bg-[var(--paper-2)] p-12 text-center space-y-3">
-              <div className="h-10 w-10 mx-auto rounded-full border border-[var(--ink-2)] flex items-center justify-center">
-                <Bookmark className="h-5 w-5 text-[var(--ink-2)]" />
+            <div className="border border-dashed border-[#E0D4C5] bg-white rounded-2xl p-12 text-center space-y-3 neu-card">
+              <div className="h-12 w-12 mx-auto rounded-full bg-[#FAF6EF] border border-[#E0D4C5] flex items-center justify-center">
+                <Bookmark className="h-5 w-5 text-[#6A1F35]" />
               </div>
-              <h3 className="font-serif text-lg font-bold text-[var(--ink)]">
+              <h3 className="font-serif text-lg font-bold text-[#34252A]">
                 No Saved Dispatches
               </h3>
-              <p className="text-xs font-mono text-[var(--ink-2)] max-w-sm mx-auto">
-                Bookmark cultural dispatches from the Explore or Home feed to curate your private research archive.
+              <p className="text-xs font-sans text-[#75666B] max-w-sm mx-auto">
+                Bookmark cultural dispatches from the Explore feed to curate your private research archive.
               </p>
               <Link
                 to="/explore"
-                className="inline-block border border-[var(--ink)] bg-[var(--clay)] text-[var(--paper)] px-4 py-2 font-mono text-xs uppercase font-bold shadow-[1.5px_1.5px_0_var(--ink)] mt-2"
+                className="inline-block bg-[#6A1F35] hover:bg-[#511528] text-white px-5 py-2 rounded-full font-sans text-xs font-semibold shadow-xs mt-2 transition-colors"
               >
                 Explore Living Archives →
               </Link>
@@ -696,7 +704,7 @@ export function ProfilePage() {
                 <Link
                   key={post.id}
                   to={`/post/${post.id}`}
-                  className="group relative aspect-square border border-[var(--ink)] bg-[var(--paper-2)] overflow-hidden shadow-[1.5px_1.5px_0_var(--ink)]"
+                  className="group relative aspect-square rounded-2xl border border-[#E0D4C5]/80 bg-[#FAF6EF] overflow-hidden neu-card"
                 >
                   {post.media_url ? (
                     <img
@@ -705,17 +713,17 @@ export function ProfilePage() {
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="h-full w-full p-4 flex flex-col justify-between bg-[var(--paper)]">
-                      <p className="text-xs font-serif line-clamp-4 text-[var(--ink)] leading-relaxed">
+                    <div className="h-full w-full p-4 flex flex-col justify-between bg-[#FAF6EF]">
+                      <p className="text-xs font-serif line-clamp-4 text-[#34252A] leading-relaxed">
                         {post.body}
                       </p>
-                      <span className="font-mono text-[9px] uppercase text-[var(--clay)] font-bold">
+                      <span className="font-sans text-[10px] uppercase text-[#6A1F35] font-bold">
                         Read Dispatch →
                       </span>
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-mono text-xs font-bold">
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4 text-white font-sans text-xs font-bold">
                     <span className="flex items-center gap-1">
                       ❤️ {post.reactions?.likesCount ?? 0}
                     </span>
@@ -751,50 +759,50 @@ export function ProfilePage() {
 
           {isAnalyticsLoading ? (
             <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-6 w-6 animate-spin text-[var(--clay)]" />
+              <Loader2 className="h-6 w-6 animate-spin text-[#6A1F35]" />
             </div>
           ) : (
             <div className="space-y-6">
               {/* Analytics Summary Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-4 shadow-[2px_2px_0_var(--ink)] space-y-1">
-                  <span className="font-mono text-[10px] text-[var(--ink-2)] uppercase tracking-wider block">
+                <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-4 neu-card space-y-1">
+                  <span className="font-sans text-[10px] text-[#75666B] uppercase tracking-wider block font-semibold">
                     Total Reach
                   </span>
-                  <span className="font-serif text-2xl font-bold text-[var(--ink)]">
+                  <span className="font-serif text-2xl font-bold text-[#34252A]">
                     {analytics?.empty ? '0' : analytics?.totalReach}
                   </span>
-                  <span className="font-mono text-[10px] text-[var(--moss)] block">Verified views</span>
+                  <span className="font-sans text-[10px] text-emerald-700 block">Verified views</span>
                 </div>
 
-                <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-4 shadow-[2px_2px_0_var(--ink)] space-y-1">
-                  <span className="font-mono text-[10px] text-[var(--ink-2)] uppercase tracking-wider block">
+                <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-4 neu-card space-y-1">
+                  <span className="font-sans text-[10px] text-[#75666B] uppercase tracking-wider block font-semibold">
                     Engagement Rate
                   </span>
-                  <span className="font-serif text-2xl font-bold text-[var(--ink)]">
+                  <span className="font-serif text-2xl font-bold text-[#34252A]">
                     {analytics?.empty ? '0.0%' : `${analytics?.avgEngagementRate}%`}
                   </span>
-                  <span className="font-mono text-[10px] text-[var(--indigo)] block">Reactions / Reach</span>
+                  <span className="font-sans text-[10px] text-indigo-700 block">Reactions / Reach</span>
                 </div>
 
-                <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-4 shadow-[2px_2px_0_var(--ink)] space-y-1">
-                  <span className="font-mono text-[10px] text-[var(--ink-2)] uppercase tracking-wider block">
+                <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-4 neu-card space-y-1">
+                  <span className="font-sans text-[10px] text-[#75666B] uppercase tracking-wider block font-semibold">
                     Cultural Posts
                   </span>
-                  <span className="font-serif text-2xl font-bold text-[var(--ink)]">
+                  <span className="font-serif text-2xl font-bold text-[#34252A]">
                     {userPosts.length}
                   </span>
-                  <span className="font-mono text-[10px] text-[var(--saffron)] block">Published dispatches</span>
+                  <span className="font-sans text-[10px] text-[#B08A50] block">Published dispatches</span>
                 </div>
 
-                <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-4 shadow-[2px_2px_0_var(--ink)] space-y-1">
-                  <span className="font-mono text-[10px] text-[var(--ink-2)] uppercase tracking-wider block">
+                <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-4 neu-card space-y-1">
+                  <span className="font-sans text-[10px] text-[#75666B] uppercase tracking-wider block font-semibold">
                     Onchain Attested
                   </span>
-                  <span className="font-serif text-2xl font-bold text-[var(--ink)]">
+                  <span className="font-serif text-2xl font-bold text-[#34252A]">
                     {attestedCount}
                   </span>
-                  <span className="font-mono text-[10px] text-purple-700 block">Monad L1 seals</span>
+                  <span className="font-sans text-[10px] text-purple-700 block">Monad L1 seals</span>
                 </div>
               </div>
 
@@ -811,15 +819,15 @@ export function ProfilePage() {
 
       {/* ─── Tab Content 3: Exploring Threads ────────────────────────── */}
       {activeTab === 'threads' && (
-        <div className="border border-[var(--line)] bg-[var(--paper-2)] p-6 space-y-4 shadow-[var(--shadow-hard)]">
-          <div className="flex items-center gap-2 text-[var(--clay)] border-b border-[var(--line)] pb-2">
+        <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-6 space-y-4 neu-card">
+          <div className="flex items-center gap-2 text-[#6A1F35] border-b border-[#E0D4C5]/60 pb-3">
             <Compass className="h-4 w-4" />
-            <h2 className="font-serif text-base font-bold text-[var(--ink)]">
+            <h2 className="font-serif text-base font-bold text-[#34252A]">
               Exploring Cultural Taxonomy ({userInterests.length})
             </h2>
           </div>
           {userInterests.length === 0 ? (
-            <p className="text-xs font-mono text-[var(--ink-2)] py-4">
+            <p className="text-xs font-sans text-[#75666B] py-4">
               No threads selected yet. Visit the Explore section to tag topics.
             </p>
           ) : (
@@ -842,15 +850,15 @@ export function ProfilePage() {
 
       {/* ─── Tab Content 4: Collectives & Memberships ─────────────────── */}
       {activeTab === 'collectives' && (
-        <div className="border border-[var(--line)] bg-[var(--paper-2)] p-6 space-y-4 shadow-[var(--shadow-hard)]">
-          <div className="flex items-center gap-2 text-[var(--clay)] border-b border-[var(--line)] pb-2">
+        <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-6 space-y-4 neu-card">
+          <div className="flex items-center gap-2 text-[#6A1F35] border-b border-[#E0D4C5]/60 pb-3">
             <Users className="h-4 w-4" />
-            <h2 className="font-serif text-base font-bold text-[var(--ink)]">
+            <h2 className="font-serif text-base font-bold text-[#34252A]">
               Collective Memberships ({memberships.length})
             </h2>
           </div>
           {memberships.length === 0 ? (
-            <p className="text-xs font-mono text-[var(--ink-2)] py-4">
+            <p className="text-xs font-sans text-[#75666B] py-4">
               No community memberships joined yet.
             </p>
           ) : (
@@ -859,11 +867,11 @@ export function ProfilePage() {
                 <Link
                   key={m.id}
                   to={`/communities/${m.slug}`}
-                  className="inline-flex items-center gap-2 border border-[var(--line)] bg-[var(--paper)] px-3.5 py-2 font-mono text-xs text-[var(--ink)] hover:border-[var(--ink)] shadow-[1px_1px_0_var(--line)] transition-all"
+                  className="inline-flex items-center gap-2 border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] px-4 py-2 rounded-full font-sans text-xs font-semibold text-[#34252A] shadow-xs transition-all"
                 >
                   <span className="font-bold">{m.name}</span>
                   {m.role === 'curator' && (
-                    <span className="bg-[var(--onchain)]/20 text-[var(--onchain)] text-[9px] px-1.5 py-0.2 rounded font-bold uppercase">
+                    <span className="bg-[#6A1F35] text-white text-[9px] px-2 py-0.5 rounded-full font-bold uppercase">
                       Curator
                     </span>
                   )}
@@ -876,11 +884,11 @@ export function ProfilePage() {
 
       {/* ─── Tab Content 5: Attestations & Ledger ─────────────────────── */}
       {activeTab === 'attestations' && (
-        <div className="border border-[var(--ink)] bg-[var(--paper-2)] p-6 shadow-[var(--shadow-hard)] space-y-4">
-          <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+        <div className="border border-[#E0D4C5]/80 bg-white rounded-2xl p-6 neu-card space-y-4">
+          <div className="flex items-center justify-between border-b border-[#E0D4C5]/60 pb-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-[var(--onchain)]" />
-              <h2 className="font-serif text-xl font-bold text-[var(--ink)]">
+              <ShieldCheck className="h-5 w-5 text-[#6A1F35]" />
+              <h2 className="font-serif text-xl font-bold text-[#34252A]">
                 Verified Onchain Contributions ({contributions.length})
               </h2>
             </div>
@@ -888,7 +896,7 @@ export function ProfilePage() {
             {profile.wallet_address && (
               <Link
                 to={`/verify/${profile.wallet_address}`}
-                className="font-mono text-xs text-[var(--clay)] hover:underline flex items-center gap-1 font-bold"
+                className="font-sans text-xs text-[#6A1F35] hover:underline flex items-center gap-1 font-bold"
               >
                 <span>Onchain Ledger Verification</span>
                 <ExternalLink className="h-3 w-3" />
@@ -897,7 +905,7 @@ export function ProfilePage() {
           </div>
 
           {contributions.length === 0 ? (
-            <div className="border border-dashed border-[var(--line)] p-8 text-center text-xs text-[var(--ink-2)] font-mono">
+            <div className="border border-dashed border-[#E0D4C5] rounded-xl p-8 text-center text-xs text-[#75666B] font-sans">
               No contributions submitted or verified yet. Submit citations to community collections to earn verifiable onchain stamps.
             </div>
           ) : (
@@ -905,14 +913,14 @@ export function ProfilePage() {
               {contributions.map((c) => (
                 <div
                   key={c.id}
-                  className="border border-[var(--line)] bg-[var(--paper)] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-[1px_1px_0_var(--line)]"
+                  className="border border-[#E0D4C5]/70 bg-[#FAF6EF] rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs"
                 >
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 font-mono text-xs">
-                      <span className="font-bold text-[var(--clay)]">
+                    <div className="flex items-center gap-2 font-sans text-xs">
+                      <span className="font-bold text-[#6A1F35]">
                         Collective: {c.communities?.name || 'Global'}
                       </span>
-                      <span className="text-[10px] text-[var(--ink-2)]">
+                      <span className="text-[11px] text-[#75666B]">
                         · {new Date(c.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -922,7 +930,7 @@ export function ProfilePage() {
                         href={c.collection_items.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs font-mono text-[var(--clay)] hover:underline flex items-center gap-1 truncate max-w-lg"
+                        className="text-xs font-sans text-[#6A1F35] hover:underline flex items-center gap-1 truncate max-w-lg"
                       >
                         <span>{c.collection_items.url}</span>
                         <ExternalLink className="h-3 w-3" />
@@ -931,7 +939,7 @@ export function ProfilePage() {
                   </div>
 
                   <span
-                    className={`font-mono text-[10px] uppercase px-2 py-0.5 rounded font-bold self-start md:self-center ${
+                    className={`font-sans text-[10px] uppercase px-2.5 py-0.5 rounded-full font-bold self-start md:self-center ${
                       c.status === 'attested'
                         ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                         : 'bg-amber-100 text-amber-800 border border-amber-300'

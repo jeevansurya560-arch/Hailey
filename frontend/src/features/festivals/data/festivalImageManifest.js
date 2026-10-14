@@ -165,6 +165,117 @@ export const FESTIVAL_IMAGE_MANIFEST = {
     altText: 'Traditional courtyard entrance adorned with glowing red silk lanterns, red calligraphy spring couplets, and blooming plum blossoms for Lunar New Year.'
   },
 
+  'lantern-festival-yuanxiao': {
+    festivalId: 'lantern-festival-yuanxiao',
+    assetPath: '/festivals/lantern_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork celebrating Yuanxiao Lantern Festival. Illuminated traditional streets and floating sky lanterns.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Vibrant Chinese Lantern Festival celebration with red and gold silk lanterns, floating sky lanterns illuminating ancient architecture.'
+  },
+  'f-lantern-festival': {
+    festivalId: 'f-lantern-festival',
+    assetPath: '/festivals/lantern_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork celebrating Yuanxiao Lantern Festival. Illuminated traditional streets and floating sky lanterns.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Vibrant Chinese Lantern Festival celebration with red and gold silk lanterns, floating sky lanterns illuminating ancient architecture.'
+  },
+  'lantern_festival': {
+    festivalId: 'lantern_festival',
+    assetPath: '/festivals/lantern_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork celebrating Yuanxiao Lantern Festival. Illuminated traditional streets and floating sky lanterns.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Vibrant Chinese Lantern Festival celebration with red and gold silk lanterns, floating sky lanterns illuminating ancient architecture.'
+  },
+
+  'qingming-festival': {
+    festivalId: 'qingming-festival',
+    assetPath: '/festivals/qingming_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork of Qingming Festival spring landscape with weeping willows, stone bridge, and tea terraces.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Serene Qingming Festival spring landscape in China with misty terraced tea hills, weeping willow branches, and stone bridge.'
+  },
+  'f-qingming': {
+    festivalId: 'f-qingming',
+    assetPath: '/festivals/qingming_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork of Qingming Festival spring landscape with weeping willows, stone bridge, and tea terraces.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Serene Qingming Festival spring landscape in China with misty terraced tea hills, weeping willow branches, and stone bridge.'
+  },
+  'qingming': {
+    festivalId: 'qingming',
+    assetPath: '/festivals/qingming_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork of Qingming Festival spring landscape with weeping willows, stone bridge, and tea terraces.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Serene Qingming Festival spring landscape in China with misty terraced tea hills, weeping willow branches, and stone bridge.'
+  },
+
+  'dragon-boat-festival-duanwu': {
+    festivalId: 'dragon-boat-festival-duanwu',
+    assetPath: '/festivals/dragon_boat_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork of Dragon Boat Festival Duanwu race with ornate dragon heads and synchronized rowers.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Traditional Chinese Dragon Boat Festival race with ornate carved dragon head prow and rowers paddling across water.'
+  },
+  'f-dragon-boat': {
+    festivalId: 'f-dragon-boat',
+    assetPath: '/festivals/dragon_boat_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork of Dragon Boat Festival Duanwu race with ornate dragon heads and synchronized rowers.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Traditional Chinese Dragon Boat Festival race with ornate carved dragon head prow and rowers paddling across water.'
+  },
+  'dragon_boat': {
+    festivalId: 'dragon_boat',
+    assetPath: '/festivals/dragon_boat_festival.jpg',
+    sourcePageUrl: '',
+    creator: 'Google DeepMind Imagen 3 (via Antigravity visual synthesis)',
+    licenseName: 'Hailey Internal Reference Artwork / Editorial Prototype',
+    licenseUrl: 'https://hailey.app/legal/terms',
+    attribution: 'Synthesized editorial artwork of Dragon Boat Festival Duanwu race with ornate dragon heads and synchronized rowers.',
+    imageType: 'ai_generated',
+    verified: false,
+    altText: 'Traditional Chinese Dragon Boat Festival race with ornate carved dragon head prow and rowers paddling across water.'
+  },
+
   'eid-al-fitr': {
     festivalId: 'eid-al-fitr',
     assetPath: '/festivals/eid_al_fitr.jpg',

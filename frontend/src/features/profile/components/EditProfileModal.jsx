@@ -217,17 +217,17 @@ export function EditProfileModal({ profile, isOpen, onClose, onUpdated }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto border border-[var(--ink)] bg-[var(--paper)] p-6 shadow-[var(--shadow-hard)] space-y-5">
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl border border-[#E0D4C5] bg-white p-6 neu-card space-y-5">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--line)] pb-3">
+        <div className="flex items-center justify-between border-b border-[#E0D4C5]/60 pb-3">
           <div className="flex items-center gap-2">
-            <User className="h-4 w-4 text-[var(--clay)]" />
-            <h3 className="font-serif text-lg font-bold text-[var(--ink)]">Edit Profile</h3>
+            <User className="h-4 w-4 text-[#6A1F35]" />
+            <h3 className="font-serif text-lg font-bold text-[#34252A]">Edit Profile</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[var(--ink-2)] hover:text-[var(--ink)] p-1"
+            className="text-[#75666B] hover:text-[#34252A] p-1 rounded-full hover:bg-[#FAF6EF] transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
@@ -506,18 +506,18 @@ export function EditProfileModal({ profile, isOpen, onClose, onUpdated }) {
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--line)]">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#E0D4C5]/60">
             <button
               type="button"
               onClick={onClose}
-              className="border border-[var(--line)] bg-[var(--paper-2)] px-4 py-2 font-mono text-xs uppercase tracking-wider text-[var(--ink)] hover:bg-[var(--line)] transition-colors"
+              className="border border-[#E0D4C5] bg-[#FAF6EF] hover:bg-[#F0E7DA] px-5 py-2 rounded-full font-sans text-xs font-semibold text-[#34252A] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSaving || isUploading || isHandleBlocked}
-              className="border border-[var(--ink)] bg-[var(--clay)] px-5 py-2 font-mono text-xs uppercase tracking-wider text-[var(--paper)] font-bold flex items-center gap-1.5 shadow-[1.5px_1.5px_0_var(--ink)] hover:opacity-90 disabled:opacity-50 transition-opacity"
+              className="bg-[#6A1F35] hover:bg-[#511528] px-5 py-2 rounded-full font-sans text-xs font-bold text-white flex items-center gap-1.5 shadow-xs transition-colors disabled:opacity-50"
             >
               {isSaving ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />

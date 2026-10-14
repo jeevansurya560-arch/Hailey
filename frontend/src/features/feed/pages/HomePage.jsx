@@ -1,10 +1,8 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
-  Sparkles,
   Users,
-  Loader2,
   ArrowRight,
   Calendar,
   Globe,
@@ -17,19 +15,12 @@ import {
   Share2,
   Bookmark,
   MoreVertical,
-  PlusCircle,
 } from 'lucide-react'
-import {
-  fetchUserInterestsCount,
-  fetchFeedStream,
-} from '@/features/feed/services/feedService'
 import { fetchAllFestivals } from '@/features/festivals/services/festivalService'
+import { getFestivalImage } from '@/features/festivals/data/festivalImageManifest'
 import { useAuth } from '@/features/auth/hooks/useAuth'
-import { PostComposer } from '@/features/posts/components/PostComposer'
-import { FeedCard } from '@/features/feed/components/FeedCard'
 import BlurText from '@/components/BlurText'
 
-const PAGE_SIZE = 15
 const HERO_PHOTO_DEFAULT = "https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?q=80&w=1600&auto=format&fit=crop"
 const HERO_PHOTO_LOCAL = "/images/hero-cultural-landscape.jpg"
 
@@ -86,33 +77,8 @@ function BotanicalBranchWatermark({ className = "text-[#B08A50]/25" }) {
   )
 }
 
-const HOME_FEED_CACHE_KEY = 'hailey_home_feed_cache_v2'
-
-function getLocalHomeFeedCache() {
-  try {
-    const raw = localStorage.getItem(HOME_FEED_CACHE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    if (Date.now() - parsed.timestamp < 1000 * 60 * 120 && Array.isArray(parsed.data?.items) && parsed.data.items.length > 0) {
-      return parsed.data
-    }
-  } catch {}
-  return null
-}
-
-function saveLocalHomeFeedCache(data) {
-  try {
-    if (data?.items?.length > 0) {
-      localStorage.setItem(HOME_FEED_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }))
-    }
-  } catch {}
-}
-
 export function HomePage() {
   const { user } = useAuth()
-  const queryClient = useQueryClient()
-  const [page, setPage] = useState(0)
-  const [showComposer, setShowComposer] = useState(false)
   const [likedStories, setLikedStories] = useState({})
   const [savedStories, setSavedStories] = useState({})
   const [heroPhotoSrc, setHeroPhotoSrc] = useState(HERO_PHOTO_LOCAL)
@@ -127,38 +93,7 @@ export function HomePage() {
     }
   }
 
-  // 1. Fetch user's interest weights count via feedService
-  const { data: userInterestsCount = 0 } = useQuery({
-    queryKey: ['user_interests_count', user?.id],
-    queryFn: () => fetchUserInterestsCount(user?.id),
-    enabled: !!user,
-    staleTime: 1000 * 60 * 5,
-  })
-
-  const cachedHomeFeed = page === 0 ? getLocalHomeFeedCache() : null
-
-  // 2. Fetch personalized or fallback feed stream via feedService with instant local cache
-  const { data: feedData, isLoading: isFeedLoading } = useQuery({
-    queryKey: ['feed', user?.id, page, userInterestsCount],
-    queryFn: async () => {
-      const res = await fetchFeedStream({
-        user,
-        userInterestsCount,
-        page,
-        pageSize: PAGE_SIZE,
-      })
-      if (page === 0 && res?.items?.length > 0) {
-        saveLocalHomeFeedCache(res)
-      }
-      return res
-    },
-    initialData: cachedHomeFeed || undefined,
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 30,
-    refetchOnWindowFocus: false,
-  })
-
-  // 3. Fetch real verified festivals from archive
+  // Fetch real verified festivals from archive
   const { data: allFestivals = [] } = useQuery({
     queryKey: ['festivals_archive'],
     queryFn: fetchAllFestivals,
@@ -168,39 +103,39 @@ export function HomePage() {
   const upcomingFestivals = useMemo(() => {
     const fallbackList = [
       {
-        id: 'f-diwali',
-        month: 'NOV',
-        day: '08',
-        name: 'Diwali (Deepavali)',
-        origin: 'Ancient Indian Subcontinent',
-        image: 'https://images.unsplash.com/photo-1605629921711-2f6b00c6bbf4?q=80&w=300&auto=format&fit=crop',
+        id: 'f-spring-festival',
+        month: 'FEB',
+        day: '17',
+        name: 'Chinese New Year (Spring Festival)',
+        origin: 'China — Shang Dynasty (circa 1600–1046 BCE)',
+        image: '/festivals/spring_festival.jpg',
         to: '/festivals',
       },
       {
-        id: 'f-eid-fitr',
+        id: 'f-lantern-festival',
         month: 'MAR',
-        day: '20',
-        name: 'Eid al-Fitr',
-        origin: 'Lunar Islamic Calendar',
-        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=300&auto=format&fit=crop',
+        day: '03',
+        name: 'Lantern Festival',
+        origin: 'China — Han Dynasty (206 BCE – 220 CE)',
+        image: '/festivals/lantern_festival.jpg',
         to: '/festivals',
       },
       {
-        id: 'f-nowruz',
-        month: 'MAR',
-        day: '20',
-        name: 'Nowruz (Persian New Year)',
-        origin: 'Persian & Central Asian Traditions',
-        image: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=300&auto=format&fit=crop',
+        id: 'f-qingming',
+        month: 'APR',
+        day: '05',
+        name: 'Qingming Festival',
+        origin: 'China — Tang Dynasty (618–907 CE)',
+        image: '/festivals/qingming_festival.jpg',
         to: '/festivals',
       },
       {
-        id: 'f-muertos',
-        month: 'NOV',
-        day: '01',
-        name: 'Día de los Muertos',
-        origin: 'Mexican Traditions',
-        image: 'https://images.unsplash.com/photo-1572945759243-7f254e2d316e?q=80&w=300&auto=format&fit=crop',
+        id: 'f-dragon-boat',
+        month: 'JUN',
+        day: '19',
+        name: 'Dragon Boat Festival',
+        origin: 'China — Warring States Period (475–221 BCE)',
+        image: '/festivals/dragon_boat_festival.jpg',
         to: '/festivals',
       },
     ]
@@ -210,17 +145,24 @@ export function HomePage() {
     }
 
     const festivalImages = {
-      'diwali-deepavali': 'https://images.unsplash.com/photo-1605629921711-2f6b00c6bbf4?q=80&w=300&auto=format&fit=crop',
-      'eid-al-fitr': 'https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=300&auto=format&fit=crop',
+      'chinese-new-year-spring-festival': '/festivals/spring_festival.jpg',
+      'lantern-festival-yuanxiao': '/festivals/lantern_festival.jpg',
+      'qingming-festival': '/festivals/qingming_festival.jpg',
+      'dragon-boat-festival-duanwu': '/festivals/dragon_boat_festival.jpg',
+      'diwali-deepavali': '/festivals/diwali.jpg',
+      'eid-al-fitr': '/festivals/eid_al_fitr.jpg',
       'dia-de-los-muertos': 'https://images.unsplash.com/photo-1572945759243-7f254e2d316e?q=80&w=300&auto=format&fit=crop',
       'nowruz': 'https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=300&auto=format&fit=crop',
       'hanami': 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?q=80&w=300&auto=format&fit=crop',
+      'sukkot': '/festivals/sukkot.jpg',
+      'navratri': '/festivals/navratri.jpg',
+      'double-ninth-festival': '/festivals/double_ninth.jpg',
     }
 
     return allFestivals.slice(0, 4).map((f) => {
       const occ = f.occurrences?.find((o) => o.year === 2026) || f.occurrences?.[0]
-      let monthStr = 'NOV'
-      let dayStr = '08'
+      let monthStr = 'FEB'
+      let dayStr = '17'
       if (occ?.startDate) {
         const d = new Date(occ.startDate)
         monthStr = d.toLocaleString('en-US', { month: 'short' }).toUpperCase()
@@ -232,15 +174,11 @@ export function HomePage() {
         day: dayStr,
         name: f.name,
         origin: f.culturalOrigin || f.traditionType,
-        image: festivalImages[f.slug] || f.image || fallbackList[0].image,
+        image: festivalImages[f.slug] || getFestivalImage(f)?.assetPath || f.image || fallbackList[0].image,
         to: '/festivals',
       }
     })
   }, [allFestivals])
-
-  const posts = feedData?.items || []
-  const _hasPersonalization = feedData?.hasPersonalization || false
-  const hasMore = feedData?.hasMore || false
 
   // Category shortcuts configuration matching reference
   const categories = [
@@ -598,74 +536,6 @@ export function HomePage() {
                 )
               })}
             </div>
-          </section>
-
-          {/* Integrated Community Dispatch Stream & Post Composer */}
-          <section className="space-y-4 pt-4 border-t border-[#E0D4C5]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-[#6A1F35]" />
-                <h3 className="font-serif text-lg font-bold text-[#34252A]">
-                  Community Dispatches & Archival Notes
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowComposer(!showComposer)}
-                className="flex items-center gap-1.5 text-xs font-medium text-[#6A1F35] hover:text-[#511528] bg-[#F0E7DA] hover:bg-[#E8DDD0] px-3 py-1.5 rounded-full transition-colors"
-              >
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span>{showComposer ? 'Close Composer' : 'Share Dispatch'}</span>
-              </button>
-            </div>
-
-            {showComposer && (
-              <div className="bg-white rounded-2xl p-4 border border-[#E0D4C5] shadow-xs">
-                <PostComposer
-                  onPostCreated={() => {
-                    queryClient.invalidateQueries({ queryKey: ['feed'] })
-                    setShowComposer(false)
-                  }}
-                />
-              </div>
-            )}
-
-            {isFeedLoading && (
-              <div className="flex flex-col items-center justify-center py-8 space-y-2">
-                <Loader2 className="h-5 w-5 animate-spin text-[#6A1F35]" />
-                <p className="text-xs text-[#75666B]">Curating cultural archive...</p>
-              </div>
-            )}
-
-            {posts.length > 0 && (
-              <div className="space-y-4 pt-2">
-                {posts.map((post) => (
-                  <FeedCard
-                    key={post.id}
-                    post={post}
-                    onDelete={() => {
-                      queryClient.invalidateQueries({ queryKey: ['feed'] })
-                    }}
-                    onHide={() => {
-                      queryClient.invalidateQueries({ queryKey: ['feed'] })
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-
-            {hasMore && (
-              <div className="flex justify-center pt-2">
-                <button
-                  type="button"
-                  onClick={() => setPage((p) => p + 1)}
-                  className="flex items-center gap-2 border border-[#6A1F35] text-[#6A1F35] hover:bg-[#6A1F35] hover:text-white px-5 py-2 rounded-full text-xs font-medium transition-colors"
-                >
-                  <span>Load More Dispatches</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            )}
           </section>
         </div>
 
