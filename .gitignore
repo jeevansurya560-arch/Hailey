@@ -33,3 +33,5 @@ supabase/.temp/
 # Large Datasets
 Hailey_1M_Culture_Master_Dataset/
 *.parquet
+.vercel
+.env*

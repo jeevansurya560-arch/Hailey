@@ -1,5 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import dotenv from 'dotenv'
+dotenv.config({ path: '.env.local' })
+dotenv.config({ path: '.env' })
 dotenv.config({ path: 'frontend/.env' })
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://ycftnowviqyapxycirwz.supabase.co'

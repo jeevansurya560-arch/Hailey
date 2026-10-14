@@ -192,21 +192,40 @@ alter table public.moderation_reports   enable row level security;
 alter table public.audit_logs           enable row level security;
 
 -- Public Read for Cultural Archive
+drop policy if exists "religions_read_all" on public.religions;
 create policy "religions_read_all" on public.religions for select using (true);
+
+drop policy if exists "traditions_read_all" on public.traditions;
 create policy "traditions_read_all" on public.traditions for select using (true);
+
+drop policy if exists "cultural_entities_read_all" on public.cultural_entities;
 create policy "cultural_entities_read_all" on public.cultural_entities for select using (true);
+
+drop policy if exists "festivals_read_all" on public.festivals;
 create policy "festivals_read_all" on public.festivals for select using (true);
+
+drop policy if exists "festival_occurrences_read_all" on public.festival_occurrences;
 create policy "festival_occurrences_read_all" on public.festival_occurrences for select using (true);
+
+drop policy if exists "cultural_media_read_all" on public.cultural_media;
 create policy "cultural_media_read_all" on public.cultural_media for select using (true);
+
+drop policy if exists "sources_read_all" on public.sources;
 create policy "sources_read_all" on public.sources for select using (true);
+
+drop policy if exists "citations_read_all" on public.citations;
 create policy "citations_read_all" on public.citations for select using (true);
+
+drop policy if exists "content_versions_read_all" on public.content_versions;
 create policy "content_versions_read_all" on public.content_versions for select using (true);
 
 -- Authenticated Users can submit moderation reports
+drop policy if exists "moderation_reports_insert_auth" on public.moderation_reports;
 create policy "moderation_reports_insert_auth" on public.moderation_reports
   for insert with check (auth.uid() = reporter_user_id or reporter_user_id is null);
 
 -- Reporters can view their own reports
+drop policy if exists "moderation_reports_select_own" on public.moderation_reports;
 create policy "moderation_reports_select_own" on public.moderation_reports
   for select using (auth.uid() = reporter_user_id);
 

@@ -61,12 +61,14 @@ create index if not exists idx_culture_master_fts
 alter table public.culture_master_dataset enable row level security;
 
 -- Public can read all verified and research nodes
+drop policy if exists "culture_master_public_read" on public.culture_master_dataset;
 create policy "culture_master_public_read" 
   on public.culture_master_dataset 
   for select 
   using (true);
 
 -- Authenticated editorial curators can insert nodes
+drop policy if exists "culture_master_curator_insert" on public.culture_master_dataset;
 create policy "culture_master_curator_insert" 
   on public.culture_master_dataset 
   for insert 
@@ -79,6 +81,7 @@ create policy "culture_master_curator_insert"
   );
 
 -- Authenticated editorial curators can update nodes
+drop policy if exists "culture_master_curator_update" on public.culture_master_dataset;
 create policy "culture_master_curator_update" 
   on public.culture_master_dataset 
   for update 

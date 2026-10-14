@@ -1,0 +1,16 @@
+/node_modules
+/.git
+/.vercel
+/dist
+/dist-ssr
+/frontend
+/contracts
+/docs
+/tests
+/Hailey_1M_Culture_Master_Dataset
+*.parquet
+*.log
+.vscode
+.idea
+.env*
+/scripts/seed

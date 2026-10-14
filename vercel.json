@@ -1,5 +1,8 @@
-﻿{
+{
+  "framework": "vite",
   "rewrites": [
+    { "source": "/api/:path*", "destination": "https://hailey-backend-production-e13a.up.railway.app/api/:path*" },
+    { "source": "/health", "destination": "https://hailey-backend-production-e13a.up.railway.app/health" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

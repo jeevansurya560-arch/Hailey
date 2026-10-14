@@ -4,8 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
     "dev": "vite",
-    "build": "vite build",
+    "build": "node -e \"const fs=require('fs'); if(fs.existsSync('frontend/index.html')){require('child_process').execSync('vite build',{stdio:'inherit'})}else{console.log('Backend deployment: frontend build skipped')}\"",
     "lint": "oxlint",
     "seed": "node scripts/seed/seed.js",
     "check-weights": "node scripts/verification/check-weights.js",

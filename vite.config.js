@@ -74,6 +74,7 @@ function apiDevPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   root: path.resolve(__dirname, 'frontend'),
+  envDir: __dirname,
   publicDir: path.resolve(__dirname, 'frontend', 'public'),
   build: {
     outDir: path.resolve(__dirname, 'dist'),

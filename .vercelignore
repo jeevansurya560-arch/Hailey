@@ -1,0 +1,23 @@
+# Root-only Large Datasets & Archives
+/Hailey_1M_Culture_Master_Dataset
+*.parquet
+
+# Dependencies & Build artifacts
+node_modules
+/dist
+/dist-ssr
+/.temp
+
+# Root-only Development & Local Tooling (use leading slash so src/lib/supabase and shared/contracts are NOT ignored)
+/tests
+/contracts
+/supabase
+/docs
+/scripts
+.vscode
+.idea
+
+# Logs & Environment
+*.log
+.env.local
+.env.*.local
