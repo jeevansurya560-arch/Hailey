@@ -4,11 +4,11 @@ dotenv.config({ path: '.env.local' })
 dotenv.config({ path: '.env' })
 dotenv.config({ path: 'frontend/.env' })
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || 'https://ycftnowviqyapxycirwz.supabase.co'
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY
+const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
 
-if (!supabaseKey) {
-  console.error('Missing VITE_SUPABASE_ANON_KEY')
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY in .env.local')
   process.exit(1)
 }
 

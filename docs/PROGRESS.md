@@ -22,7 +22,7 @@
   - `src/features/auth/ProtectedRoute.tsx`: Route protection wrapper.
   - `src/features/auth/AuthPage.tsx`: Sign in and sign up form with validation and error display.
 - **Database Migrations Applied**:
-  - `0001_schema`: Applied to Supabase project `Hailey` (`ycftnowviqyapxycirwz`). 17 tables created with check constraints, foreign keys, indexes, and `handle_new_user()` security definer trigger.
+  - `0001_schema`: Applied to Supabase project `Hailey`. 17 tables created with check constraints, foreign keys, indexes, and `handle_new_user()` security definer trigger.
   - `0002_rls`: Applied to Supabase project `Hailey`. RLS enabled on all 17 tables with policies matching System Design §10.1.
 
 ---

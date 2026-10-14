@@ -1,4 +1,4 @@
-# Logs
+# ── Logs & Debugging ───────────────────────────────────────────
 logs
 *.log
 npm-debug.log*
@@ -7,31 +7,61 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Dependencies & Build
-node_modules
-dist
-dist-ssr
+# ── Dependencies & Build Outputs ──────────────────────────────
+node_modules/
+dist/
+dist-ssr/
+.rollup.cache/
 
-# Environment and Secrets (CRITICAL)
+# ── Environment & Secrets (CRITICAL) ──────────────────────────
 .env
-.env.local
-.env.*.local
+.env*
+!.env.example
 *.local
 
-# Editor directories and files
+# ── Certificates & Private Keys ───────────────────────────────
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*id_rsa*
+*id_ed25519*
+*credentials*.json
+*service-account*.json
+*firebase*.json
+
+# ── Foundry / Smart Contract Artifacts ────────────────────────
+contracts/broadcast/
+contracts/out/
+contracts/cache/
+
+# ── Local Databases & Large Datasets ──────────────────────────
+Hailey_1M_Culture_Master_Dataset/
+*.parquet
+*.sqlite
+*.sqlite3
+*.db
+
+# ── Test Coverage & Temporary Cache ───────────────────────────
+coverage/
+.nyc_output/
+supabase/.temp/
+.vercel
+.vercel/
+
+# ── OS & IDE Files ─────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+ehthumbs.db
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-# Supabase CLI temp
-supabase/.temp/
-
-# Large Datasets
-Hailey_1M_Culture_Master_Dataset/
-*.parquet
-.vercel
-.env*
+*.swp
+*.swo
+*~
+*.bak

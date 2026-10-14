@@ -4,12 +4,12 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl =
   process.env.SUPABASE_URL ||
   process.env.VITE_SUPABASE_URL ||
-  'https://ycftnowviqyapxycirwz.supabase.co'
+  'https://placeholder-project.supabase.co'
 
 const anonKey =
   process.env.VITE_SUPABASE_ANON_KEY ||
   process.env.SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InljZnRub3d2aXF5YXB4eWNpcnd6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwOTAyNDcsImV4cCI6MjEwNjY2NjI0N30.QOoc9QZh5Mfpq4P_v8dcghEH1TCunh00lKx--Mo-cu0'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder'
 
 describe('Adversarial Live RLS Security Defense (Vitest Security Suite)', () => {
   const anonClient = createClient(supabaseUrl, anonKey)

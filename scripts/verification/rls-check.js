@@ -26,8 +26,12 @@ loadEnv('.env')
 
 const supabaseUrl =
   process.env.SUPABASE_URL ||
-  process.env.VITE_SUPABASE_URL ||
-  'https://ycftnowviqyapxycirwz.supabase.co'
+  process.env.VITE_SUPABASE_URL
+
+if (!supabaseUrl) {
+  console.error('❌ Error: SUPABASE_URL or VITE_SUPABASE_URL is required in .env.local')
+  process.exit(1)
+}
 
 const anonKey =
   process.env.VITE_SUPABASE_ANON_KEY ||
